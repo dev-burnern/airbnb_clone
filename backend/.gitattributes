@@ -1,0 +1,25 @@
+# Normalize line endings — store files in the repo with LF and let clients convert on checkout
+* text=auto
+
+# Force LF for typical source files used in this project
+*.js     text eol=lf
+*.jsx    text eol=lf
+*.ts     text eol=lf
+*.tsx    text eol=lf
+*.json   text eol=lf
+*.css    text eol=lf
+*.html   text eol=lf
+*.md     text eol=lf
+
+# Binary files should be left alone
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.webp   binary
+
+# Lockfiles: keep as-is (some teams prefer LF, but leave default auto)
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
