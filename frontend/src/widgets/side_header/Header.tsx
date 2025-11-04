@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import HeaderSearchBar from "./HeaderSearchBar";
-import HeaderProfile from "./HeaderProfile";
+import HeaderProfile from "../side_header/HeaderProfile";
 
 
 export default function Header() {
@@ -14,11 +13,6 @@ export default function Header() {
         {/* 좌측 로고 */}
         <div className="flex items-center gap-2">
           <Image src="/images/airbnb_logo.png" alt="Airbnb Logo" width={100} height={32} />
-        </div>
-
-        {/* 중앙 검색 */}
-        <div className="flex-1 flex justify-center">
-          <HeaderSearchBar />
         </div>
 
         {/* 우측 프로필 */}
