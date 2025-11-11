@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import HeaderSearchBar from "./HeaderSearchBar";
-import HeaderProfile from "../main_header/HeaderProfile";
+import HeaderProfile from "./HeaderProfile";
 
 
 export default function Header() {

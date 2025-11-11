@@ -9,7 +9,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body className="bg-white text-gray-800">
         <Header />
-        <main className="min-h-screen">{children}</main>  
+        <main className="min-h-screen">{children}</main>
         <Footer />
       </body>
     </html>
