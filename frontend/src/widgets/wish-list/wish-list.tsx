@@ -92,8 +92,9 @@ export default function Wishlist() {
 
             <h2 className="text-lg font-semibold mb-2">이 위시리스트를 삭제하시겠어요?</h2>
             <p className="text-gray-500 mb-6">
-              '{deleteTarget.title}' 위시리스트가 영구적으로 삭제됩니다.
+            "{deleteTarget.title}" 위시리스트가 영구적으로 삭제됩니다.
             </p>
+
 
             <div className="flex justify-end gap-3">
               <button
