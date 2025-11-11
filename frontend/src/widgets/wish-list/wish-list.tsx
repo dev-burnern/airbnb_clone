@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link"; 
+import Link from "next/link";
 import { useState } from "react";
 
 type WishlistGroup = {
@@ -34,7 +34,7 @@ const wishlistGroups: WishlistGroup[] = [
     id: 4,
     title: "Yongsan-gu 2024",
     subtitle: "저장된 항목 1개",
-    images: ["/images/sample7.jpg"],
+    images: ["/images/sample7.jpg"], 
   },
 ];
 
@@ -60,19 +60,31 @@ export default function Wishlist() {
                   ×
                 </button>
 
-                <div className="rounded-3xl overflow-hidden w-full h-64 bg-gray-200 grid grid-cols-2 grid-rows-2">
-                  {group.images.slice(0, 4).map((img, index) => (
-                    <div key={index} className="relative">
-                      <Image src={img} alt={group.title} fill className="object-cover" />
-                    </div>
-                  ))}
-                </div>
+                {/* 이미지 */}
+                {group.images.length >= 4 ? (
+                  <div className="rounded-3xl overflow-hidden w-full h-64 grid grid-cols-2 grid-rows-2 bg-gray-200">
+                    {group.images.slice(0, 4).map((img, index) => (
+                      <div key={index} className="relative w-full h-full">
+                        <Image src={img} alt={group.title} fill className="object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-3xl overflow-hidden w-full h-64 bg-gray-200 relative">
+                    <Image
+                      src={group.images[0]}
+                      alt={group.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
 
+                {/* 텍스트 */}
                 <div className="mt-3">
                   <p className="text-[17px] font-semibold">{group.title}</p>
                   <p className="text-sm text-gray-500">{group.subtitle}</p>
                 </div>
-
               </div>
             </Link>
           ))}
@@ -92,9 +104,8 @@ export default function Wishlist() {
 
             <h2 className="text-lg font-semibold mb-2">이 위시리스트를 삭제하시겠어요?</h2>
             <p className="text-gray-500 mb-6">
-            &quot;{deleteTarget.title}&quot; 위시리스트가 영구적으로 삭제됩니다.
+              &quot;{deleteTarget.title}&quot; 위시리스트가 영구적으로 삭제됩니다.
             </p>
-
 
             <div className="flex justify-end gap-3">
               <button
