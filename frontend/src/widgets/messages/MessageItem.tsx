@@ -1,7 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function MessageItem({ message }: any) {
+export interface MessageListItem {
+  id: number;
+  user: string;
+  preview: string;
+  date: string;
+  image: string;
+}
+
+interface Props {
+  message: MessageListItem;
+}
+
+export default function MessageItem({ message }: Props) {
   return (
     <Link href={`/messages/${message.id}`}>
       <div className="flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition">
