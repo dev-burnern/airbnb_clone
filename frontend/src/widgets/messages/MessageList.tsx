@@ -1,39 +1,36 @@
 "use client";
 
-import MessageItem from "./MessageItem";
-
-const messages = [
-  {
-    id: 1,
-    user: "지원",
-    preview: "번호로 메시지 주시면 유선 안내드리겠습니다.",
-    date: "2024년 6월 14일",
-    image: "/images/profile1.jpg",
-  },
-  {
-    id: 2,
-    user: "Anna, 호스트",
-    preview: "에어비앤비 업데이트: 알림 - 후기글 작성",
-    date: "2023년 1월 5일",
-    image: "/images/profile2.jpg",
-  },
-  {
-    id: 3,
-    user: "에어비앤비 고객지원 팀",
-    preview: "Anna님에게 메시지 보내기 환영합니다.",
-    date: "2023년 1월 4일",
-    image: "/images/profile3.jpg",
-  },
-];
+import Link from "next/link";
+import Image from "next/image";
+import { useMessagesStore } from "@/entities/message/model/useMessagesStore";
 
 export default function MessageList() {
-  return (
-    <aside className="w-[500px] border-r border-gray-200 h-screen overflow-y-auto p-4">
-      <h2 className="text-lg font-semibold mb-4">메시지</h2>
+  const list = useMessagesStore((state) => state.list);
 
-      <div className="space-y-3">
-        {messages.map((msg) => (
-          <MessageItem key={msg.id} message={msg} />
+  return (
+    <aside className="w-[420px] border-r border-gray-200 h-screen overflow-y-auto p-6">
+      <h2 className="text-2xl font-semibold mb-6">메시지</h2>
+
+      <div className="space-y-4">
+        {list.map((msg) => (
+          <Link href={`/messages/${msg.id}`} key={msg.id}>
+            <div className="flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition">
+              <Image
+                src={msg.image}
+                alt={msg.user}
+                width={50}
+                height={50}
+                className="rounded-full"
+              />
+              <div className="flex-1">
+                <p className="font-semibold">{msg.user}</p>
+                <p className="text-gray-500 text-sm truncate">{msg.preview}</p>
+              </div>
+              <span className="text-xs text-gray-400 whitespace-nowrap">
+                {msg.date}
+              </span>
+            </div>
+          </Link>
         ))}
       </div>
     </aside>
