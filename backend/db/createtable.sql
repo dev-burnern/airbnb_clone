@@ -280,5 +280,15 @@ create table reservation(
     room_id int not null,
     Foreign Key (room_id) REFERENCES rooms(room_id)
 );
+ALTER TABLE locations ADD lat DOUBLE;
+ALTER TABLE locations ADD lng DOUBLE;
+ALTER TABLE locations ADD neighbourhood VARCHAR(100);
+ALTER TABLE locations ADD neighbourhood_group VARCHAR(100);
 
-show tables;
+
+create table hosts(
+    host_id BIGINT PRIMARY key,
+    host_name VARCHAR(100),
+    identity_verified VARCHAR(20),
+    listing_count INT
+);
