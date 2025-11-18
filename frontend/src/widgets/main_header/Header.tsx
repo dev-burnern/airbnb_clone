@@ -71,6 +71,12 @@ export default function Header() {
               href="#"
               className="block px-4 py-2 hover:bg-gray-100 transition-colors"
             >
+              위시리스트
+            </a>
+            <a
+              href="#"
+              className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+            >
               예약내역
             </a>
             <a
