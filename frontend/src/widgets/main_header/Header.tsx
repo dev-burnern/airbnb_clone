@@ -84,6 +84,19 @@ export default function Header() {
               href="#"
               className="block px-4 py-2 hover:bg-gray-100 transition-colors"
             >
+              계정관리
+            </a>
+            <a
+              href="#"
+              className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+            >
+              언어 및 통화
+            </a>
+            <hr className="my-2 border-gray-200" />
+            <a
+              href="#"
+              className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+            >
               로그인 및 회원가입
             </a>
           </div>

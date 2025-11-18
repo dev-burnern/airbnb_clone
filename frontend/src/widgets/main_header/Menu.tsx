@@ -1,4 +1,7 @@
 import { FaBars } from 'react-icons/fa';
+import { FiGlobe } from "react-icons/fi";
+import { MdOutlineManageAccounts } from "react-icons/md";
+
 
 export default function Button() {
   return (
