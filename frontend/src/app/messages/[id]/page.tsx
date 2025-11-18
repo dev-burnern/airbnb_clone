@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useMessagesStore } from "@/entities/message/model/useMessagesStore";
+import type { Conversation, MessagesState } from "@/entities/message/model/useMessagesStore";
 import MessageList from "@/widgets/messages/MessageList";
 import MessageDetail from "@/widgets/messages/MessageDetail";
 import MessageSideInfo from "@/widgets/messages/MessageSideInfo";
@@ -9,11 +10,9 @@ import MessageSideInfo from "@/widgets/messages/MessageSideInfo";
 export default function MessagePage() {
   const { id } = useParams() as { id: string };
 
-  const conversations = useMessagesStore((state) => state.conversations);
+  const conversations = useMessagesStore((state: MessagesState) => state.conversations);
 
-  const conversation = conversations.find(
-    (conv) => conv.id === Number(id)
-  );
+  const conversation = conversations.find((conv: Conversation) => conv.id === Number(id));
 
   if (!conversation) {
     return (

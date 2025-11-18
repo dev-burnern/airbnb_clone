@@ -28,7 +28,7 @@ export interface MessagesState {
   addMessage: (conversationId: number, text: string) => void;
 }
 
-export const useMessagesStore = create<MessagesState>((set, get) => ({
+export const useMessagesStore = create<MessagesState>((set: any, get: any) => ({
   list: [
     {
       id: 1,
@@ -53,7 +53,7 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
 
   // 이미 존재하는 고객지원 대화가 있는지 확인
   const existing = state.conversations.find(
-    (conv) => conv.title === "에어비앤비 고객지원 팀"
+    (conv: Conversation) => conv.title === "에어비앤비 고객지원 팀"
   );
 
   if (existing) {
@@ -96,10 +96,10 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
 
 
   
-  addMessage: (conversationId, text) => {
+  addMessage: (conversationId: number, text: string) => {
     const state = get();
 
-    const updatedConversations = state.conversations.map((conv) => {
+    const updatedConversations = state.conversations.map((conv: Conversation) => {
       if (conv.id === conversationId) {
         return {
           ...conv,
@@ -108,7 +108,7 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
             {
               sender: "나",
               text,
-              avatar: "/images/profile_me.png", 
+              avatar: "/images/profile_me.png",
             },
           ],
         };

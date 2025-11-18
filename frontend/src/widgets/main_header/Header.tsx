@@ -4,10 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import HeaderSearchBar from "./HeaderSearchBar";
 import HeaderProfile from "./HeaderProfile";
+import EmailLogion from "../login_or_signup/EmailLogion";
+import PasswordLogin from "../login_or_signup/PasswordLogin";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [loginEmail, setLoginEmail] = useState("");
 
   return (
     <header className="bg-gray-50 border-b border-gray-200">
@@ -99,15 +104,46 @@ export default function Header() {
               언어 및 통화
             </a>
             <hr className="my-2 border-gray-200" />
-            <a
-              href="#"
-              className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+            <button
+              onClick={() => {
+                setEmailModalOpen(true);
+                setMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
             >
               로그인 및 회원가입
-            </a>
+            </button>
           </div>
         )}
       </div>
+
+      {/* 1단계: 이메일 입력 모달 */}
+      <EmailLogion
+        open={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        onSubmit={(email) => {
+          setLoginEmail(email);
+          setEmailModalOpen(false);
+          setPasswordModalOpen(true);
+        }}
+      />
+
+      {/* 2단계: 비밀번호 입력 모달 */}
+      <PasswordLogin
+        open={passwordModalOpen}
+        email={loginEmail}
+        onClose={() => setPasswordModalOpen(false)}
+        onBack={() => {
+          setPasswordModalOpen(false);
+          setEmailModalOpen(true);
+        }}
+        onSubmit={(password: string) => {
+          // 여기에서 실제 로그인/회원가입 API 연동
+          console.log("로그인 시도:", { email: loginEmail, password });
+          setPasswordModalOpen(false);
+          setIsLoggedIn(true);
+        }}
+      />
     </header>
   );
 }
