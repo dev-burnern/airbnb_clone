@@ -3,6 +3,7 @@ import "@/app/styles/globals.css";
 import Header from "@/widgets/main_header/Header";
 // import Header from "@/widgets/side_header/Header";
 import Footer from "@/widgets/footer/Footer";
+import ChatWidget from "@/chat/ChatWidget";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-white text-gray-800">
         <Header />
         <main className="min-h-screen">{children}</main>
+        <ChatWidget />
         <Footer />
       </body>
     </html>
