@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Listing } from '../listings/listing.entity';
 import { Booking } from '../bookings/booking.entity';
-// import { Review } from '../reviews/review.entity';
-// import { Wishlist } from '../wishlists/wishlist.entity';
-// import { SupportTicket } from '../support/ticket.entity';
+import { Review } from '../reviews/review.entity';
+import { Wishlist } from '../wishlists/wishlist.entity';
+import { SupportTicket } from '../support/ticket.entity';
 // import { ChatRoom } from '../chat/chat.entity';
 
 @Entity('users')
@@ -38,17 +38,17 @@ export class User {
     @OneToMany(() => Booking, booking => booking.guest)
     bookings: Booking[];
 
-    // @OneToMany(() => Review, review => review.author)
-    // reviews: Review[];
+    @OneToMany(() => Review, review => review.author)
+    reviews: Review[];
 
-    // @OneToMany(() => Wishlist, wishlist => wishlist.user)
-    // wishlists: Wishlist[];
+    @OneToMany(() => Wishlist, wishlist => wishlist.user)
+    wishlists: Wishlist[];
 
-    // @OneToMany(() => SupportTicket, ticket => ticket.user)
-    // tickets: SupportTicket[];
+    @OneToMany(() => SupportTicket, ticket => ticket.user)
+    tickets: SupportTicket[];
 
-    // @OneToMany(() => SupportTicket, ticket => ticket.assignedAgent)
-    // assignedTickets: SupportTicket[];
+    @OneToMany(() => SupportTicket, ticket => ticket.assignedAgent)
+    assignedTickets: SupportTicket[];
 
     // @OneToMany(() => ChatRoom, chatRoom => chatRoom.host)
     // chatRoomsAsHost: ChatRoom[];

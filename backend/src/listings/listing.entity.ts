@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { User } from '../users/user.entity';
 import { Booking } from '../bookings/booking.entity';
 import { Review } from '../reviews/review.entity';
-import { ChatRoom } from '../chat/chat.entity';
+// import { ChatRoom } from '../chat/chat.entity';
 // import { Booking } from '../bookings/booking.entity'; // Circular dependency, will uncomment later or handle now if file exists
 // import { Review } from '../reviews/review.entity';
 
@@ -69,6 +69,6 @@ export class Listing {
     @OneToMany(() => Review, review => review.listing)
     reviews: Review[];
 
-    @OneToMany(() => ChatRoom, chatRoom => chatRoom.listing)
-    chatRooms: ChatRoom[];
+    // @OneToMany(() => ChatRoom, chatRoom => chatRoom.listing)
+    // chatRooms: ChatRoom[];
 }
