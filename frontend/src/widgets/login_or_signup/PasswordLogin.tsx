@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import axios from "axios"; 
 import { useAuth, User } from "../../app/providers/AuthContext";
 
 type Props = {
@@ -8,10 +9,10 @@ type Props = {
   email: string;
   onClose?: () => void;
   onBack?: () => void;
-  onSubmit?: (password: string) => void; 
+  onSubmit?: () => void; 
 };
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:3001'; 
 
 export default function PasswordLogin({
   open,
@@ -20,11 +21,11 @@ export default function PasswordLogin({
   onBack,
   onSubmit, 
 }: Props) {
-  const { login } = useAuth(); 
+  const { login } = useAuth();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -46,38 +47,31 @@ export default function PasswordLogin({
       setError("비밀번호를 입력해주세요.");
       return;
     }
-    
+
     setError(null);
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+        email,
+        password,
       });
 
-      if (!response.ok) {
-        // 서버에서 반환된 에러 메시지를 사용자에게 표시
-        const errorData = await response.json();
-        throw new Error(errorData.message || "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요.");
-      }
+      const { access_token, user } = response.data;
 
-      const data = await response.json();
-      
-      const { access_token, user } = data;
-      login(access_token, user as User); 
+      login(access_token, user as User);
       
       onClose?.(); 
+      onSubmit?.();
       
     } catch (err: any) {
       console.error("Login API Error:", err);
-      if (err instanceof TypeError && err.message === 'Failed to fetch') {
-         setError("서버 연결에 실패했습니다. 백엔드 서버 상태를 확인해주세요.");
+      
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data?.message || "로그인에 실패했습니다. 비밀번호를 확인해주세요.";
+        setError(message);
       } else {
-        setError(err.message || "서버 오류가 발생했습니다.");
+        setError("서버 연결에 실패했거나 알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       setIsLoading(false);
@@ -140,7 +134,7 @@ export default function PasswordLogin({
 
           <button
             onClick={handleLogin}
-            disabled={isLoading} // 로딩 중 버튼 비활성화
+            disabled={isLoading} 
             className={`mt-6 w-full text-white py-2 rounded-md font-medium transition ${
               isLoading ? "bg-pink-400 cursor-not-allowed" : "bg-pink-600 hover:bg-pink-700"
             }`}

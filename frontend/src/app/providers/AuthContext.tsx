@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import axios from 'axios'; 
 
 // 백엔드 User Entity를 기반으로 타입 정의
 export interface User {
@@ -18,17 +19,15 @@ interface AuthContextType {
   isLoggedIn: boolean;
   login: (token: string, userData: User) => void;
   logout: () => void;
-  fetchUserProfile: (authToken: string) => Promise<User | null>; 
+  fetchUserProfile: (authToken: string) => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Local Storage 키
 const TOKEN_KEY = 'accessToken';
 const USER_KEY = 'userProfile';
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:3001'; 
 
-// 헬퍼 함수
 const saveAuthData = (token: string, user: User) => {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -47,28 +46,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserProfile = async (authToken: string): Promise<User | null> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/me`, {
+      const response = await axios.get(`${API_BASE_URL}/users/me`, {
         headers: {
           'Authorization': `Bearer ${authToken}`,
         },
       });
-      if (response.ok) {
-        const userData: User = await response.json();
-        setUser(userData);
-        return userData; 
-      } else {
-        throw new Error('Failed to fetch user profile');
-      }
+      
+      const userData: User = response.data;
+      setUser(userData);
+      
+      localStorage.setItem(USER_KEY, JSON.stringify(userData));
+      
+      return userData;
     } catch (error) {
-      console.error('Profile fetch failed:', error);
+      console.error('Profile fetch failed (Token might be expired):', error);
       clearAuthData();
       setToken(null);
       setUser(null);
-      return null; 
+      return null;
     }
   };
 
-  // 초기 로딩: Local Storage에서 인증 정보 로드 및 유효성 검사
   useEffect(() => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
     if (storedToken) {
@@ -95,7 +93,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isLoggedIn = !!user && !!token;
 
   if (isLoading) {
-    // 앱 로딩 중 스피너 등을 표시합니다.
     return <div className="flex justify-center items-center min-h-screen">Loading App...</div>;
   }
 

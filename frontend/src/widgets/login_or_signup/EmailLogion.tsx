@@ -1,16 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 type Props = {
   open: boolean;
   onClose?: () => void;
   onSubmit?: (email: string) => void;
+  onSignup?: (email: string) => void; 
 };
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:3001'; 
 
-export default function EmailLogion({ open, onClose, onSubmit }: Props) {
+export default function EmailLogion({ open, onClose, onSubmit, onSignup }: Props) { /
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -29,11 +31,10 @@ export default function EmailLogion({ open, onClose, onSubmit }: Props) {
   if (!open) return null;
 
   const validateEmail = (value: string) => {
-    // simple email regex
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!email) {
       setError("이메일을 입력해주세요.");
       return;
@@ -43,8 +44,19 @@ export default function EmailLogion({ open, onClose, onSubmit }: Props) {
       return;
     }
     setError(null);
-    // 이메일 유효성 검사 후 다음 모달로 넘깁니다.
-    onSubmit?.(email);
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/users/check-email`, { email });
+
+      if (response.data.exists) {
+        onSubmit?.(email);
+      } else {
+        onSignup?.(email);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("이메일 확인 중 오류가 발생했습니다.");
+    }
   };
 
   const handleGithub = () => {
