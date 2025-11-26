@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ListingsModule } from './listings/listings.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { PaymentsModule } from './payments/payments.module';
 import { typeOrmConfig } from './config/typeorm.config';
 
 @Module({
@@ -18,6 +19,7 @@ import { typeOrmConfig } from './config/typeorm.config';
     UsersModule,
     ListingsModule,
     BookingsModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],
