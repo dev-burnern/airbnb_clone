@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-// import { Listing } from '../listings/listing.entity';
+import { Listing } from '../listings/listing.entity';
 // import { Booking } from '../bookings/booking.entity';
 // import { Review } from '../reviews/review.entity';
 // import { Wishlist } from '../wishlists/wishlist.entity';
@@ -32,8 +32,8 @@ export class User {
     @Column({ type: 'enum', enum: ['local', 'google', 'naver'], default: 'local' })
     provider: string;
 
-    // @OneToMany(() => Listing, listing => listing.host)
-    // listings: Listing[];
+    @OneToMany(() => Listing, listing => listing.host)
+    listings: Listing[];
 
     // @OneToMany(() => Booking, booking => booking.guest)
     // bookings: Booking[];
