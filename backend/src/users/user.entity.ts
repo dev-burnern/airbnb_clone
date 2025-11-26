@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Listing } from '../listings/listing.entity';
-// import { Booking } from '../bookings/booking.entity';
+import { Booking } from '../bookings/booking.entity';
 // import { Review } from '../reviews/review.entity';
 // import { Wishlist } from '../wishlists/wishlist.entity';
 // import { SupportTicket } from '../support/ticket.entity';
@@ -35,8 +35,8 @@ export class User {
     @OneToMany(() => Listing, listing => listing.host)
     listings: Listing[];
 
-    // @OneToMany(() => Booking, booking => booking.guest)
-    // bookings: Booking[];
+    @OneToMany(() => Booking, booking => booking.guest)
+    bookings: Booking[];
 
     // @OneToMany(() => Review, review => review.author)
     // reviews: Review[];
