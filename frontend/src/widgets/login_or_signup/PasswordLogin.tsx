@@ -48,7 +48,7 @@ export default function PasswordLogin({
     setError(null);
 
     try {
-      const response = await axios.post('http://localhost:8080/auth/login', { email, password });
+      const response = await axios.post('http://localhost:3301/auth/login', { email, password });
       // Assuming response contains token or success status
       onSubmit?.(password); // Or pass token if needed
     } catch (err) {

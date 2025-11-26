@@ -14,7 +14,7 @@ export default function LoginForm() {
         setIsLoading(true);
         try {
             // TODO: Replace with actual API endpoint
-            const response = await axios.post('http://localhost:8080/auth/login', data);
+            const response = await axios.post('http://localhost:3301/auth/login', data);
             console.log('Login success:', response.data);
             // Handle successful login (e.g., save token, redirect)
             router.push('/');

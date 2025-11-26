@@ -46,7 +46,7 @@ export default function SignupModal({
         setIsLoading(true);
 
         try {
-            await axios.post('http://localhost:8080/auth/register', {
+            await axios.post('http://localhost:3301/auth/register', {
                 email,
                 name,
                 password

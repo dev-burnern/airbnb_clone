@@ -46,7 +46,7 @@ export default function EmailLogion({ open, onClose, onSubmit, onSignup }: Props
 
     try {
       // Check if email exists
-      const response = await axios.post('http://localhost:8080/users/check-email', { email });
+      const response = await axios.post('http://localhost:3301/users/check-email', { email });
       if (response.data.exists) {
         onSubmit?.(email);
       } else {
