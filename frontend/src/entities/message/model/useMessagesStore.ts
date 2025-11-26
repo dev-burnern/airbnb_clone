@@ -28,7 +28,8 @@ export interface MessagesState {
   addMessage: (conversationId: number, text: string) => void;
 }
 
-export const useMessagesStore = create<MessagesState>((set: any, get: any) => ({
+// @ts-expect-error: Zustand types inference issue
+export const useMessagesStore = create<MessagesState>((set, get) => ({
   list: [
     {
       id: 1,
@@ -49,53 +50,53 @@ export const useMessagesStore = create<MessagesState>((set: any, get: any) => ({
   conversations: [],
 
   addSupportMessage: () => {
-  const state = get();
+    const state = get();
 
-  // 이미 존재하는 고객지원 대화가 있는지 확인
-  const existing = state.conversations.find(
-    (conv: Conversation) => conv.title === "에어비앤비 고객지원 팀"
-  );
+    // 이미 존재하는 고객지원 대화가 있는지 확인
+    const existing = state.conversations.find(
+      (conv: Conversation) => conv.title === "에어비앤비 고객지원 팀"
+    );
 
-  if (existing) {
-    return existing.id; // 새로 생성하지 않고 기존 id만 반환
-  }
+    if (existing) {
+      return existing.id; // 새로 생성하지 않고 기존 id만 반환
+    }
 
-  // 새 대화 생성
-  const id = Date.now();
+    // 새 대화 생성
+    const id = Date.now();
 
-  const newListItem = {
-    id,
-    user: "에어비앤비 고객지원 팀",
-    preview: "상담을 도와드릴게요",
-    date: "오늘",
-    image: "/images/airbnb_logo.png",
-  };
+    const newListItem = {
+      id,
+      user: "에어비앤비 고객지원 팀",
+      preview: "상담을 도와드릴게요",
+      date: "오늘",
+      image: "/images/airbnb_logo.png",
+    };
 
-  const newConv: Conversation = {
-    id,
-    title: "에어비앤비 고객지원 팀",
-    date: "오늘",
-    messages: [
-      {
-        sender: "에어비앤비 고객지원 팀",
-        text:
-          "민서 님, 안녕하세요. 최선을 다해 도와드리겠습니다. 먼저 몇 가지 질문을 드린 다음 상담원과 연결해 드리겠습니다.",
-          
-        avatar: "/images/airbnb_logo.png",
-      },
-    ],
-  };
+    const newConv: Conversation = {
+      id,
+      title: "에어비앤비 고객지원 팀",
+      date: "오늘",
+      messages: [
+        {
+          sender: "에어비앤비 고객지원 팀",
+          text:
+            "민서 님, 안녕하세요. 최선을 다해 도와드리겠습니다. 먼저 몇 가지 질문을 드린 다음 상담원과 연결해 드리겠습니다.",
 
-  set({
-    list: [...state.list, newListItem],
-    conversations: [...state.conversations, newConv],
-  });
+          avatar: "/images/airbnb_logo.png",
+        },
+      ],
+    };
 
-  return id;
-},
+    set({
+      list: [...state.list, newListItem],
+      conversations: [...state.conversations, newConv],
+    });
+
+    return id;
+  },
 
 
-  
+
   addMessage: (conversationId: number, text: string) => {
     const state = get();
 
