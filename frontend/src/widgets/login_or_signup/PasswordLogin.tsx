@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 type Props = {
   open: boolean;
@@ -39,13 +40,21 @@ export default function PasswordLogin({
 
   if (!open) return null;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!password) {
       setError("비밀번호를 입력해주세요.");
       return;
     }
     setError(null);
-    onSubmit?.(password);
+
+    try {
+      const response = await axios.post('http://localhost:8080/auth/login', { email, password });
+      // Assuming response contains token or success status
+      onSubmit?.(password); // Or pass token if needed
+    } catch (err) {
+      console.error(err);
+      setError("로그인에 실패했습니다. 비밀번호를 확인해주세요.");
+    }
   };
 
   return (
