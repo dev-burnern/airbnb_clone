@@ -8,6 +8,8 @@ type Props = {
   onSubmit?: (email: string) => void;
 };
 
+const API_BASE_URL = 'http://localhost:8080';
+
 export default function EmailLogion({ open, onClose, onSubmit }: Props) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -41,12 +43,12 @@ export default function EmailLogion({ open, onClose, onSubmit }: Props) {
       return;
     }
     setError(null);
+    // 이메일 유효성 검사 후 다음 모달로 넘깁니다.
     onSubmit?.(email);
   };
 
   const handleGithub = () => {
-    // redirect to GitHub OAuth endpoint (adjust to your backend route)
-    window.location.href = "/api/auth/github";
+    window.location.href = `${API_BASE_URL}/auth/github`;
   };
 
   return (

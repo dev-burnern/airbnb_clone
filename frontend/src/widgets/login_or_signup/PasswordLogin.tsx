@@ -1,51 +1,87 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useAuth, User } from "../../app/providers/AuthContext";
 
 type Props = {
   open: boolean;
   email: string;
   onClose?: () => void;
   onBack?: () => void;
-  onSubmit?: (password: string) => void;
+  onSubmit?: (password: string) => void; 
 };
+
+const API_BASE_URL = 'http://localhost:8080';
 
 export default function PasswordLogin({
   open,
   email,
   onClose,
   onBack,
-  onSubmit,
+  onSubmit, 
 }: Props) {
+  const { login } = useAuth(); 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); 
 
   useEffect(() => {
     if (!open) {
       setPassword("");
       setShowPassword(false);
       setError(null);
-      return;
     }
-
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose?.();
     };
-
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [open, onClose]);
 
   if (!open) return null;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!password) {
       setError("비밀번호를 입력해주세요.");
       return;
     }
+    
     setError(null);
-    onSubmit?.(password);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        // 서버에서 반환된 에러 메시지를 사용자에게 표시
+        const errorData = await response.json();
+        throw new Error(errorData.message || "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요.");
+      }
+
+      const data = await response.json();
+      
+      const { access_token, user } = data;
+      login(access_token, user as User); 
+      
+      onClose?.(); 
+      
+    } catch (err: any) {
+      console.error("Login API Error:", err);
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+         setError("서버 연결에 실패했습니다. 백엔드 서버 상태를 확인해주세요.");
+      } else {
+        setError(err.message || "서버 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -86,6 +122,9 @@ export default function PasswordLogin({
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="비밀번호"
                 className="w-full border border-gray-200 rounded-md px-3 py-2 pr-16 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleLogin();
+                }}
                 autoComplete="current-password"
               />
               <button
@@ -101,9 +140,12 @@ export default function PasswordLogin({
 
           <button
             onClick={handleLogin}
-            className="mt-6 w-full bg-pink-600 text-white py-2 rounded-md font-medium hover:bg-pink-700"
+            disabled={isLoading} // 로딩 중 버튼 비활성화
+            className={`mt-6 w-full text-white py-2 rounded-md font-medium transition ${
+              isLoading ? "bg-pink-400 cursor-not-allowed" : "bg-pink-600 hover:bg-pink-700"
+            }`}
           >
-            로그인
+            {isLoading ? '로그인 중...' : '로그인'}
           </button>
 
           <button
