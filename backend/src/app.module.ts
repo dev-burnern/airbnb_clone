@@ -9,6 +9,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { ChatModule } from './chat/chat.module';
 import { typeOrmConfig } from './config/typeorm.config';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,7 +22,7 @@ import { typeOrmConfig } from './config/typeorm.config';
     ListingsModule,
     BookingsModule,
     PaymentsModule,
-    // ChatModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [],

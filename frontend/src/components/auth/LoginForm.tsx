@@ -1,32 +1,25 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 import axios from 'axios';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
-    const searchParams = useSearchParams();
 
-    useEffect(() => {
-        const token = searchParams?.get('token');
-        if (token) {
-            localStorage.setItem('token', token);
-            router.push('/');
-        }
-    }, [searchParams, router]);
-
-    const onSubmit = async (data: Record<string, string>) => {
+    const onSubmit = async (data: any) => {
         setIsLoading(true);
         try {
-            const response = await axios.post('http://localhost:8080/auth/login', data);
-            localStorage.setItem('token', response.data.access_token);
+            // TODO: Replace with actual API endpoint
+            const response = await axios.post('http://localhost:3001/auth/login', data);
+            console.log('Login success:', response.data);
+            // Handle successful login (e.g., save token, redirect)
             router.push('/');
         } catch (error) {
-            console.error('Login failed', error);
+            console.error('Login failed:', error);
             alert('Login failed. Please check your credentials.');
         } finally {
             setIsLoading(false);
@@ -48,7 +41,7 @@ export default function LoginForm() {
                         className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-rose-500 sm:text-sm"
                         {...register('email', { required: true })}
                     />
-                    {errors.email && <span className="text-red-500 text-xs">This field is required</span>}
+                    {errors.email && <span className="text-red-500 text-xs">Email is required</span>}
                 </div>
             </div>
 
@@ -65,7 +58,7 @@ export default function LoginForm() {
                         className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-rose-500 sm:text-sm"
                         {...register('password', { required: true })}
                     />
-                    {errors.password && <span className="text-red-500 text-xs">This field is required</span>}
+                    {errors.password && <span className="text-red-500 text-xs">Password is required</span>}
                 </div>
             </div>
 

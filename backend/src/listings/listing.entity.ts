@@ -3,8 +3,7 @@ import { User } from '../users/user.entity';
 import { Booking } from '../bookings/booking.entity';
 import { Review } from '../reviews/review.entity';
 import { ChatRoom } from '../chat/chat.entity';
-import { Booking } from '../bookings/booking.entity'; 
-
+import { Booking } from '../bookings/booking.entity';
 @Entity('listings')
 export class Listing {
     @PrimaryGeneratedColumn('uuid')
