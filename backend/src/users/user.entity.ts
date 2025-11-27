@@ -4,7 +4,7 @@ import { Booking } from '../bookings/booking.entity';
 import { Review } from '../reviews/review.entity';
 import { Wishlist } from '../wishlists/wishlist.entity';
 import { SupportTicket } from '../support/ticket.entity';
-// import { ChatRoom } from '../chat/chat.entity';
+import { ChatRoom } from '../chat/chat.entity';
 
 @Entity('users')
 export class User {
@@ -50,11 +50,11 @@ export class User {
     @OneToMany(() => SupportTicket, ticket => ticket.assignedAgent)
     assignedTickets: SupportTicket[];
 
-    // @OneToMany(() => ChatRoom, chatRoom => chatRoom.host)
-    // chatRoomsAsHost: ChatRoom[];
+    @OneToMany(() => ChatRoom, chatRoom => chatRoom.host)
+    chatRoomsAsHost: ChatRoom[];
 
-    // @OneToMany(() => ChatRoom, chatRoom => chatRoom.guest)
-    // chatRoomsAsGuest: ChatRoom[];
+    @OneToMany(() => ChatRoom, chatRoom => chatRoom.guest)
+    chatRoomsAsGuest: ChatRoom[];
 
     @CreateDateColumn()
     createdAt: Date;
