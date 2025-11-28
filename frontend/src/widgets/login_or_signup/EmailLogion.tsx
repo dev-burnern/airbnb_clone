@@ -61,7 +61,7 @@ export default function EmailLogion({ open, onClose, onSubmit, onSignup }: Props
 
   const handleGithub = () => {
     // redirect to GitHub OAuth endpoint (adjust to your backend route)
-    window.location.href = "/api/auth/github";
+    window.location.href = "http://localhost:3001/auth/github";
   };
 
   return (
