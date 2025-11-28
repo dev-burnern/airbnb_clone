@@ -10,6 +10,7 @@ const SIDEBAR_ITEMS = [
   { name: "로그인 및 보안", href: "/account/login-and-security", icon: Shield },
    { name: "개인 정보 보호", href: "/account/privacy-and-sharing", icon: Lock },
   { name: "알림", href: "/account/notifications", icon: Bell },
+  { name: "결제 및 대금 수령", href: "/account/payments-payouts", icon: CreditCard },
 ];
 
 export const AccountSidebar = () => {
