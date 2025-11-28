@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import HeaderSearchBar from "./HeaderSearchBar";
 import HeaderProfile from "./HeaderProfile";
 import EmailLogion from "../login_or_signup/EmailLogion";
@@ -18,6 +18,19 @@ export default function Header() {
   const [loginEmail, setLoginEmail] = useState("");
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const token = searchParams?.get("token");
+    if (token) {
+      // Store token (optional, depending on your auth strategy)
+      // localStorage.setItem("accessToken", token);
+
+      setIsLoggedIn(true);
+      // Remove token from URL
+      router.replace("/");
+    }
+  }, [searchParams, router]);
 
   const handleNavigation = (path: string) => {
     router.push(path);
