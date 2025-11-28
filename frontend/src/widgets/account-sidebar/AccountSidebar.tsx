@@ -8,7 +8,7 @@ const SIDEBAR_ITEMS = [
   { name: "개인 정보", href: "/account/personal-info", icon: User },
   { name: "언어 및 통화", href: "/account/language-and-currency", icon: Globe },
   { name: "로그인 및 보안", href: "/account/privacy-and-sharing", icon: Shield },
-  { name: "알림", href: "#", icon: Bell },
+  { name: "알림", href: "/account/notifications", icon: Bell },
 ];
 
 export const AccountSidebar = () => {
