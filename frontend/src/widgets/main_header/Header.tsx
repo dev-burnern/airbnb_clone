@@ -1,21 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; 
+import { useRouter, useSearchParams } from "next/navigation";
 import HeaderSearchBar from "./HeaderSearchBar";
 import HeaderProfile from "./HeaderProfile";
 import EmailLogion from "../login_or_signup/EmailLogion";
 import PasswordLogin from "../login_or_signup/PasswordLogin";
+import SignupModal from "@/widgets/login_or_signup/SignupModal";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [signupModalOpen, setSignupModalOpen] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
 
-  const router = useRouter(); 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const token = searchParams?.get("token");
+    if (token) {
+      // Store token (optional, depending on your auth strategy)
+      // localStorage.setItem("accessToken", token);
+
+      setIsLoggedIn(true);
+      // Remove token from URL
+      router.replace("/");
+    }
+  }, [searchParams, router]);
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -32,8 +47,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-5 relative">
         {/* 좌측 로고 (클릭 시 홈으로 이동) */}
         <div className="flex items-center gap-2">
-          <div 
-            onClick={() => handleNavigation("/")} 
+          <div
+            onClick={() => handleNavigation("/")}
             className="cursor-pointer"
           >
             <Image
@@ -72,7 +87,7 @@ export default function Header() {
         {/* 메뉴 드롭다운 */}
         {menuOpen && (
           <div className="absolute top-16 right-6 bg-white border border-gray-200 rounded-xl shadow-lg w-48 py-2 animate-fadeIn z-50 flex flex-col">
-            
+
             <button
               type="button"
               onClick={() => handleNavigation("/")}
@@ -80,7 +95,7 @@ export default function Header() {
             >
               홈
             </button>
-            
+
             <button
               type="button"
               onClick={() => handleNavigation("/wishlist")}
@@ -88,7 +103,7 @@ export default function Header() {
             >
               위시리스트
             </button>
-            
+
             <button
               type="button"
               onClick={() => handleNavigation("/messages")} // 예약내역 페이지가 없어서 메시지로 임시 연결
@@ -96,7 +111,7 @@ export default function Header() {
             >
               예약내역
             </button>
-            
+
             <button
               type="button"
               onClick={() => handleNavigation("/messages")}
@@ -106,7 +121,7 @@ export default function Header() {
             </button>
 
             <hr className="my-2 bsorder-gray-200" />
-            
+
             <button
               type="button"
               onClick={() => handleNavigation("/account")}
@@ -124,15 +139,30 @@ export default function Header() {
             </button>
 
             <hr className="my-2 border-gray-200" />
-            
+
             {/* 로그인 버튼 (모달 오픈) */}
-            <button
-              type="button"
-              onClick={handleLoginOpen}
-              className="text-left px-4 py-2 hover:bg-gray-100 transition-colors w-full"
-            >
-              로그인 및 회원가입
-            </button>
+            {/* 로그인 상태에 따른 메뉴 표시 */}
+            {!isLoggedIn ? (
+              <button
+                type="button"
+                onClick={handleLoginOpen}
+                className="text-left px-4 py-2 hover:bg-gray-100 transition-colors w-full"
+              >
+                로그인 및 회원가입
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLoggedIn(false);
+                  setMenuOpen(false);
+                  // TODO: Clear token from storage if needed
+                }}
+                className="text-left px-4 py-2 hover:bg-gray-100 transition-colors w-full"
+              >
+                로그아웃
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -146,6 +176,11 @@ export default function Header() {
           setEmailModalOpen(false);
           setPasswordModalOpen(true);
         }}
+        onSignup={(email) => {
+          setLoginEmail(email);
+          setEmailModalOpen(false);
+          setSignupModalOpen(true);
+        }}
       />
 
       {/* 2단계: 비밀번호 입력 모달 */}
@@ -157,9 +192,22 @@ export default function Header() {
           setPasswordModalOpen(false);
           setEmailModalOpen(true);
         }}
-        onSubmit={(password: string) => {
-          console.log("로그인 시도:", { email: loginEmail, password });
+        onSubmit={() => {
           setPasswordModalOpen(false);
+          setIsLoggedIn(true);
+        }}
+      />
+
+      <SignupModal
+        open={signupModalOpen}
+        email={loginEmail}
+        onClose={() => setSignupModalOpen(false)}
+        onBack={() => {
+          setSignupModalOpen(false);
+          setEmailModalOpen(true);
+        }}
+        onSubmit={() => {
+          setSignupModalOpen(false);
           setIsLoggedIn(true);
         }}
       />

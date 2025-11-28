@@ -1,4 +1,4 @@
-import { Controller, Get, Request, UseGuards, Patch, Body } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards, Patch, Body, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -17,5 +17,11 @@ export class UsersController {
     async updateProfile(@Request() req, @Body() updateData: any) {
         // TODO: Create UpdateUserDto
         return this.usersService.update(req.user.id, updateData);
+    }
+
+    @Post('check-email')
+    async checkEmail(@Body('email') email: string) {
+        const user = await this.usersService.findOneByEmail(email);
+        return { exists: !!user };
     }
 }
