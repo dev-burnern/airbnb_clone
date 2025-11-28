@@ -1,11 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Booking } from '../bookings/booking.entity';
-// import { Review } from '../reviews/review.entity';
-// import { ChatRoom } from '../chat/chat.entity';
-// import { Booking } from '../bookings/booking.entity'; // Circular dependency, will uncomment later or handle now if file exists
-// import { Review } from '../reviews/review.entity';
-
+import { Review } from '../reviews/review.entity';
+import { ChatRoom } from '../chat/chat.entity';
+import { Booking } from '../bookings/booking.entity';
 @Entity('listings')
 export class Listing {
     @PrimaryGeneratedColumn('uuid')
@@ -66,9 +64,9 @@ export class Listing {
     @OneToMany(() => Booking, booking => booking.listing)
     bookings: Booking[];
 
-    // @OneToMany(() => Review, review => review.listing)
-    // reviews: Review[];
+    @OneToMany(() => Review, review => review.listing)
+    reviews: Review[];
 
-    // @OneToMany(() => ChatRoom, chatRoom => chatRoom.listing)
-    // chatRooms: ChatRoom[];
+    @OneToMany(() => ChatRoom, chatRoom => chatRoom.listing)
+    chatRooms: ChatRoom[];
 }
