@@ -40,14 +40,21 @@ export default function ChatWidget() {
     setMessages([...newMessages, loadingMsg]);
     
     try {
-      const res = await fetch("http://localhost:3001/chat", {
+      const res = await fetch("http://localhost:3001/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages })
+        body: JSON.stringify({
+          message: input,
+          history: newMessages.map((m) => ({
+          role: m.role,
+          content: m.content
+          }))
+        })
+
       });
 
       const data = await res.json();
-      const reply = data?.message?.content || "답변을 가져올 수 없습니다.";
+      const reply = data?.answer || "답변을 가져올 수 없습니다.";
 
       const botMsg: Msg = {
         role: "assistant",
