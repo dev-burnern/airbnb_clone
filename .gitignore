@@ -1,0 +1,17 @@
+# 공통
+node_modules
+npm-debug.log
+.env
+.env.*
+dist
+.next
+
+# Docker
+docker-data
+db_data
+ollama_data
+
+# OS / IDE
+.DS_Store
+.vscode
+.idea

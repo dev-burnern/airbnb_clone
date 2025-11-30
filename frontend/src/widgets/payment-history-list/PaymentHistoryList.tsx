@@ -1,4 +1,5 @@
 // src/widgets/payment-history-list/PaymentHistoryList.tsx
+"use client"; // doc
 
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";

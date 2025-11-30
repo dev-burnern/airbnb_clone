@@ -1,37 +1,62 @@
 version: "3.9"
 
 services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: airbnbDB
+      MYSQL_USER: airbnb
+      MYSQL_PASSWORD: qwer1234!
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
   backend:
-    build: ./backend
-    container_name: backend
+    build:
+      context: ./backend
     ports:
       - "3001:3001"
     env_file:
       - ./backend/.env
     depends_on:
       - db
+      - ollama
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
     ports:
       - "3000:3000"
+    env_file:
+      - ./frontend/.env
     depends_on:
-      - db
+      - backend
 
-  db:
-    image: mysql:8.0
-    container_name: airbnb_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: airbnb
+  nginx:
+    image: nginx:latest
+    container_name: airbnb-nginx
     ports:
-      - "3306:3306"
+      - "80:80"
+      - "443:443"
     volumes:
-      - db_data:/var/lib/mysql
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    restart: always
 
 volumes:
   db_data:
+  ollama_data:

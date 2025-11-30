@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { User } from '../users/user.entity';
 import { Booking } from '../bookings/booking.entity';
 import { Review } from '../reviews/review.entity';
-import { ChatRoom } from '../chat/chat.entity';
+import { ChatRoom } from '../chatbot/chatbot.entity';
 
 @Entity('listings')
 export class Listing {

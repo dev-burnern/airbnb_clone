@@ -1,4 +1,6 @@
-// src/app/main/page.tsx
+// src/app/page.tsx
+"use client";
+
 import React from 'react';
 import { AccommodationList } from '../widgets/accommodation-list/AccommodationList'; 
 // AccommodationCard에서 사용한 데이터 구조를 여기에 모킹합니다.

@@ -4,7 +4,7 @@ import { Booking } from '../bookings/booking.entity';
 import { Review } from '../reviews/review.entity';
 import { Wishlist } from '../wishlists/wishlist.entity';
 import { SupportTicket } from '../support/ticket.entity';
-import { ChatRoom } from '../chat/chat.entity';
+import { ChatRoom } from '../chatbot/chatbot.entity';
 
 @Entity('users')
 export class User {

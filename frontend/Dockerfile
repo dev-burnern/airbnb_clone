@@ -1,33 +1,30 @@
-# 1️⃣ 빌드 단계
-FROM node:20 AS build
+# 1단계: 빌드 단계
+FROM node:20 AS builder
+WORKDIR /app
 
-# 컨테이너 안의 작업 디렉토리
-WORKDIR /frontend
-
-# package.json과 lock 파일만 먼저 복사 → 캐시 활용
+# 먼저 의존성 설치
 COPY package*.json ./
+RUN npm ci
 
-# 의존성 설치
-RUN npm install
-
-# 소스 전체 복사
+# 소스 복사 후 빌드
 COPY . .
-
-# Next.js 빌드
 RUN npm run build
 
-# 2️⃣ 실행 단계
+# 2단계: 런타임 단계
 FROM node:20-alpine AS runner
+WORKDIR /app
 
-WORKDIR /frontend
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# 빌드 결과물과 실행에 필요한 파일 복사
-COPY --from=build /frontend/.next ./.next
-COPY --from=build /frontend/public ./public
-COPY --from=build /frontend/package*.json ./
-COPY --from=build /frontend/node_modules ./node_modules
+# 실행에 필요한 의존성만 설치
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# 빌드 결과 및 정적 파일 복사
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.mjs ./next.config.mjs
 
 EXPOSE 3000
-
-# Next.js 프로덕션 서버 실행
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
