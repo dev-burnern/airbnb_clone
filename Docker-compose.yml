@@ -1,37 +1,79 @@
 version: "3.9"
 
 services:
-  backend:
-    build: ./backend
-    container_name: backend
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: airbnb_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_DATABASE:-airbnb}
     ports:
-      - "3001:3001"
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - airbnb_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend (NestJS)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: airbnb_backend
+    restart: always
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
     env_file:
       - ./backend/.env
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - airbnb_network
+    command: npm run start:dev
 
+  # Frontend (Next.js)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-
-  db:
-    image: mysql:8.0
-    container_name: airbnb_db
+    container_name: airbnb_frontend
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: airbnb
     ports:
-      - "3306:3306"
+      - "${FRONTEND_PORT:-3000}:3000"
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://backend:3001
+    depends_on:
+      - backend
     volumes:
-      - db_data:/var/lib/mysql
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - airbnb_network
+    command: npm run dev
 
 volumes:
-  db_data:
+  postgres_data:
+    driver: local
+
+networks:
+  airbnb_network:
+    driver: bridge
