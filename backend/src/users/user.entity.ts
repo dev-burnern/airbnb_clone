@@ -1,10 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { Listing } from '../listings/listing.entity';
-import { Booking } from '../bookings/booking.entity';
-import { Review } from '../reviews/review.entity';
-import { Wishlist } from '../wishlists/wishlist.entity';
-import { SupportTicket } from '../support/ticket.entity';
-import { ChatRoom } from '../chat/chat.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -26,35 +20,11 @@ export class User {
     @Column({ nullable: true })
     avatarUrl?: string;
 
-    @Column({ type: 'simple-array' })
+    @Column({ type: 'simple-array', default: 'guest' })
     roles: string[] = ['guest'];
 
-    @Column({ type: 'enum', enum: ['local', 'google', 'naver'], default: 'local' })
+    @Column({ type: 'varchar', length: 50, default: 'local' })
     provider: string;
-
-    @OneToMany(() => Listing, listing => listing.host)
-    listings: Listing[];
-
-    @OneToMany(() => Booking, booking => booking.guest)
-    bookings: Booking[];
-
-    @OneToMany(() => Review, review => review.author)
-    reviews: Review[];
-
-    @OneToMany(() => Wishlist, wishlist => wishlist.user)
-    wishlists: Wishlist[];
-
-    @OneToMany(() => SupportTicket, ticket => ticket.user)
-    tickets: SupportTicket[];
-
-    @OneToMany(() => SupportTicket, ticket => ticket.assignedAgent)
-    assignedTickets: SupportTicket[];
-
-    @OneToMany(() => ChatRoom, chatRoom => chatRoom.host)
-    chatRoomsAsHost: ChatRoom[];
-
-    @OneToMany(() => ChatRoom, chatRoom => chatRoom.guest)
-    chatRoomsAsGuest: ChatRoom[];
 
     @CreateDateColumn()
     createdAt: Date;
@@ -62,3 +32,4 @@ export class User {
     @UpdateDateColumn()
     updatedAt: Date;
 }
+

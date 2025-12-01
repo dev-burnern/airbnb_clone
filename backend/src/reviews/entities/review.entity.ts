@@ -7,8 +7,8 @@ import {
     ManyToOne,
     JoinColumn,
 } from 'typeorm';
-import { Room } from '../listings/entities/room.entity';
-import { User } from '../users/user.entity';
+import { Room } from '../../listings/entities/room.entity';
+import { User } from '../../users/user.entity';
 
 @Entity('reviews')
 export class Review {
@@ -42,5 +42,5 @@ export class Review {
 
     @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
-    user: User;
+    author: User;
 }
