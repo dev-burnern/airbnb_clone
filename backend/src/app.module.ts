@@ -14,7 +14,8 @@ import { typeOrmConfig } from './config/typeorm.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+      cache: true,
     }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
     AuthModule,
@@ -28,3 +29,4 @@ import { typeOrmConfig } from './config/typeorm.config';
   providers: [],
 })
 export class AppModule { }
+
