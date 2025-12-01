@@ -31,10 +31,10 @@ export class SupportTicket {
     @Column({ nullable: true })
     category: string;
 
-    @ManyToOne(() => User, user => user.tickets) // User who created the ticket
+    @ManyToOne(() => User) // User who created the ticket
     user: User;
 
-    @ManyToOne(() => User, user => user.assignedTickets, { nullable: true }) // Agent assigned
+    @ManyToOne(() => User, { nullable: true }) // Agent assigned
     assignedAgent: User;
 
     @OneToMany(() => TicketMessage, message => message.ticket)

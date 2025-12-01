@@ -1,4 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Listing } from '../listings/listing.entity';
+import { Booking } from '../bookings/booking.entity';
+import { Wishlist } from '../wishlists/wishlist.entity';
 
 @Entity('users')
 export class User {
@@ -25,6 +28,15 @@ export class User {
 
     @Column({ type: 'varchar', length: 50, default: 'local' })
     provider: string;
+
+    @OneToMany(() => Listing, (listing) => listing.host)
+    listings: Listing[];
+
+    @OneToMany(() => Booking, (booking) => booking.guest)
+    bookings: Booking[];
+
+    @OneToMany(() => Wishlist, (wishlist) => wishlist.user)
+    wishlists: Wishlist[];
 
     @CreateDateColumn()
     createdAt: Date;

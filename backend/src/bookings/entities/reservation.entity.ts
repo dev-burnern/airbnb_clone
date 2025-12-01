@@ -7,7 +7,7 @@ import {
     ManyToOne,
     JoinColumn,
 } from 'typeorm';
-import { Room } from './room.entity';
+import { Room } from '../../listings/entities/room.entity';
 
 @Entity('reservation')
 export class Reservation {
