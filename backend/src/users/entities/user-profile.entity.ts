@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../user.entity';
 
+
 @Entity('user_profile')
 export class UserProfile {
     @PrimaryGeneratedColumn('increment')
