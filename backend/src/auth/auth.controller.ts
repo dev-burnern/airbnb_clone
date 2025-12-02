@@ -1,10 +1,11 @@
 import { Controller, Request, Post, UseGuards, Get, Req, Res, Body } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) { }
@@ -13,7 +14,7 @@ export class AuthController {
     @Post('login')
     @ApiOperation({ summary: 'Log in with email and password' })
     @ApiResponse({ status: 200, description: 'Return JWT access token.' })
-    async login(@Request() req) {
+    async login(@Body() loginDto: LoginDto, @Request() req) {
         return this.authService.login(req.user);
     }
 
