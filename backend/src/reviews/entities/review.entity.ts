@@ -42,9 +42,5 @@ export class Review {
 
     @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
-<<<<<<< HEAD
     author: User;
-=======
-    user: User;
->>>>>>> ad3214a6914c9233eb5e0e2cb589d2e2d224aea8
 }
