@@ -42,7 +42,8 @@ export class UsersController {
     @ApiOperation({ summary: 'Check if email already exists' })
     @ApiResponse({ status: 200, description: 'Return whether email exists.' })
     async checkEmail(@Body('email') email: string) {
-        const user = await this.usersService.findOneByEmail(email);
+        const normalizedEmail = email.trim().toLowerCase();
+        const user = await this.usersService.findOneByEmail(normalizedEmail);
         return { exists: !!user };
     }
 }

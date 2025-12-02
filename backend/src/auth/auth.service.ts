@@ -11,7 +11,8 @@ export class AuthService {
     ) { }
 
     async validateUser(email: string, pass: string): Promise<any> {
-        const user = await this.usersService.findOneByEmail(email);
+        const normalizedEmail = email.trim().toLowerCase();
+        const user = await this.usersService.findOneByEmail(normalizedEmail);
         if (user && user.password && (await bcrypt.compare(pass, user.password))) {
             const { password, ...result } = user;
             return result;
@@ -28,7 +29,8 @@ export class AuthService {
     }
 
     async register(registerDto: any) {
-        const existingUser = await this.usersService.findOneByEmail(registerDto.email);
+        const email = registerDto.email.trim().toLowerCase();
+        const existingUser = await this.usersService.findOneByEmail(email);
         if (existingUser) {
             throw new ConflictException('이미 존재하는 이메일입니다');
         }
@@ -36,6 +38,7 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(registerDto.password, 10);
         const user = await this.usersService.create({
             ...registerDto,
+            email,
             password: hashedPassword,
             provider: 'local',
         });

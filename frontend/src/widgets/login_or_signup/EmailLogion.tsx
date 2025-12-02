@@ -46,8 +46,9 @@ export default function EmailLogion({ open, onClose, onSubmit, onSignup }: Props
 
     try {
       // Check if email exists
-      const response = await axios.post('http://localhost:3001/users/check-email', { email });
-      if (response.data.exists) {
+      const response = await axios.post('http://localhost:3001/api/v1/users/check-email', { email });
+      // Backend wraps response in { data: ... } due to TransformInterceptor
+      if (response.data.data?.exists) {
         onSubmit?.(email);
       } else {
         // Switch to signup modal
@@ -61,7 +62,7 @@ export default function EmailLogion({ open, onClose, onSubmit, onSignup }: Props
 
   const handleGithub = () => {
     // redirect to GitHub OAuth endpoint (adjust to your backend route)
-    window.location.href = "http://localhost:3001/auth/github";
+    window.location.href = "http://localhost:3001/api/v1/auth/github";
   };
 
   return (
