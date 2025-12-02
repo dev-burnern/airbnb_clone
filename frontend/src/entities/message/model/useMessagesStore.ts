@@ -28,7 +28,6 @@ export interface MessagesState {
   addMessage: (conversationId: number, text: string) => void;
 }
 
-// @ts-expect-error: Zustand types inference issue
 export const useMessagesStore = create<MessagesState>((set, get) => ({
   list: [
     {

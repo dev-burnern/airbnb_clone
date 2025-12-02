@@ -19,6 +19,7 @@ interface Props {
 
 export default function MessageDetail({ conversation }: Props) {
   const router = useRouter();
+  const { addSupportMessage } = useMessagesStore();
   const msg = conversation.messages[0];
 
   return (
@@ -46,7 +47,7 @@ export default function MessageDetail({ conversation }: Props) {
 
           <button
             onClick={() => {
-              const id = useMessagesStore.getState().addSupportMessage();
+              const id = addSupportMessage();
               router.push(`/messages/${id}`);
             }}
             className="w-full py-4 px-6 flex justify-between items-center hover:bg-gray-50 transition"
