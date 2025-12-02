@@ -2,12 +2,20 @@
 
 import { useState } from "react";
 import { Modal } from "@/shared/ui/Modal"; // Modal 컴포넌트 임포트
-import { CreditCard, Lock } from "lucide-react"; // 아이콘 임포트
+import { Lock } from "lucide-react"; // 아이콘 임포트
+
+interface CardData {
+  cardNumber: string;
+  expiryDate: string;
+  cvv: string;
+  zipCode: string;
+  country: string;
+}
 
 interface AddPaymentMethodModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (cardData: any) => void; // 저장 로직을 위한 콜백
+  onSave: (cardData: CardData) => void; // 저장 로직을 위한 콜백
 }
 
 export const AddPaymentMethodModal = ({ isOpen, onClose, onSave }: AddPaymentMethodModalProps) => {
@@ -28,9 +36,9 @@ export const AddPaymentMethodModal = ({ isOpen, onClose, onSave }: AddPaymentMet
       <div className="space-y-4">
         {/* 카드 브랜드 로고 */}
         <div className="flex items-center space-x-2 mb-4">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" alt="Visa" className="h-6" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Mastercard_2019_logo.svg/1200px-Mastercard_2019_logo.svg.png" alt="Mastercard" className="h-6" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/American_Express_logo.svg/1200px-American_Express_logo.svg.png" alt="Amex" className="h-6" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" alt="Visa" className="h-6" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Mastercard_2019_logo.svg/1200px-Mastercard_2019_logo.svg.png" alt="Mastercard" className="h-6" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/American_Express_logo.svg/1200px-American_Express_logo.svg.png" alt="Amex" className="h-6" />
         </div>
 
         {/* 카드 번호 */}
@@ -105,7 +113,7 @@ export const AddPaymentMethodModal = ({ isOpen, onClose, onSave }: AddPaymentMet
               {/* 다른 국가 추가 */}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z"/></svg>
+              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z" /></svg>
             </div>
           </div>
         </div>
