@@ -3,7 +3,7 @@ import "@/app/styles/globals.css";
 import Header from "@/widgets/main_header/Header";
 // import Header from "@/widgets/side_header/Header";
 import Footer from "@/widgets/footer/Footer";
-import ChatWidget from "@/chat/ChatWidget";
+import ChatWidget from "@/chatbot/ChatbotWidget";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
