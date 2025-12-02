@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   # PostgreSQL Database
   db:
@@ -7,8 +5,8 @@ services:
     container_name: airbnb_db
     restart: always
     environment:
-      POSTGRES_USER: ${DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_USER: ${DB_USERNAME:-airbnb}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-airbnb}
       POSTGRES_DB: ${DB_DATABASE:-airbnb}
     ports:
       - "${DB_PORT:-5432}:5432"
@@ -17,7 +15,7 @@ services:
     networks:
       - airbnb_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U airbnb" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -55,8 +53,8 @@ services:
     restart: always
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
-    env_file:
-      - ./frontend/.env.local
+    # env_file:
+    #   - ./frontend/.env.local
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://backend:3001
