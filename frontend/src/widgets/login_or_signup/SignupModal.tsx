@@ -46,16 +46,24 @@ export default function SignupModal({
         setIsLoading(true);
 
         try {
-            await axios.post('http://localhost:3001/auth/register', {
+            // 1. 회원가입
+            await axios.post('http://localhost:3001/api/v1/auth/register', {
                 email,
                 name,
                 password
             });
-            alert("회원가입이 완료되었습니다! 로그인해주세요.");
+
+            // 2. 자동 로그인 시도
+            await axios.post('http://localhost:3001/api/v1/auth/login', {
+                email,
+                password
+            });
+
+            // 3. 완료 처리 (부모 컴포넌트에서 로그인 상태 변경)
             onSubmit?.();
         } catch (err) {
             console.error(err);
-            setError("회원가입 중 오류가 발생했습니다.");
+            setError("회원가입 또는 로그인 중 오류가 발생했습니다.");
         } finally {
             setIsLoading(false);
         }
