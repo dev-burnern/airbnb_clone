@@ -1,8 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Booking } from '../bookings/booking.entity';
-import { Review } from '../reviews/review.entity';
-import { ChatRoom } from '../chat/chat.entity';
 
 @Entity('listings')
 export class Listing {
@@ -63,10 +61,5 @@ export class Listing {
 
     @OneToMany(() => Booking, booking => booking.listing)
     bookings: Booking[];
-
-    @OneToMany(() => Review, review => review.listing)
-    reviews: Review[];
-
-    @OneToMany(() => ChatRoom, chatRoom => chatRoom.listing)
-    chatRooms: ChatRoom[];
 }
+

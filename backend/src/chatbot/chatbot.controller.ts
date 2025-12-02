@@ -4,7 +4,7 @@ import { ChatDto } from './dto/chatbot.dto';
 
 @Controller('chatbot')
 export class ChatbotController {
-  constructor(private readonly chatbotService: ChatbotService) {}
+  constructor(private readonly chatbotService: ChatbotService) { }
 
   @Post()
   async chat(@Body() body: ChatDto) {
