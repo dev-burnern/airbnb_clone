@@ -25,7 +25,7 @@ export function setupSwagger(app: INestApplication): void {
         .addTag('Wishlists', '위시리스트')
         .addTag('Chat', '실시간 채팅')
         .addTag('Chatbot', 'AI 챗봇')
-        .addTag('Payments', '결제')
+        .addTag('Payments', '결제 관리')
         .addTag('Support', '고객 지원')
         .build();
 

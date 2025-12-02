@@ -3,7 +3,7 @@ import { ListingsService } from './listings.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 
-@ApiTags('listings')
+@ApiTags('Listings')
 @Controller('listings')
 export class ListingsController {
     constructor(private listingsService: ListingsService) { }

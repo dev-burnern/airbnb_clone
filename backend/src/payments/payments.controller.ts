@@ -2,6 +2,9 @@ import { Controller, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { AuthGuard } from '@nestjs/passport';
 
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Payments')
 @Controller('payments')
 @UseGuards(AuthGuard('jwt'))
 export class PaymentsController {

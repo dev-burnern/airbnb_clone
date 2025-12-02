@@ -3,7 +3,7 @@ import { BookingsService } from './bookings.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
-@ApiTags('bookings')
+@ApiTags('Bookings')
 @Controller('bookings')
 @UseGuards(AuthGuard('jwt'))
 export class BookingsController {
