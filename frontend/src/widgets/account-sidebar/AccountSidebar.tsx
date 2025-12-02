@@ -17,7 +17,7 @@ export const AccountSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="w-full md:w-[300px] shrink-0 mb-8 md:mb-0 pr-8">
+    <aside className="shrink-0 mb-8 md:mb-0 pr-8">
       <nav className="flex flex-col space-y-1">
         {SIDEBAR_ITEMS.map((item) => {
           const isActive = pathname === item.href;
