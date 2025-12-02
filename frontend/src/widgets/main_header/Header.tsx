@@ -1,16 +1,17 @@
 // Header.tsx (수정됨)
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import HeaderSearchBar from "./HeaderSearchBar";
 import HeaderProfile from "./HeaderProfile";
 import EmailLogion from "../login_or_signup/EmailLogion";
 import PasswordLogin from "../login_or_signup/PasswordLogin";
 import SignupModal from "@/widgets/login_or_signup/SignupModal";
+import AuthTokenHandler from "./AuthTokenHandler";
 // Lucide-React 아이콘 임포트
-import { 
+import {
   Heart, // 위시리스트
   Plane, // 여행
   MessageSquare, // 메시지
@@ -21,7 +22,7 @@ import {
   LogIn, // 로그인
   Home, // 홈
   Menu, // 햄버거 메뉴를 아이콘으로 대체할 경우
-} from "lucide-react"; 
+} from "lucide-react";
 
 // 드롭다운 메뉴 항목 데이터 구조화 (재사용성 및 명확성 확보)
 interface MenuItem {
@@ -41,25 +42,14 @@ export default function Header() {
   const [loginEmail, setLoginEmail] = useState("");
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const token = searchParams?.get("token");
-    if (token) {
-      // Store token (optional, depending on your auth strategy)
-      // localStorage.setItem("accessToken", token);
-
-      setIsLoggedIn(true);
-      // Remove token from URL
-      router.replace("/");
-    }
-  }, [searchParams, router]);
 
   const handleNavigation = (path: string) => {
     router.push(path);
     setMenuOpen(false);
   };
-  
+
+
+
   // 로그아웃 처리 함수
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -86,9 +76,12 @@ export default function Header() {
 
   return (
     <header className="bg-white border-b border-gray-200"> {/* 배경을 흰색으로 변경 */}
+      <Suspense fallback={null}>
+        <AuthTokenHandler setIsLoggedIn={setIsLoggedIn} />
+      </Suspense>
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 relative"> {/* py-5 -> py-4 (헤더 높이 약간 줄임) */}
-        
-       {/* 좌측 로고 (클릭 시 홈으로 이동) */}
+
+        {/* 좌측 로고 (클릭 시 홈으로 이동) */}
         <div className="flex items-center gap-2">
           <div
             onClick={() => handleNavigation("/")}
@@ -149,7 +142,7 @@ export default function Header() {
                 {((isLoggedIn && item.name === '프로필') || (!isLoggedIn && item.name === '홈')) && <hr className="my-2 border-gray-200" />}
               </div>
             ))}
-            
+
             {/* 로그인/로그아웃 및 기타 메뉴 */}
             <div className="mt-1">
               {/* 로그인 상태에 따른 메뉴 표시 */}

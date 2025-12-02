@@ -5,12 +5,17 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
+interface LoginData {
+    email: string;
+    password: string;
+}
+
 export default function LoginForm() {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginData>();
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: LoginData) => {
         setIsLoading(true);
         try {
             // TODO: Replace with actual API endpoint
