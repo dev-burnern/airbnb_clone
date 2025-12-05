@@ -14,7 +14,7 @@ const getAuthHeaders = (token: string) => ({
     } 
 });
 
-// ID 확보 및 생성 로직
+// 🚀 ID 확보 및 생성 로직 (ID 추출 로직 최종 강화 및 디버그 로그 추가)
 const setupWishlistId = async (token: string, setWishlistId: (id: string) => void) => {
     try {
         // 1. 위시리스트 목록 조회 (GET /api/v1/wishlists)
@@ -23,9 +23,10 @@ const setupWishlistId = async (token: string, setWishlistId: (id: string) => voi
         let mainId: string | null = null;
 
         if (listResponse.data && listResponse.data.length > 0) {
-            // 2. 존재하는 첫 번째 위시리스트 ID 사용
             const firstWishlist = listResponse.data[0];
-            mainId = firstWishlist.id || firstWishlist.data?.id || null;
+            
+            // GET 응답에서 ID 추출
+            mainId = firstWishlist.id || firstWishlist.data?.id || null; 
 
             if (mainId) {
                 console.log("✅ Wishlist ID found (GET):", mainId);
@@ -41,12 +42,29 @@ const setupWishlistId = async (token: string, setWishlistId: (id: string) => voi
             );
             
             const responseData = createResponse.data;
-            mainId = responseData.id || responseData.data?.id || null;
+            
+            // 🚨🚨 ID 추출 로직 최종 강화 🚨🚨
+            // responseData.id, responseData.data?.id 등을 모두 시도
+            let extractedId = responseData.id || responseData.data?.id || responseData[0]?.id;
+
+            // 응답이 { data: { id: "..." } } 같은 구조일 때를 대비하여 재확인
+            if (typeof extractedId !== 'string' && responseData.data && responseData.data.id) {
+                extractedId = responseData.data.id;
+            }
+            
+            mainId = extractedId || null;
 
             if (mainId) {
                 console.log("✅ Wishlist ID created (POST):", mainId);
             } else {
-                console.error("❌ Wishlist ID extraction failed from POST response:", responseData);
+                // ID 추출 실패 시, 상세 응답 데이터를 콘솔에 출력
+                console.error(
+                    "❌ Wishlist ID extraction failed from POST response.", 
+                    { 
+                        responseStatus: createResponse.status, 
+                        fullResponseData: responseData // 전체 데이터 출력
+                    }
+                );
                 alert("위시리스트 ID 생성 후 추출 실패. 백엔드 응답 구조를 확인하세요.");
                 return;
             }
@@ -95,6 +113,7 @@ export const useWishlistToggle = (initialState: boolean, listingId: string) => {
             return;
         }
 
+        // 🚨 userMainWishlistId가 null이면 alert이 뜹니다.
         if (!userMainWishlistId) { 
             alert("위시리스트 정보를 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
             return;
@@ -102,33 +121,48 @@ export const useWishlistToggle = (initialState: boolean, listingId: string) => {
 
         setIsLoading(true);
         const headers = getAuthHeaders(token).headers;
+        
 
         try {
             if (isWished) {
                 // 제거: DELETE /api/v1/wishlists/{id}/listings/{listingId}
-                console.log("DELETE Request URL:", `${API_BASE_URL}/wishlists/${userMainWishlistId}/listings/${listingId}`);
+                const deleteUrl = `${API_BASE_URL}/wishlists/${userMainWishlistId}/listings/${listingId}`;
+                console.log("DELETE Request URL:", deleteUrl);
+                
                 await axios.delete(
-                    `${API_BASE_URL}/wishlists/${userMainWishlistId}/listings/${listingId}`, 
-                    { headers }
+                    deleteUrl, 
+                    { headers } 
                 );
+                
                 setIsWished(false);
                 alert("위시리스트에서 숙소가 제거되었습니다.");
             } else {
                 // 추가: POST /api/v1/wishlists/{id}/listings
+                const postUrl = `${API_BASE_URL}/wishlists/${userMainWishlistId}/listings`;
                 const payload = { listingId: listingId };
-                console.log("POST Payload being sent:", payload); // 🚨 요청 본문 확인
-                console.log("POST Request URL:", `${API_BASE_URL}/wishlists/${userMainWishlistId}/listings`);
+                
+                console.log("POST Request URL:", postUrl);
+                console.log("POST Payload being sent:", payload); 
                 
                 await axios.post(
-                    `${API_BASE_URL}/wishlists/${userMainWishlistId}/listings`,
+                    postUrl,
                     payload, 
                     { headers }
                 );
+                
                 setIsWished(true);
                 alert("위시리스트에 숙소가 추가되었습니다.");
             }
         } catch (error) {
-            console.error("위시리스트 토글 실패:", error);
+            if (axios.isAxiosError(error) && error.response) {
+                // 에러 응답 상세 로그 추가
+                console.error(
+                    `❌ API Request Failed: Status ${error.response.status}`, 
+                    error.response.data
+                );
+            } else {
+                console.error("❌ 위시리스트 토글 실패:", error);
+            }
             alert("위시리스트 변경에 실패했습니다. 서버 상태를 확인해주세요.");
         } finally {
             setIsLoading(false);
