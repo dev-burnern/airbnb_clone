@@ -49,8 +49,12 @@ export default function PasswordLogin({
 
     try {
       const response = await axios.post('http://localhost:3001/api/v1/auth/login', { email, password });
-      // Assuming response contains token or success status
-      onSubmit?.(password); // Or pass token if needed
+      // 토큰 저장 (백엔드 TransformInterceptor로 인해 data.data 구조)
+      const token = response.data.data?.access_token || response.data.access_token;
+      if (token) {
+        localStorage.setItem('accessToken', token);
+      }
+      onSubmit?.(password);
     } catch (err) {
       console.error(err);
       setError("로그인에 실패했습니다. 비밀번호를 확인해주세요.");

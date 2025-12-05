@@ -43,6 +43,14 @@ export default function Header() {
 
   const router = useRouter();
 
+  // 페이지 로드 시 저장된 토큰으로 로그인 상태 복원
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const handleNavigation = (path: string) => {
     router.push(path);
     setMenuOpen(false);
@@ -52,9 +60,9 @@ export default function Header() {
 
   // 로그아웃 처리 함수
   const handleLogout = () => {
+    localStorage.removeItem('accessToken');
     setIsLoggedIn(false);
     setMenuOpen(false);
-    // TODO: Clear token from storage if needed
   };
 
   const handleLoginOpen = () => {
