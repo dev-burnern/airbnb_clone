@@ -9,7 +9,7 @@ export class ListingsController {
     constructor(private listingsService: ListingsService) { }
 
     @Get()
-    @ApiOperation({ summary: 'Find all listings with filters' })
+    @ApiOperation({ summary: '필터를 적용하여 모든 숙소 목록 조회' })
     @ApiQuery({ name: 'minLat', required: false })
     @ApiQuery({ name: 'maxLat', required: false })
     @ApiQuery({ name: 'minLng', required: false })
@@ -24,14 +24,14 @@ export class ListingsController {
     }
 
     @Get(':id')
-    @ApiOperation({ summary: 'Find a listing by ID' })
+    @ApiOperation({ summary: 'ID로 숙소 상세 조회' })
     async findOne(@Param('id') id: string) {
         return this.listingsService.findOne(id);
     }
 
     @UseGuards(AuthGuard('jwt'))
     @Post()
-    @ApiOperation({ summary: 'Create a new listing' })
+    @ApiOperation({ summary: '새 숙소 등록' })
     async create(@Request() req, @Body() listingData: any) {
         return this.listingsService.create({
             ...listingData,
