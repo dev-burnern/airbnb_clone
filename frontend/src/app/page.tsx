@@ -1,9 +1,8 @@
-// src/app/main/page.tsx
-import React from 'react';
-import { AccommodationList } from '../widgets/accommodation-list/AccommodationList'; 
-// AccommodationCard에서 사용한 데이터 구조를 여기에 모킹합니다.
+// src/app/main/page.tsx (수정)
 
-// --- 1. 더미 데이터 모킹 (실제로는 API/Model Layer에서 가져옵니다) ---
+import React from 'react';
+import { AccommodationList } from '@/widgets/accommodation-list/AccommodationList';
+// --- 1. 더미 데이터 모킹 (initialIsWished 필드 추가) ---
 
 interface AccommodationData {
   id: string;
@@ -13,6 +12,7 @@ interface AccommodationData {
   price: number;
   rating: number;
   dates: string;
+  initialIsWished?: boolean; // 새롭게 추가된 필드
 }
 
 const JEJU_ACCOMMODATIONS: AccommodationData[] = [
@@ -24,6 +24,7 @@ const JEJU_ACCOMMODATIONS: AccommodationData[] = [
     price: 182588,
     rating: 4.88,
     dates: '3일 6일-8일',
+    initialIsWished: true, // 이 항목은 위시리스트에 추가된 상태로 시작
   },
   {
     id: 'jeju-2',
@@ -33,6 +34,7 @@ const JEJU_ACCOMMODATIONS: AccommodationData[] = [
     price: 182588,
     rating: 4.98,
     dates: '1월 16일-18일',
+    initialIsWished: false, 
   },
   {
     id: 'jeju-3',
@@ -42,6 +44,7 @@ const JEJU_ACCOMMODATIONS: AccommodationData[] = [
     price: 273882,
     rating: 4.95,
     dates: '1월 9일-11일',
+    initialIsWished: true, // 이 항목은 위시리스트에 추가된 상태로 시작
   },
   // ... 필요에 따라 더 추가합니다.
 ];
@@ -55,6 +58,7 @@ const OSAKA_ACCOMMODATIONS: AccommodationData[] = [
     price: 208994,
     rating: 4.88,
     dates: '12월 19일-21일',
+    initialIsWished: false,
   },
   {
     id: 'osaka-2',
@@ -64,10 +68,11 @@ const OSAKA_ACCOMMODATIONS: AccommodationData[] = [
     price: 227738,
     rating: 4.93,
     dates: '12월 19일-21일',
+    initialIsWished: false,
   },
 ];
 
-// --- 2. 메인 페이지 컴포넌트 ---
+// --- 2. 메인 페이지 컴포넌트 (기존과 동일) ---
 
 const MainPage = () => {
   return (
@@ -75,14 +80,14 @@ const MainPage = () => {
       
       <AccommodationList 
         title="제주도의 숙소"
-        data={JEJU_ACCOMMODATIONS}
+        data={JEJU_ACCOMMODATIONS as any} // 타입 오류를 피하기 위해 임시로 'as any' 사용
       />
       
       <div className="my-10 border-t border-gray-100" /> {/* 섹션 간 구분선 */}
 
       <AccommodationList 
         title="다음 달에 예약 가능한 오사카 숙소"
-        data={OSAKA_ACCOMMODATIONS}
+        data={OSAKA_ACCOMMODATIONS as any}
       />
       
     </div>
