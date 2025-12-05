@@ -54,12 +54,18 @@ export default function SignupModal({
             });
 
             // 2. 자동 로그인 시도
-            await axios.post('http://localhost:3001/api/v1/auth/login', {
+            const loginResponse = await axios.post('http://localhost:3001/api/v1/auth/login', {
                 email,
                 password
             });
 
-            // 3. 완료 처리 (부모 컴포넌트에서 로그인 상태 변경)
+            // 3. 토큰 저장
+            const token = loginResponse.data.data?.access_token || loginResponse.data.access_token;
+            if (token) {
+                localStorage.setItem('accessToken', token);
+            }
+
+            // 4. 완료 처리 (부모 컴포넌트에서 로그인 상태 변경)
             onSubmit?.();
         } catch (err) {
             console.error(err);
