@@ -1,3 +1,5 @@
+"use client";
+
 // src/shared/ui/PaymentAndPayoutTabs.tsx
 
 interface PaymentAndPayoutTabsProps {

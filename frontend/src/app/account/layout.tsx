@@ -2,8 +2,13 @@
 
 "use client";
 
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { AccountSidebar } from "@/widgets/account-sidebar/AccountSidebar"; // 경로는 맞게 수정
+
+const AccountSidebar = dynamic(
+  () => import("@/widgets/account-sidebar/AccountSidebar").then((mod) => mod.AccountSidebar),
+  { ssr: false }
+);
 
 export default function AccountSettingsLayout({
   children,

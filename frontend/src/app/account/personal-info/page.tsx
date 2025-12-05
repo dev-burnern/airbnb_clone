@@ -1,3 +1,5 @@
+"use client";
+
 import { PersonalInfoList } from "@/widgets/personal-info-list/PersonalInfoList";
 
 export default function Page() {
