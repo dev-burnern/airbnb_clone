@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ListingsModule } from './listings/listings.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { PaymentsModule } from './payments/payments.module';
+import { ChatModule } from './chat/chat.module';
 import { typeOrmConfig } from './config/typeorm.config';
 
 
@@ -22,6 +23,7 @@ import { typeOrmConfig } from './config/typeorm.config';
     ListingsModule,
     BookingsModule,
     PaymentsModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [],
