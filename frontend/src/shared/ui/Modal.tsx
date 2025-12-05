@@ -1,3 +1,5 @@
+"use client";
+
 // src/shared/ui/Modal.tsx
 
 import React from 'react';

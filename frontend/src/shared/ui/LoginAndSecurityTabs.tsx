@@ -1,3 +1,5 @@
+"use client";
+
 // src/shared/ui/LoginAndSecurityTabs.tsx
 
 interface LoginAndSecurityTabsProps {

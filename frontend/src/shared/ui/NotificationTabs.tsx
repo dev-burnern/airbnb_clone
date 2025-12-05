@@ -1,3 +1,5 @@
+"use client";
+
 // src/shared/ui/NotificationTabs.tsx
 
 interface NotificationTabsProps {
