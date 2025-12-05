@@ -1,0 +1,40 @@
+{
+    "name": "airbnb-db",
+    "version": "1.0.0",
+    "description": "Airbnb Clone Database Migrations, Seeds & Tools",
+    "scripts": {
+        "typeorm": "typeorm-ts-node-commonjs -d ./data-source.ts",
+        "migration:generate": "npm run typeorm -- migration:generate",
+        "migration:create": "npm run typeorm -- migration:create",
+        "migration:run": "npm run typeorm -- migration:run",
+        "migration:revert": "npm run typeorm -- migration:revert",
+        "migration:show": "npm run typeorm -- migration:show",
+        "schema:drop": "npm run typeorm -- schema:drop",
+        "schema:sync": "npm run typeorm -- schema:sync",
+        "seed": "ts-node ./seeds/seed.ts",
+        "seed:fresh": "npm run schema:drop && npm run migration:run && npm run seed",
+        "backup": "ts-node ./scripts/backup.ts backup",
+        "backup:tables": "ts-node ./scripts/backup.ts backup:tables",
+        "backup:list": "ts-node ./scripts/backup.ts list",
+        "backup:cleanup": "ts-node ./scripts/backup.ts cleanup",
+        "restore": "ts-node ./scripts/backup.ts restore",
+        "analyze": "ts-node ./scripts/analyze.ts all",
+        "analyze:indexes": "ts-node ./scripts/analyze.ts indexes",
+        "analyze:stats": "ts-node ./scripts/analyze.ts stats",
+        "analyze:slow": "ts-node ./scripts/analyze.ts slow",
+        "validate": "ts-node ./scripts/validate.ts all",
+        "validate:fk": "ts-node ./scripts/validate.ts fk",
+        "validate:null": "ts-node ./scripts/validate.ts null",
+        "validate:duplicates": "ts-node ./scripts/validate.ts duplicates"
+    },
+    "dependencies": {
+        "dotenv": "^16.3.1",
+        "pg": "^8.16.3",
+        "typeorm": "^0.3.27"
+    },
+    "devDependencies": {
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.3",
+        "@types/node": "^20.10.0"
+    }
+}
