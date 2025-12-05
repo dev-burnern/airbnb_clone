@@ -2,6 +2,7 @@ import { Controller, Post, Body, UseGuards, Request, Get } from '@nestjs/common'
 import { BookingsService } from './bookings.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { CreateBookingDto } from './dto/create-booking.dto';
 
 @ApiTags('Bookings')
 @Controller('bookings')
@@ -11,7 +12,7 @@ export class BookingsController {
 
     @Post()
     @ApiOperation({ summary: 'Create a new booking' })
-    async create(@Request() req, @Body() createBookingDto: any) {
+    async create(@Request() req, @Body() createBookingDto: CreateBookingDto) {
         return this.bookingsService.createBooking(req.user, createBookingDto);
     }
 
