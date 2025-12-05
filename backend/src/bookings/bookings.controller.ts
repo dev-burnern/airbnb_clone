@@ -11,13 +11,13 @@ export class BookingsController {
     constructor(private bookingsService: BookingsService) { }
 
     @Post()
-    @ApiOperation({ summary: 'Create a new booking' })
+    @ApiOperation({ summary: '새 예약 생성' })
     async create(@Request() req, @Body() createBookingDto: CreateBookingDto) {
         return this.bookingsService.createBooking(req.user, createBookingDto);
     }
 
     @Get()
-    @ApiOperation({ summary: 'Get my bookings' })
+    @ApiOperation({ summary: '내 예약 목록 조회' })
     async findAll(@Request() req) {
         return this.bookingsService.findAll(req.user);
     }
