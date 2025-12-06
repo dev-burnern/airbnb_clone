@@ -7,6 +7,7 @@ import { ListingsModule } from './listings/listings.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ChatModule } from './chat/chat.module';
+import { WishlistsModule } from './wishlists/wishlists.module';
 import { typeOrmConfig } from './config/typeorm.config';
 
 
@@ -24,9 +25,9 @@ import { typeOrmConfig } from './config/typeorm.config';
     BookingsModule,
     PaymentsModule,
     ChatModule,
+    WishlistsModule,
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule { }
-

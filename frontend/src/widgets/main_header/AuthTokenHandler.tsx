@@ -14,8 +14,8 @@ export default function AuthTokenHandler({ setIsLoggedIn }: Props) {
     useEffect(() => {
         const token = searchParams?.get("token");
         if (token) {
-            // Store token (optional, depending on your auth strategy)
-            // localStorage.setItem("accessToken", token);
+            // 토큰을 localStorage에 저장
+            localStorage.setItem("accessToken", token);
 
             setIsLoggedIn(true);
             // Remove token from URL
