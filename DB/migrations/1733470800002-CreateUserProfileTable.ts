@@ -1,13 +1,13 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateUserProfileTable implements MigrationInterface {
-    name = 'CreateUserProfileTable';
+export class CreateUserProfileTable1733470800002 implements MigrationInterface {
+    name = 'CreateUserProfileTable1733470800002';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             CREATE TABLE IF NOT EXISTS "user_profile" (
                 "profile_id" SERIAL NOT NULL,
-                "user_id" integer NOT NULL UNIQUE,
+                "user_id" uuid NOT NULL UNIQUE,
                 "image_name" character varying(50) NOT NULL,
                 "path" text NOT NULL,
                 "introduction_text" text,
@@ -17,7 +17,9 @@ export class CreateUserProfileTable implements MigrationInterface {
                 "status" text,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-                CONSTRAINT "PK_user_profile" PRIMARY KEY ("profile_id")
+                CONSTRAINT "PK_user_profile" PRIMARY KEY ("profile_id"),
+                CONSTRAINT "FK_user_profile_user_id" FOREIGN KEY ("user_id") 
+                    REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE
             )
         `);
 

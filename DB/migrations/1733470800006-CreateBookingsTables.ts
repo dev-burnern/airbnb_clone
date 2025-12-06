@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateBookingsTables implements MigrationInterface {
-    name = 'CreateBookingsTables';
+export class CreateBookingsTables1733470800006 implements MigrationInterface {
+    name = 'CreateBookingsTables1733470800006';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // BookingStatus ENUM 생성

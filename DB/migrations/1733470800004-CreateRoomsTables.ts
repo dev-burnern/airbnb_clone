@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateRoomsTables implements MigrationInterface {
-    name = 'CreateRoomsTables';
+export class CreateRoomsTables1733470800004 implements MigrationInterface {
+    name = 'CreateRoomsTables1733470800004';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // locations 테이블

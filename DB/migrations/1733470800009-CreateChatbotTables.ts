@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateChatbotTables implements MigrationInterface {
-    name = 'CreateChatbotTables';
+export class CreateChatbotTables1733470800009 implements MigrationInterface {
+    name = 'CreateChatbotTables1733470800009';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // chatbot 테이블
@@ -28,8 +28,10 @@ export class CreateChatbotTables implements MigrationInterface {
                 "ended_at" TIMESTAMP NOT NULL,
                 "status" text,
                 "chatbot_id" integer NOT NULL,
-                "user_id" integer NOT NULL,
-                CONSTRAINT "PK_chatbot_session" PRIMARY KEY ("session_id")
+                "user_id" uuid NOT NULL,
+                CONSTRAINT "PK_chatbot_session" PRIMARY KEY ("session_id"),
+                CONSTRAINT "FK_chatbot_session_user_id" FOREIGN KEY ("user_id") 
+                    REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE
             )
         `);
 
@@ -101,6 +103,7 @@ export class CreateChatbotTables implements MigrationInterface {
 
         // 인덱스
         await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_chatbot_session_chatbot_id" ON "chatbot_session" ("chatbot_id")`);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_chatbot_session_user_id" ON "chatbot_session" ("user_id")`);
         await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_chatbot_logs_session_id" ON "chatbot_logs" ("session_id")`);
         await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_chat_messages_session_id" ON "chat_messages" ("session_id")`);
     }
@@ -108,12 +111,14 @@ export class CreateChatbotTables implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`DROP INDEX IF EXISTS "IDX_chat_messages_session_id"`);
         await queryRunner.query(`DROP INDEX IF EXISTS "IDX_chatbot_logs_session_id"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_chatbot_session_user_id"`);
         await queryRunner.query(`DROP INDEX IF EXISTS "IDX_chatbot_session_chatbot_id"`);
         await queryRunner.query(`ALTER TABLE "chat_messages" DROP CONSTRAINT IF EXISTS "FK_chat_messages_chatbot_id"`);
         await queryRunner.query(`ALTER TABLE "chat_messages" DROP CONSTRAINT IF EXISTS "FK_chat_messages_session_id"`);
         await queryRunner.query(`ALTER TABLE "chatbot_logs" DROP CONSTRAINT IF EXISTS "FK_chatbot_logs_session_id"`);
         await queryRunner.query(`ALTER TABLE "chatbot_logs" DROP CONSTRAINT IF EXISTS "FK_chatbot_logs_chatbot_id"`);
         await queryRunner.query(`ALTER TABLE "chatbot_session" DROP CONSTRAINT IF EXISTS "FK_chatbot_session_chatbot_id"`);
+        await queryRunner.query(`ALTER TABLE "chatbot_session" DROP CONSTRAINT IF EXISTS "FK_chatbot_session_user_id"`);
         await queryRunner.query(`DROP TABLE IF EXISTS "chat_messages"`);
         await queryRunner.query(`DROP TABLE IF EXISTS "chatbot_logs"`);
         await queryRunner.query(`DROP TABLE IF EXISTS "chatbot_session"`);

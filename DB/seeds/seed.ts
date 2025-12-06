@@ -80,15 +80,18 @@ async function seedUserProfiles(dataSource: DataSource) {
     const languages = ['한국어', '영어', '일본어', '중국어', '한국어, 영어'];
     const jobs = ['개발자', '디자이너', '마케터', '학생', '프리랜서', '사업가', '교사', '의사', '변호사', '요리사'];
 
-    for (let i = 1; i <= 30; i++) {
+    // 실제 user ID (UUID) 조회
+    const users = await dataSource.query(`SELECT id FROM users ORDER BY "createdAt" LIMIT 30`);
+
+    for (let i = 0; i < users.length; i++) {
         await dataSource.query(`
             INSERT INTO user_profile (user_id, image_name, path, introduction_text, location, language, job, status)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             ON CONFLICT (user_id) DO NOTHING
         `, [
-            i,
-            `profile_${i}.jpg`,
-            `/uploads/profiles/profile_${i}.jpg`,
+            users[i].id,
+            `profile_${i + 1}.jpg`,
+            `/uploads/profiles/profile_${i + 1}.jpg`,
             `안녕하세요! 여행을 좋아하는 ${jobs[i % jobs.length]}입니다.`,
             locations[i % locations.length],
             languages[i % languages.length],
@@ -98,6 +101,7 @@ async function seedUserProfiles(dataSource: DataSource) {
     }
     console.log('📝 UserProfiles: 30개 생성');
 }
+
 
 // ========== 호스트 ==========
 async function seedHosts(dataSource: DataSource) {
@@ -411,6 +415,9 @@ async function seedChatbot(dataSource: DataSource) {
 
 // ========== 챗봇 세션 ==========
 async function seedChatbotSessions(dataSource: DataSource) {
+    // 실제 user ID (UUID) 조회
+    const users = await dataSource.query(`SELECT id FROM users`);
+
     for (let i = 1; i <= 50; i++) {
         const startedAt = new Date();
         startedAt.setHours(startedAt.getHours() - Math.floor(Math.random() * 24));
@@ -425,7 +432,7 @@ async function seedChatbotSessions(dataSource: DataSource) {
             endedAt,
             'completed',
             (i % 20) + 1,
-            (i % 50) + 1
+            users[(i - 1) % users.length].id
         ]);
     }
     console.log('🔄 ChatbotSessions: 50개 생성');
@@ -484,6 +491,9 @@ async function seedReviews(dataSource: DataSource) {
         '체크인/체크아웃이 간편해서 좋았습니다.'
     ];
 
+    // 실제 user ID (UUID) 조회
+    const users = await dataSource.query(`SELECT id FROM users`);
+
     for (let i = 1; i <= 200; i++) {
         await dataSource.query(`
             INSERT INTO reviews (content_text, status, star_point, room_id, user_id)
@@ -493,7 +503,7 @@ async function seedReviews(dataSource: DataSource) {
             'approved',
             Math.floor(Math.random() * 2) + 4, // 4~5점
             (i % 100) + 1,
-            (i % 50) + 1
+            users[(i - 1) % users.length].id
         ]);
     }
     console.log('⭐ Reviews: 200개 생성');

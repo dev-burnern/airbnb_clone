@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateUsersTables implements MigrationInterface {
-    name = 'CreateUsersTables';
+export class CreateUsersTables1733470800001 implements MigrationInterface {
+    name = 'CreateUsersTables1733470800001';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // UUID 확장 활성화
