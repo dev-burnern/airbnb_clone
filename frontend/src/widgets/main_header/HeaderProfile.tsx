@@ -63,8 +63,6 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
 
   return (
     <div className="flex items-center space-x-4">
-      <button className="text-sm font-medium hover:bg-gray-100 px-3 py-2 rounded-full">호스팅하기</button>
-
       {isLoggedIn ? (
         <button
           onClick={handleProfileClick}
