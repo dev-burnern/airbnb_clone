@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateReviewsTables implements MigrationInterface {
-    name = 'CreateReviewsTables';
+export class CreateReviewsTables1733470800010 implements MigrationInterface {
+    name = 'CreateReviewsTables1733470800010';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -11,10 +11,12 @@ export class CreateReviewsTables implements MigrationInterface {
                 "status" text,
                 "star_point" integer,
                 "room_id" integer NOT NULL,
-                "user_id" integer NOT NULL,
+                "user_id" uuid NOT NULL,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-                CONSTRAINT "PK_reviews" PRIMARY KEY ("review_id")
+                CONSTRAINT "PK_reviews" PRIMARY KEY ("review_id"),
+                CONSTRAINT "FK_reviews_user_id" FOREIGN KEY ("user_id") 
+                    REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE
             )
         `);
 

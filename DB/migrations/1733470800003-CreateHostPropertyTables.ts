@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateHostPropertyTables implements MigrationInterface {
-    name = 'CreateHostPropertyTables';
+export class CreateHostPropertyTables1733470800003 implements MigrationInterface {
+    name = 'CreateHostPropertyTables1733470800003';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // hosts 테이블

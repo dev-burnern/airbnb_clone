@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateChatTables implements MigrationInterface {
-    name = 'CreateChatTables';
+export class CreateChatTables1733470800008 implements MigrationInterface {
+    name = 'CreateChatTables1733470800008';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // conversations 테이블 생성

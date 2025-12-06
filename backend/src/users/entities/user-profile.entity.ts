@@ -15,8 +15,8 @@ export class UserProfile {
     @PrimaryGeneratedColumn('increment')
     profile_id: number;
 
-    @Column({ type: 'int', unique: true, nullable: false })
-    user_id: number;
+    @Column({ type: 'uuid', unique: true, nullable: false })
+    user_id: string;
 
     @Column({ type: 'varchar', length: 50, nullable: false })
     image_name: string;

@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateWishlistTables implements MigrationInterface {
-    name = 'CreateWishlistTables';
+export class CreateWishlistTables1733470800011 implements MigrationInterface {
+    name = 'CreateWishlistTables1733470800011';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // wishlists 테이블 생성
