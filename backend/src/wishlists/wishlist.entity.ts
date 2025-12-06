@@ -14,7 +14,17 @@ export class Wishlist {
     user: User;
 
     @ManyToMany(() => Listing)
-    @JoinTable()
+    @JoinTable({
+        name: 'wishlists_listings_listing',
+        joinColumn: {
+            name: 'wishlistsId',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'listingId',
+            referencedColumnName: 'id',
+        },
+    })
     listings: Listing[];
 
     @CreateDateColumn()
