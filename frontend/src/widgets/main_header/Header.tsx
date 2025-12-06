@@ -3,13 +3,14 @@
 
 import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import HeaderSearchBar from "./HeaderSearchBar";
 import HeaderProfile from "./HeaderProfile";
 import EmailLogion from "../login_or_signup/EmailLogion";
 import PasswordLogin from "../login_or_signup/PasswordLogin";
 import SignupModal from "@/widgets/login_or_signup/SignupModal";
 import AuthTokenHandler from "./AuthTokenHandler";
+import HostRegistrationModal from "@/components/host/HostRegistrationModal";
 // Lucide-React 아이콘 임포트
 import {
   Heart, // 위시리스트
@@ -39,14 +40,26 @@ export default function Header() {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [signupModalOpen, setSignupModalOpen] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
+  const [hostModalOpen, setHostModalOpen] = useState(false);
+  const [hasListing, setHasListing] = useState(false);
 
   const router = useRouter();
+  const pathname = usePathname();
+
+  // 현재 호스트 모드인지 확인
+  const isHostMode = pathname?.startsWith('/host') ?? false;
 
   // 페이지 로드 시 저장된 토큰으로 로그인 상태 복원
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
       setIsLoggedIn(true);
+    }
+    
+    // 리스팅 존재 여부 확인
+    const listingStatus = localStorage.getItem('hasListing');
+    if (listingStatus === 'true') {
+      setHasListing(true);
     }
   }, []);
 
@@ -102,13 +115,68 @@ export default function Header() {
           </div>
         </div>
 
-        {/* 중앙 검색 */}
-        <div className="flex-1 flex justify-center">
-          <HeaderSearchBar />
-        </div>
-
+        {/* 중앙 - 호스트 모드일 때는 네비게이션, 게스트 모드일 때는 검색 */}
+        {isHostMode ? (
+          <nav className="flex-1 flex justify-center">
+            <div className="flex items-center gap-8">
+              <button
+                onClick={() => handleNavigation("/host")}
+                className="text-sm font-semibold hover:underline transition"
+              >
+                투데이
+              </button>
+              <button
+                onClick={() => handleNavigation("/host/calendar")}
+                className="text-sm font-semibold hover:underline transition"
+              >
+                달력
+              </button>
+              <button
+                onClick={() => handleNavigation("/host/listings")}
+                className="text-sm font-semibold hover:underline transition"
+              >
+                리스팅
+              </button>
+              <button
+                onClick={() => handleNavigation("/host/messages")}
+                className="text-sm font-semibold hover:underline transition"
+              >
+                메시지
+              </button>
+            </div>
+          </nav>
+        ) : (
+          <div className="flex-1 flex justify-center">
+            <HeaderSearchBar />
+          </div>
+        )}
+        
         {/* 우측 프로필 + 메뉴 */}
         <div className="flex items-center gap-3">
+          {/* 호스트 되기 / 호스트 모드로 전환 / 게스트 모드로 전환 버튼 */}
+          {isHostMode ? (
+            <button
+              onClick={() => handleNavigation("/")}
+              className="text-sm font-semibold hover:bg-gray-100 px-4 py-2 rounded-full transition whitespace-nowrap"
+            >
+              게스트 모드로 전환
+            </button>
+          ) : hasListing ? (
+            <button
+              onClick={() => handleNavigation("/host")}
+              className="text-sm font-semibold hover:bg-gray-100 px-4 py-2 rounded-full transition whitespace-nowrap"
+            >
+              호스트 모드로 전환
+            </button>
+          ) : (
+            <button
+              onClick={() => setHostModalOpen(true)}
+              className="text-sm font-semibold hover:bg-gray-100 px-4 py-2 rounded-full transition whitespace-nowrap"
+            >
+              호스팅하기
+            </button>
+          )}
+
           <HeaderProfile
             isLoggedIn={isLoggedIn}
             setIsLoggedIn={setIsLoggedIn}
@@ -224,6 +292,12 @@ export default function Header() {
           setSignupModalOpen(false);
           setIsLoggedIn(true);
         }}
+      />
+
+      {/* 호스트 등록 모달 */}
+      <HostRegistrationModal
+        isOpen={hostModalOpen}
+        onClose={() => setHostModalOpen(false)}
       />
     </header>
   );
