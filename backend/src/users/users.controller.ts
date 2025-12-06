@@ -18,6 +18,15 @@ export class UsersController {
     }
 
     @UseGuards(AuthGuard('jwt'))
+    @Get('profile')
+    @ApiBearerAuth('access-token')
+    @ApiOperation({ summary: 'Get current user profile (alias for /me)' })
+    @ApiResponse({ status: 200, description: 'Return current user profile.' })
+    getProfileAlias(@Request() req) {
+        return this.usersService.findOneById(req.user.id);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
     @Patch('me')
     @ApiBearerAuth('access-token')
     @ApiOperation({ summary: 'Update current user profile' })

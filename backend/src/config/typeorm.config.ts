@@ -12,7 +12,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
         password: configService.get<string>('DB_PASSWORD', 'airbnb'),
         database: configService.get<string>('DB_DATABASE', 'airbnb'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        synchronize: configService.get<boolean>('DB_SYNCHRONIZE', true),
+        synchronize: configService.get<string>('DB_SYNCHRONIZE', 'true') === 'true',
         logging: configService.get<string>('NODE_ENV') === 'development',
         migrations: [__dirname + '/../migrations/*{.ts,.js}'],
         migrationsRun: false,

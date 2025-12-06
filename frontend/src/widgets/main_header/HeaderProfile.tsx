@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type SetLoginState = (next: boolean | ((prev: boolean) => boolean)) => void;
@@ -7,9 +7,55 @@ interface HeaderProfileProps {
   setIsLoggedIn: SetLoginState;
 }
 
+interface UserProfile {
+  avatarUrl?: string;
+  name?: string;
+}
+
 export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfileProps) {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    console.log('🔑 isLoggedIn:', isLoggedIn);
+    console.log('🎫 accessToken:', localStorage.getItem('accessToken'));
+    
+    if (isLoggedIn) {
+      // 사용자 프로필 정보 가져오기
+      const fetchUserProfile = async () => {
+        try {
+          const token = localStorage.getItem('accessToken');
+          if (!token) {
+            console.warn('⚠️ 토큰 없음');
+            return;
+          }
+
+          const response = await fetch('http://localhost:3001/api/v1/users/profile', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log('🔍 프로필 데이터:', result);
+            // API 응답이 { success: true, data: {...} } 형식이면 data 추출
+            const userData = result.data || result;
+            setUserProfile(userData);
+          } else {
+            console.error('❌ 프로필 API 실패:', response.status, response.statusText);
+          }
+        } catch (error) {
+          console.error('❌ 프로필 정보 가져오기 실패:', error);
+        }
+      };
+
+      fetchUserProfile();
+    } else {
+      setUserProfile(null);
+    }
+  }, [isLoggedIn]);
 
   const handleProfileClick = () => {
     if (isLoggedIn) {
@@ -31,10 +77,20 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
       {isLoggedIn ? (
         <button
           onClick={handleProfileClick}
-          className="bg-gray-200 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold hover:bg-gray-300 transition cursor-pointer"
+          className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden hover:opacity-80 transition cursor-pointer border-2 border-gray-300"
           title="프로필 보기"
         >
-          👤
+          {userProfile?.avatarUrl ? (
+            <img 
+              src={userProfile.avatarUrl} 
+              alt={userProfile.name || "프로필"} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="bg-blue-500 text-white w-full h-full flex items-center justify-center text-sm font-bold">
+              {userProfile?.name?.charAt(0).toUpperCase() || '👤'}
+            </div>
+          )}
         </button>
       ) : (
         <button className="text-xl">🌍</button>
