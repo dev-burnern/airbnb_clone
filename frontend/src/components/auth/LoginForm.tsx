@@ -19,9 +19,13 @@ export default function LoginForm() {
         setIsLoading(true);
         try {
             // TODO: Replace with actual API endpoint
-            const response = await axios.post('http://localhost:3001/auth/login', data);
+            const response = await axios.post('http://localhost:3001/api/v1/auth/login', data);
+            // 토큰 저장 (백엔드 TransformInterceptor로 인해 data.data 구조)
+            const token = response.data.data?.access_token || response.data.access_token;
+            if (token) {
+                localStorage.setItem('accessToken', token);
+            }
             console.log('Login success:', response.data);
-            // Handle successful login (e.g., save token, redirect)
             router.push('/');
         } catch (error) {
             console.error('Login failed:', error);
