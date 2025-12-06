@@ -1,63 +1,76 @@
 "use client";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useMessagesStore } from "@/entities/message/model/useMessagesStore";
 
-interface Conversation {
-  title: string;
-  date: string;
-  messages: {
-    sender: string;
-    text: string;
-    avatar: string;
-  }[];
-}
+import Image from "next/image";
+import { Message } from "@/entities/message/model/useMessagesStore";
 
 interface Props {
-  conversation: Conversation;
+  messages: Message[];
+  currentUserId?: string;
 }
 
-export default function MessageDetail({ conversation }: Props) {
-  const router = useRouter();
-  const { addSupportMessage } = useMessagesStore();
-  const msg = conversation.messages[0];
+export default function MessageDetail({ messages, currentUserId }: Props) {
+  if (messages.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-32 text-gray-400">
+        메시지가 없습니다. 대화를 시작하세요!
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full flex flex-col items-start">
+    <div className="w-full flex flex-col gap-4">
+      {messages.map((msg) => {
+        const isMe = currentUserId === msg.senderId;
 
-      <p className="text-gray-400 text-sm mb-4">
-        {msg.sender} 오후 8:53
-      </p>
-
-      <div className="flex items-start gap-3 mb-10">
-        <div className="bg-gray-100 rounded-3xl px-6 py-4 text-gray-800 leading-relaxed max-w-[600px] shadow-sm">
-          {msg.text}
-        </div>
-      </div>
-
-      <div className="flex items-start gap-3">
-
-        {/* 버튼 박스 */}
-        <div className="border border-gray-200 bg-white rounded-2xl shadow-sm w-[420px] divide-y divide-gray-200">
-
-          <button className="w-full py-4 px-6 flex justify-between items-center hover:bg-gray-50 transition">
-            <span>Anna 님에게 메시지 보내기</span>
-            <span className="text-gray-400 text-lg">›</span>
-          </button>
-
-          <button
-            onClick={() => {
-              const id = addSupportMessage();
-              router.push(`/messages/${id}`);
-            }}
-            className="w-full py-4 px-6 flex justify-between items-center hover:bg-gray-50 transition"
+        return (
+          <div
+            key={msg.id}
+            className={`flex items-start gap-3 ${isMe ? "flex-row-reverse" : ""}`}
           >
-            <span>에어비앤비에 도움 요청</span>
-            <span className="text-gray-400 text-lg">›</span>
-          </button>
+            {/* 아바타 */}
+            {!isMe && (
+              <Image
+                src={msg.avatar}
+                alt={msg.sender}
+                width={40}
+                height={40}
+                className="rounded-full object-cover flex-shrink-0"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/images/default_avatar.png";
+                }}
+              />
+            )}
 
-        </div>
-      </div>
+            {/* 메시지 내용 */}
+            <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+              {!isMe && (
+                <span className="text-xs text-gray-400 mb-1">{msg.sender}</span>
+              )}
+              <div
+                className={`rounded-3xl px-4 py-3 max-w-[400px] shadow-sm ${isMe
+                    ? "bg-rose-500 text-white rounded-tr-sm"
+                    : "bg-gray-100 text-gray-800 rounded-tl-sm"
+                  }`}
+              >
+                {msg.text}
+              </div>
+              <span className="text-xs text-gray-400 mt-1">
+                {formatTime(msg.createdAt)}
+              </span>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
+}
+
+function formatTime(dateString: string): string {
+  const date = new Date(dateString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const period = hours >= 12 ? "오후" : "오전";
+  const displayHours = hours > 12 ? hours - 12 : hours || 12;
+  return `${period} ${displayHours}:${minutes}`;
 }
