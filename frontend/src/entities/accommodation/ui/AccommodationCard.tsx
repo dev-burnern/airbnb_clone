@@ -1,90 +1,144 @@
-// src/entities/accommodation/ui/AccommodationCard.tsx (수정)
-
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { Heart } from 'lucide-react'; 
-// Step 1에서 만든 훅을 가져옵니다.
-import { useWishlistToggle } from '../../../features/wishlist/useWishlistToggle'; 
+import { Heart } from 'lucide-react';
+import { AddToWishlistModal } from '@/components/wishlist/AddToWishlistModal';
+import { CreateNewWishlistModal } from '@/components/wishlist/CreateNewWishlistModal';
 
-interface AccommodationProps {
-  id: string; // 위시리스트 연동에 반드시 필요합니다.
+interface AccommodationCardProps {
+  id: string;
   title: string;
   location: string;
   imageSrc: string;
   price: number;
   rating: number;
   dates: string;
-  // 초기 위시리스트 상태를 받기 위한 Prop 추가 (백엔드에서 받아와야 함)
-  initialIsWished?: boolean; 
+  isWished?: boolean;
 }
 
-export const AccommodationCard: React.FC<AccommodationProps> = ({
-  id, // 훅에 전달하기 위해 추가
+export const AccommodationCard: React.FC<AccommodationCardProps> = ({
+  id,
   title,
   location,
   imageSrc,
   price,
   rating,
   dates,
-  initialIsWished = false, // 기본값 설정
+  isWished = false,
 }) => {
-  // 훅을 사용하여 상태와 토글 함수를 가져옵니다.
-  const { isWished, toggleWishlist, isLoading } = useWishlistToggle(initialIsWished, id); 
+  const [wished, setWished] = useState(isWished);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const formatPrice = (p: number) => `${p.toLocaleString('ko-KR')}원`;
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // 로그인 확인
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    setShowAddModal(true);
+  };
+
+  const handleCreateNewClick = () => {
+    setShowAddModal(false);
+    setShowCreateModal(true);
+  };
+
+  const handleBackToAdd = () => {
+    setShowCreateModal(false);
+    setShowAddModal(true);
+  };
+
+  const handleCloseAll = () => {
+    setShowAddModal(false);
+    setShowCreateModal(false);
+  };
+
+  const formatPrice = (p: number) => `₩${p.toLocaleString('ko-KR')}`;
 
   return (
-    <div className="flex flex-col cursor-pointer group">
-      {/* 1. 이미지 및 찜 버튼 */}
-      <div className="aspect-square relative w-full overflow-hidden rounded-xl">
-        <Image
-          src={imageSrc}
-          alt={title}
-          fill
-          className="object-cover h-full w-full transition duration-300 group-hover:scale-105"
-        />
-        {/* 찜 버튼 (로직 연동) */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleWishlist(); // 위시리스트 토글 함수 호출
-          }}
-          disabled={isLoading} // API 호출 중에는 버튼 비활성화
-          className="absolute top-3 right-3 z-10 p-1 rounded-full bg-white/50 hover:bg-white transition"
-        >
-          {/* isWished 상태에 따라 하트 아이콘 색상 변경 */}
-          <Heart 
-            className={`h-6 w-6 transition ${
-              isWished ? 'fill-red-500 stroke-red-500' : 'fill-white stroke-white/80 hover:fill-red-500 hover:stroke-red-500'
-            }`} 
+    <>
+      <div className="flex flex-col cursor-pointer group">
+        {/* 이미지 영역 */}
+        <div className="aspect-square relative w-full overflow-hidden rounded-xl">
+          <Image
+            src={imageSrc}
+            alt={title}
+            fill
+            sizes="20vw"
+            className="object-cover transition duration-300 group-hover:scale-105"
           />
-        </button>
+          
+          {/* 위시리스트 하트 아이콘 (우측 상단 오버레이) */}
+          <button
+            onClick={handleWishlistClick}
+            className="absolute top-3 right-3 z-10 p-1.5 hover:scale-110 transition"
+            aria-label={wished ? "위시리스트에서 제거" : "위시리스트에 추가"}
+          >
+            <Heart
+              className={`h-6 w-6 transition-colors ${
+                wished 
+                  ? 'fill-red-500 stroke-red-500' 
+                  : 'fill-black/50 stroke-white hover:fill-red-500 hover:stroke-red-500'
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* 숙소 정보 */}
+        <div className="pt-2">
+          {/* 위치 */}
+          <div className="font-semibold text-sm truncate text-gray-900">
+            {location}
+          </div>
+          
+          {/* 제목 */}
+          <div className="text-gray-500 text-xs truncate">
+            {title}
+          </div>
+          
+          {/* 날짜 정보 */}
+          <div className="text-gray-500 text-xs">
+            {dates}
+          </div>
+          
+          {/* 가격 및 평점 */}
+          <div className="flex items-center gap-1 mt-1">
+            <div className="font-bold text-sm text-gray-900">
+              {formatPrice(price)}
+            </div>
+            <span className="text-gray-500 text-xs">· 1박</span>
+          </div>
+          
+          {/* 평점 */}
+          {rating > 0 && (
+            <div className="flex items-center gap-1 mt-0.5">
+              <span className="text-xs">⭐</span>
+              <span className="text-xs font-medium text-gray-900">{rating.toFixed(2)}</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* 2. 상세 정보 (기존과 동일) */}
-      <div className="pt-2">
-        <div className="font-semibold text-sm truncate">
-          {location}
-        </div>
-        <div className="text-neutral-500 text-xs">
-          {title}
-        </div>
-        <div className="text-neutral-500 text-xs">
-          {dates}
-        </div>
-        <div className="flex items-center justify-between mt-1">
-          <div className="font-semibold text-sm">
-            {formatPrice(price)}
-            <span className="font-normal text-xs ml-1">/박</span>
-          </div>
-          <div className="flex items-center text-xs">
-            <span role="img" aria-label="star">⭐</span>
-            <span className="ml-1">{rating.toFixed(2)}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      {/* 모달들 */}
+      <AddToWishlistModal
+        isOpen={showAddModal}
+        onClose={handleCloseAll}
+        listingId={id}
+        onCreateNew={handleCreateNewClick}
+      />
+
+      <CreateNewWishlistModal
+        isOpen={showCreateModal}
+        onClose={handleCloseAll}
+        onBack={handleBackToAdd}
+        listingId={id}
+      />
+    </>
   );
 };

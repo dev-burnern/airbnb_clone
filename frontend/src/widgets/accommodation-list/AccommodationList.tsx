@@ -37,8 +37,8 @@ export const AccommodationList: React.FC<AccommodationListProps> = ({
       {/* 목록 제목 */}
       <h2 className="text-xl font-bold mb-4">{title}</h2>
       
-      {/* 숙소 목록 그리드 레이아웃 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-6 gap-y-8">
+      {/* 숙소 목록 그리드 레이아웃 - 5열 고정 */}
+      <div className="grid grid-cols-5 gap-x-6 gap-y-8">
         {data.map((item) => (
           // AccommodationItem 타입이 AccommodationCard Props와 일치한다고 가정합니다.
           <AccommodationCard key={item.id} {...item} />
