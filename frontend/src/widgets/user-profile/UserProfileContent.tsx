@@ -133,11 +133,11 @@ export const UserProfileContent: React.FC<ProfileContentProps> = ({ profile }) =
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="flex flex-col lg:flex-row lg:space-x-12">
+    <div className="w-full">
+      <div className="flex flex-col lg:flex-row lg:gap-8">
         
         {/* Sidebar Navigation */}
-        <nav className="lg:w-1/4 w-full mb-8 lg:mb-0 lg:sticky lg:top-10 h-max">
+        <nav className="w-full lg:w-56 mb-8 lg:mb-0 shrink-0">
           <div className="space-y-1">
             <NavItem
               icon={User}
@@ -155,7 +155,7 @@ export const UserProfileContent: React.FC<ProfileContentProps> = ({ profile }) =
         </nav>
 
         {/* Main Content */}
-        <main className="lg:w-3/4 w-full">
+        <main className="flex-1 min-w-0">
           {activeTab === 'self_intro' && (
             <div className="flex justify-between items-center mb-10">
               <h1 className="text-3xl font-bold text-gray-900">자기소개</h1>

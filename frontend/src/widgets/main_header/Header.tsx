@@ -85,7 +85,7 @@ export default function Header() {
       <Suspense fallback={null}>
         <AuthTokenHandler setIsLoggedIn={setIsLoggedIn} />
       </Suspense>
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 relative"> {/* py-5 -> py-4 (헤더 높이 약간 줄임) */}
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 pt-2 pb-8">
 
         {/* 좌측 로고 (클릭 시 홈으로 이동) */}
         <div className="flex items-center gap-2">
@@ -115,20 +115,20 @@ export default function Header() {
           />
 
           {/* 햄버거 메뉴 버튼 */}
-          <button
-            onClick={() => setMenuOpen((prev) => !prev)}
-            className="flex flex-col justify-center items-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition"
-            aria-label="메뉴 열기"
-          >
-            <span className={`block w-5 h-0.5 bg-gray-700 transition-transform duration-200 ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
-            <span className={`block w-5 h-0.5 bg-gray-700 my-1 transition-opacity duration-200 ${menuOpen ? "opacity-0" : "opacity-100"}`} />
-            <span className={`block w-5 h-0.5 bg-gray-700 transition-transform duration-200 ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
-          </button>
-        </div>
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="flex flex-col justify-center items-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition"
+              aria-label="메뉴 열기"
+            >
+              <span className={`block w-5 h-0.5 bg-gray-700 transition-transform duration-200 ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
+              <span className={`block w-5 h-0.5 bg-gray-700 my-1 transition-opacity duration-200 ${menuOpen ? "opacity-0" : "opacity-100"}`} />
+              <span className={`block w-5 h-0.5 bg-gray-700 transition-transform duration-200 ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
+            </button>
 
-        {/* 메뉴 드롭다운 */}
-        {menuOpen && (
-          <div className="absolute top-20 right-6 bg-white border border-gray-100 rounded-xl shadow-2xl w-56 py-3 animate-fadeIn z-50 flex flex-col">
+            {/* 메뉴 드롭다운 */}
+            {menuOpen && (
+              <div className="absolute top-12 right-0 bg-white border border-gray-100 rounded-xl shadow-2xl w-56 py-3 animate-fadeIn z-50 flex flex-col">
 
             {/* 메인 메뉴 섹션 */}
             {menuItems.filter(item => item.isLoggedInRequired !== false).map((item, index) => (
@@ -176,8 +176,10 @@ export default function Header() {
                 </>
               )}
             </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* 모달들은 이전과 동일하게 유지 */}
