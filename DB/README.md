@@ -6,11 +6,6 @@
 
 ```
 DB/
-├── config/                 # 환경별 설정
-│   ├── .env.development    # 개발 환경
-│   ├── .env.staging        # 스테이징 환경
-│   ├── .env.production     # 프로덕션 환경 (Git 제외)
-│   └── database.config.ts  # 설정 관리자
 ├── migrations/             # 마이그레이션 파일들 (11개)
 ├── seeds/                  # 시드 데이터
 │   └── seed.ts             # 전체 시드 스크립트
