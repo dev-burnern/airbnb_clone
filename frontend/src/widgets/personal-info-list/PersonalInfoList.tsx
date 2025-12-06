@@ -29,10 +29,11 @@ export const PersonalInfoList = () => {
 
   return (
     <div className="max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">개인 정보</h1>
-      </div>
-      <section>
+        {/* 🎯 수정: mb-0에 mt-0과 mt-[-1rem]을 추가하여 상단 마진 제거 및 타이틀을 위로 끌어올림 */}
+        <div className="mb-0 mt-0 mt-[-3rem]"> 
+          <h1 className="text-3xl font-bold text-gray-900 mb-0">개인 정보</h1>
+        </div>
+        <section className="mt-[-5em]">
         
         {/* 실명 */}
         <InfoRow 

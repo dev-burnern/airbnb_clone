@@ -13,7 +13,6 @@ import AuthTokenHandler from "./AuthTokenHandler";
 // Lucide-React 아이콘 임포트
 import {
   Heart, // 위시리스트
-  Plane, // 여행
   MessageSquare, // 메시지
   User, // 프로필
   Settings, // 계정 관리
@@ -74,9 +73,8 @@ export default function Header() {
   const menuItems: MenuItem[] = [
     { name: "홈", path: "/", icon: Home, isLoggedInRequired: null },
     { name: "위시리스트", path: "/wishlist", icon: Heart, isLoggedInRequired: true },
-    { name: "여행", path: "/trips", icon: Plane, isLoggedInRequired: true }, // 이미지에 "여행" 메뉴가 있음
     { name: "메시지", path: "/messages", icon: MessageSquare, isLoggedInRequired: true },
-    { name: "프로필", path: "/profile/self", icon: User, isLoggedInRequired: true },
+    { name: "프로필", path: "/account/profile", icon: User, isLoggedInRequired: true },
     { name: "계정 관리", path: "/account", icon: Settings, isLoggedInRequired: true },
     { name: "언어 및 통화", path: "/account/language-and-currency", icon: Globe, isLoggedInRequired: true },
   ];
@@ -130,7 +128,7 @@ export default function Header() {
 
         {/* 메뉴 드롭다운 */}
         {menuOpen && (
-          <div className="absolute top-14 right-6 bg-white border border-gray-100 rounded-xl shadow-2xl w-56 py-3 animate-fadeIn z-50 flex flex-col">
+          <div className="absolute top-20 right-6 bg-white border border-gray-100 rounded-xl shadow-2xl w-56 py-3 animate-fadeIn z-50 flex flex-col">
 
             {/* 메인 메뉴 섹션 */}
             {menuItems.filter(item => item.isLoggedInRequired !== false).map((item, index) => (
