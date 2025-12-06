@@ -15,7 +15,7 @@ export const Modal = ({ isOpen, onClose, children, title }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex justify-center items-start pt-16 bg-gray-900/40">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md mx-4">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <button onClick={onClose} className="text-gray-500 hover:text-gray-900">
