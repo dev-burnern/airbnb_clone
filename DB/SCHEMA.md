@@ -51,7 +51,7 @@ erDiagram
     
     user_profile {
         serial profile_id PK
-        int user_id FK,UK
+        uuid user_id FK,UK
         varchar image_name
         text path
         text introduction_text
@@ -249,7 +249,7 @@ erDiagram
         timestamp ended_at
         text status
         int chatbot_id FK
-        int user_id
+        uuid user_id FK
     }
     
     chatbot_logs {
@@ -287,7 +287,7 @@ erDiagram
         text status
         int star_point
         int room_id FK
-        int user_id FK
+        uuid user_id FK
         timestamp created_at
         timestamp updated_at
     }
