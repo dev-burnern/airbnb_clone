@@ -16,7 +16,7 @@ import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { AddListingDto } from './dto/add-listing.dto';
 
-@ApiTags('Wishlists 위시리스트')
+@ApiTags('Wishlists')
 @ApiBearerAuth()
 @Controller('wishlists')
 @UseGuards(AuthGuard('jwt'))
