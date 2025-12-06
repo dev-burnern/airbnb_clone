@@ -33,8 +33,8 @@ export class Review {
     @Column({ type: 'int', nullable: false })
     room_id: number;
 
-    @Column({ type: 'int', nullable: false })
-    user_id: number;
+    @Column({ type: 'uuid', nullable: false })
+    user_id: string;
 
     @ManyToOne(() => Room, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'room_id' })
