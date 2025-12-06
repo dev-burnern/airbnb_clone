@@ -2,6 +2,7 @@
 
 import MessageList from "@/widgets/messages/MessageList";
 import MessageDetail from "@/widgets/messages/MessageDetail";
+import SideHeader from "@/widgets/side_header/Header";
 
 const sampleConversation = {
   title: "에어비앤비 고객지원 팀",
@@ -17,7 +18,9 @@ const sampleConversation = {
 
 export default function MessageDetailPage() {
   return (
-    <main className="h-screen flex bg-white">
+    <>
+      <SideHeader />
+      <main className="h-screen flex bg-white">
 
       {/* 왼쪽 메시지 리스트 */}
       <MessageList />
@@ -53,5 +56,6 @@ export default function MessageDetailPage() {
 
       </div>
     </main>
+    </>
   );
 }

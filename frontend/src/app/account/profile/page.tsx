@@ -31,17 +31,9 @@ export default function AccountProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* 헤더는 상위 Layout 컴포넌트에 포함될 수 있지만, 독립적인 테스트를 위해 여기에 유지합니다. */}
-      <header className="py-8 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">프로필</h1>
-        </div>
-      </header>
-
+    <div className="bg-white">
       {/* 콘텐츠 표시 - 위젯 사용 */}
       <UserProfileContent profile={profile} />
-      
     </div>
   );
 }
