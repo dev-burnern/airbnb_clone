@@ -18,18 +18,12 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    console.log('🔑 isLoggedIn:', isLoggedIn);
-    console.log('🎫 accessToken:', localStorage.getItem('accessToken'));
-    
     if (isLoggedIn) {
       // 사용자 프로필 정보 가져오기
       const fetchUserProfile = async () => {
         try {
           const token = localStorage.getItem('accessToken');
-          if (!token) {
-            console.warn('⚠️ 토큰 없음');
-            return;
-          }
+          if (!token) return;
 
           const response = await fetch('http://localhost:3001/api/v1/users/profile', {
             headers: {
@@ -39,15 +33,12 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
 
           if (response.ok) {
             const result = await response.json();
-            console.log('🔍 프로필 데이터:', result);
             // API 응답이 { success: true, data: {...} } 형식이면 data 추출
             const userData = result.data || result;
             setUserProfile(userData);
-          } else {
-            console.error('❌ 프로필 API 실패:', response.status, response.statusText);
           }
         } catch (error) {
-          console.error('❌ 프로필 정보 가져오기 실패:', error);
+          console.error('프로필 정보 가져오기 실패:', error);
         }
       };
 

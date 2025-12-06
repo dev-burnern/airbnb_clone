@@ -29,7 +29,10 @@ const fetchWishlists = async (): Promise<WishlistGroup[]> => {
     // GET /api/v1/wishlists 호출
     const response = await axios.get(`${API_BASE_URL}/wishlists`, getAuthHeaders());
     
-    return response.data.map((item: any) => ({
+    // 백엔드 응답: { success: true, data: [...] }
+    const dataArray = Array.isArray(response.data) ? response.data : (response.data.data || []);
+    
+    return dataArray.map((item: any) => ({
       id: item.id,
       title: item.title || item.name, 
       subtitle: `${item.listings?.length || 0}개 저장된 항목`, 
