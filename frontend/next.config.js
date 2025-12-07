@@ -15,6 +15,25 @@ const nextConfig = {
   },
   // Next.js 13+에서는 `src` 디렉토리를 사용하면 별도의 설정 없이 자동으로 인식하는 것이 원칙입니다.
   // 그럼에도 불구하고 문제가 발생한다면, **Next.js 버전을 확인**해 보세요.
+
+  // 외부 이미지 도메인 허용 (Unsplash 등)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
+
   eslint: { ignoreDuringBuilds: true }
 
 };
