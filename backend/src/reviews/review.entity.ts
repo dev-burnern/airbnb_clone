@@ -21,7 +21,7 @@ export class Review {
     @Column({ type: 'int', default: 5 })
     rating: number;
 
-    @ManyToOne(() => Listing, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Listing, (listing) => listing.reviews, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'listing_id' })
     listing: Listing;
 
