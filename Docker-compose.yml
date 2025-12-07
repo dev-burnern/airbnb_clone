@@ -20,22 +20,24 @@ services:
       timeout: 5s
       retries: 5
 
-  # OLLAMA
+  # OLLAMA (healthcheck 제거)
   ollama:
     container_name: ollama
     image: ollama/ollama:latest
     restart: unless-stopped
-    ports:
-      - "11500:11434"
     volumes:
       - ./ollama_models:/root/.ollama
+    ports:
+      - "11500:11434"
     networks:
       - airbnb_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
 
   # BACKEND (NESTJS)
   backend:
@@ -57,7 +59,7 @@ services:
       db:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  # ⚡ healthy → started로 변경
     volumes:
       - ./backend:/app
       - /app/node_modules
