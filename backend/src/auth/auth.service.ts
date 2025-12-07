@@ -54,10 +54,10 @@ export class AuthService {
         }
 
         if (user) {
-            user.githubId = details.githubId;
-            user.avatarUrl = details.avatarUrl;
-            await this.usersService.create(user); // Update existing user
-            return user;
+            return this.usersService.update(user.id, {
+                githubId: details.githubId,
+                avatarUrl: details.avatarUrl,
+            });
         }
 
         return this.usersService.create({
@@ -65,6 +65,7 @@ export class AuthService {
             name: details.name,
             avatarUrl: details.avatarUrl,
             githubId: details.githubId,
+            provider: 'github',
         });
     }
 }
