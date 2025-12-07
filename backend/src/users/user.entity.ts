@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne } from 'typeorm';
 import { Listing } from '../listings/listing.entity';
 import { Booking } from '../bookings/booking.entity';
 import { Wishlist } from '../wishlists/wishlist.entity';
+import { UserProfile } from './entities/user-profile.entity';
 
 @Entity('users')
 export class User {
@@ -43,5 +44,8 @@ export class User {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @OneToOne(() => UserProfile, (profile) => profile.user)
+    profile: UserProfile;
 }
 
