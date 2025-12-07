@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { Search, ChevronLeft, ChevronRight, Minus, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // 날짜 유틸리티 함수
 // 'YYYY-MM-DD' 형식의 문자열로 변환
@@ -19,14 +20,18 @@ const parseDate = (dateStr: string | null): Date | null => {
     return new Date(year, month - 1, day);
 };
 
-// 여행지 데이터 (생략 가능)
+// 여행지 데이터
 const DESTINATIONS = [
     { name: "근처 체험 찾기", type: "experience", description: "가까운 곳에서 즐길 수 있는 체험을 찾아보세요.", icon: "✈️" },
-    { name: "Jeju", type: "city", description: "해변으로 인기 있는 곳", icon: "🏝️" },
-    { name: "광안리해수욕장, 부산", type: "spot", description: "해변으로 인기 있는 곳", icon: "🏖️" },
-    { name: "경주시, 경상북도", type: "city", description: "대구에 방문한 게스트가 관심 보인 지역", icon: "🏘️" },
-    { name: "여수시, South Jeolla Province", type: "city", description: "내 주변 여행자에게 인기 있는 곳", icon: "🌲" },
-    { name: "포항시, 경상북도", type: "city", description: "대구에 방문한 게스트가 관심 보인 지역", icon: "🏘️" },
+    // 한국
+    { name: "서울", type: "city", description: "대한민국의 수도", icon: "🏙️" },
+    { name: "부산", type: "city", description: "해변으로 인기 있는 곳", icon: "🏖️" },
+    { name: "제주", type: "city", description: "아름다운 섬", icon: "🏝️" },
+    { name: "대구", type: "city", description: "대한민국 남동부 도시", icon: "🏘️" },
+    // 해외
+    { name: "일본", type: "country", description: "동아시아의 섬나라", icon: "🗾" },
+    { name: "필리핀", type: "country", description: "동남아시아의 아름다운 섬", icon: "🌴" },
+    { name: "미국", type: "country", description: "북아메리카 대륙", icon: "🗽" },
 ];
 
 // 게스트 유형
@@ -43,6 +48,7 @@ type DateRange = {
 
 
 export default function HeaderSearchBar() {
+    const router = useRouter();
     const [activeField, setActiveField] = useState<ActiveField>(null);
     const [searchText, setSearchText] = useState("");
     const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
@@ -95,6 +101,33 @@ export default function HeaderSearchBar() {
             if (newCount < 0) return prev;
             return { ...prev, [type]: newCount };
         });
+    };
+
+    // 검색 실행 핸들러
+    const handleSearch = () => {
+        const params = new URLSearchParams();
+        
+        // 여행지
+        if (selectedDestination) {
+            params.set('destination', selectedDestination);
+        }
+        
+        // 날짜
+        if (dates.checkIn) {
+            params.set('checkIn', dates.checkIn);
+        }
+        if (dates.checkOut) {
+            params.set('checkOut', dates.checkOut);
+        }
+        
+        // 게스트
+        if (totalGuests > 0) {
+            params.set('guests', totalGuests.toString());
+        }
+        
+        // 검색 페이지로 이동 (메인 페이지)
+        router.push(`/?${params.toString()}`);
+        setActiveField(null);
     };
     
     // 현재 월을 기준으로 달력 데이터 계산
@@ -151,7 +184,7 @@ export default function HeaderSearchBar() {
     // -------------------------------------------------------------------------
 
     const DestinationDropdown = () => (
-        <div className="absolute top-full mt-6 left-0 w-[450px] bg-white rounded-3xl shadow-2xl p-6 z-10 border border-gray-100">
+        <div className="absolute top-full mt-6 left-0 w-[450px] bg-white rounded-3xl shadow-2xl p-6 z-50 border border-gray-100">
             <h4 className="text-lg font-semibold mb-5">추천 여행지</h4>
             <div className="space-y-4">
                 {filteredDestinations.map((dest) => (
@@ -178,7 +211,7 @@ export default function HeaderSearchBar() {
 
     const DatesDropdown = () => (
         // 드롭다운 너비
-        <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-[650px] bg-white rounded-3xl shadow-2xl p-6 z-10 border border-gray-100">
+        <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-[650px] bg-white rounded-3xl shadow-2xl p-6 z-50 border border-gray-100">
             
             {/* 캘린더 헤더 */}
             <div className="flex items-center justify-end px-4 mb-4">
@@ -337,7 +370,7 @@ export default function HeaderSearchBar() {
 
 
     const GuestsDropdown = () => (
-        <div className="absolute top-full mt-6 right-0 w-[400px] bg-white rounded-3xl shadow-2xl p-6 z-10 border border-gray-100">
+        <div className="absolute top-full mt-6 right-0 w-[400px] bg-white rounded-3xl shadow-2xl p-6 z-50 border border-gray-100">
             <GuestCounter 
                 label="성인" 
                 description="13세 이상" 
@@ -478,8 +511,7 @@ export default function HeaderSearchBar() {
                     <button 
                         onClick={(e) => { 
                             e.stopPropagation(); // 버튼 클릭 시 activeField 변경 방지
-                            console.log('검색 실행'); 
-                            setActiveField(null); // 검색 버튼 클릭 시 드롭다운 닫기
+                            handleSearch(); // 검색 실행
                         }}
                         className="ml-3 bg-rose-500 text-white rounded-full p-3 hover:bg-rose-600 transition flex items-center justify-center shadow-md shrink-0"
                         aria-label="검색 실행"
