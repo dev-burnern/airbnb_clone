@@ -8,8 +8,8 @@ import {
 
 @Entity('room_options')
 export class RoomOption {
-    @PrimaryGeneratedColumn('increment')
-    room_option_id: number;
+    @PrimaryGeneratedColumn('uuid')
+    room_option_id: string;
 
     @Column({ type: 'int', nullable: false })
     item1: number;

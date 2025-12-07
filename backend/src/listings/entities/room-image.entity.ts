@@ -11,11 +11,11 @@ import { Room } from './room.entity';
 
 @Entity('room_images')
 export class RoomImage {
-    @PrimaryGeneratedColumn('increment')
-    image_id: number;
+    @PrimaryGeneratedColumn('uuid')
+    image_id: string;
 
-    @Column({ type: 'int', nullable: false })
-    room_id: number;
+    @Column({ type: 'uuid', nullable: false })
+    room_id: string;
 
     @Column({ type: 'varchar', length: 200, nullable: false })
     image_name: string;

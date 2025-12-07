@@ -11,8 +11,8 @@ import { Room } from '../../listings/entities/room.entity';
 
 @Entity('reservation')
 export class Reservation {
-    @PrimaryGeneratedColumn('increment')
-    reservation_id: number;
+    @PrimaryGeneratedColumn('uuid')
+    reservation_id: string;
 
     @Column({ type: 'timestamp', nullable: false })
     check_in_date: Date;
@@ -41,8 +41,8 @@ export class Reservation {
     @Column({ type: 'text', nullable: true })
     status: string;
 
-    @Column({ type: 'int', nullable: false })
-    room_id: number;
+    @Column({ type: 'uuid', nullable: false })
+    room_id: string;
 
     @ManyToOne(() => Room, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'room_id' })

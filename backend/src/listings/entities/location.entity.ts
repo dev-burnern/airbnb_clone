@@ -8,8 +8,8 @@ import {
 
 @Entity('locations')
 export class Location {
-    @PrimaryGeneratedColumn('increment')
-    location_id: number;
+    @PrimaryGeneratedColumn('uuid')
+    location_id: string;
 
     @Column({ type: 'varchar', length: 100, nullable: false })
     location_name: string;

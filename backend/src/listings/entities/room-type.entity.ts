@@ -8,8 +8,8 @@ import {
 
 @Entity('room_types')
 export class RoomType {
-    @PrimaryGeneratedColumn('increment')
-    room_types_id: number;
+    @PrimaryGeneratedColumn('uuid')
+    room_types_id: string;
 
     @Column({ type: 'varchar', length: 50, nullable: false })
     types_name: string;

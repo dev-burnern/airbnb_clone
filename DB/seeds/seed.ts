@@ -14,20 +14,23 @@ async function runSeed() {
 
     try {
         // 순서대로 시드 실행 (의존성 순서)
+        // 순서대로 시드 실행 (의존성 순서) - UUID 반환 및 전달
         await seedUsers(dataSource);
         await seedUserProfiles(dataSource);
         await seedHosts(dataSource);
         await seedProperty(dataSource);
-        await seedLocations(dataSource);
-        await seedRoomTypes(dataSource);
-        await seedRoomOptions(dataSource);
-        await seedCategories(dataSource);
-        await seedRooms(dataSource);
-        await seedRoomImages(dataSource);
+
+        const locationIds = await seedLocations(dataSource);
+        const roomTypeIds = await seedRoomTypes(dataSource);
+        const roomOptionIds = await seedRoomOptions(dataSource);
+        const categoryIds = await seedCategories(dataSource);
+
+        const roomIds = await seedRooms(dataSource, locationIds, roomTypeIds, roomOptionIds, categoryIds);
+        await seedRoomImages(dataSource, roomIds);
         await seedListings(dataSource);
 
         await seedBookings(dataSource);
-        await seedReservations(dataSource);
+        await seedReservations(dataSource, roomIds);
         await seedConversations(dataSource);
         await seedMessages(dataSource);
         await seedChatbot(dataSource);
@@ -161,66 +164,86 @@ async function seedLocations(dataSource: DataSource) {
         { name: '필리핀', desc: '휴양의 천국', traffic: '항공', lat: 14.5995, lng: 120.9842, neighbourhood: '마닐라', group: '해외' },
     ];
 
+    const createdIds = [];
     for (const loc of locationData) {
-        await dataSource.query(`
+        const res = await dataSource.query(`
             INSERT INTO locations (location_name, description_location, description_traffic, lat, lng, neighbourhood, neighbourhood_group)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING location_id
         `, [loc.name, loc.desc, loc.traffic, loc.lat, loc.lng, loc.neighbourhood, loc.group]);
+        createdIds.push(res[0].location_id);
     }
-    console.log('📍 Locations: 7개 생성');
+    console.log(`📍 Locations: ${createdIds.length}개 생성 (UUID)`);
+    return createdIds;
 }
 
 // ========== 객실 유형 ==========
 async function seedRoomTypes(dataSource: DataSource) {
     const types = ['전체', '개인실', '다인실', '호텔객실', '독채', '반려동물 동반', '수영장', '바다전망', '산전망', '시내전망'];
+    const createdIds = [];
 
     for (const type of types) {
-        await dataSource.query(`
+        const res = await dataSource.query(`
             INSERT INTO room_types (types_name, status)
             VALUES ($1, 'active')
+            RETURNING room_types_id
         `, [type]);
+        createdIds.push(res[0].room_types_id);
     }
-    console.log('🛏️ RoomTypes: 10개 생성');
+    console.log(`🛏️ RoomTypes: ${createdIds.length}개 생성 (UUID)`);
+    return createdIds;
 }
 
 // ========== 객실 옵션 ==========
 async function seedRoomOptions(dataSource: DataSource) {
+    const createdIds = [];
     for (let i = 1; i <= 20; i++) {
-        await dataSource.query(`
+        const res = await dataSource.query(`
             INSERT INTO room_options (item1, item2, item3, status)
             VALUES ($1, $2, $3, 'active')
+            RETURNING room_option_id
         `, [
             Math.floor(Math.random() * 5) + 1,  // 침실 수
             Math.floor(Math.random() * 3) + 1,  // 욕실 수
             Math.floor(Math.random() * 8) + 2   // 최대 인원
         ]);
+        createdIds.push(res[0].room_option_id);
     }
-    console.log('⚙️ RoomOptions: 20개 생성');
+    console.log(`⚙️ RoomOptions: ${createdIds.length}개 생성 (UUID)`);
+    return createdIds;
 }
 
 // ========== 카테고리 ==========
 async function seedCategories(dataSource: DataSource) {
     const categories = ['해변', '산', '도심', '시골', '섬', '호수', '스키', '캠핑', '디자인', '역사', '한옥', '펜트하우스', '농장', '열대', '북극'];
+    const createdIds = [];
 
     for (const cat of categories) {
-        await dataSource.query(`
+        const res = await dataSource.query(`
             INSERT INTO categories (category_name, status)
             VALUES ($1, 'active')
+            RETURNING category_id
         `, [cat]);
+        createdIds.push(res[0].category_id);
     }
-    console.log('📂 Categories: 15개 생성');
+    console.log(`📂 Categories: ${createdIds.length}개 생성 (UUID)`);
+    return createdIds;
 }
 
 // ========== 객실 ==========
-async function seedRooms(dataSource: DataSource) {
+// ========== 객실 ==========
+async function seedRooms(dataSource: DataSource, locationIds: string[], roomTypeIds: string[], roomOptionIds: string[], categoryIds: string[]) {
     const roomNames = ['아늑한 스튜디오', '럭셔리 펜트하우스', '모던 아파트', '전통 한옥', '오션뷰 빌라',
         '마운틴뷰 하우스', '시티뷰 로프트', '가든 코티지', '비치 하우스', '포레스트 캐빈'];
 
+    const createdIds = [];
+
     for (let i = 1; i <= 100; i++) {
-        await dataSource.query(`
+        const res = await dataSource.query(`
             INSERT INTO rooms (room_name, room_address, room_price, room_wishes, room_description, 
                              check_in_time, check_out_time, status, location_id, room_types_id, room_option_id, category_id)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            RETURNING room_id
         `, [
             `${roomNames[i % roomNames.length]} #${i}`,
             `서울시 강남구 테헤란로 ${i}길`,
@@ -230,17 +253,20 @@ async function seedRooms(dataSource: DataSource) {
             '15:00',
             '11:00',
             'active',
-            (i % 7) + 1, // location_id (7 locations)
-            (i % 10) + 1,
-            (i % 20) + 1,
-            (i % 15) + 1
+            locationIds[i % locationIds.length],
+            roomTypeIds[i % roomTypeIds.length],
+            roomOptionIds[i % roomOptionIds.length],
+            categoryIds[i % categoryIds.length]
         ]);
+        createdIds.push(res[0].room_id);
     }
-    console.log('🏡 Rooms: 100개 생성');
+    console.log(`🏡 Rooms: ${createdIds.length}개 생성 (UUID)`);
+    return createdIds;
 }
 
 // ========== 객실 이미지 ==========
-async function seedRoomImages(dataSource: DataSource) {
+// ========== 객실 이미지 ==========
+async function seedRoomImages(dataSource: DataSource, roomIds: string[]) {
     const roomImages = [
         'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
         'https://images.unsplash.com/photo-1502005229766-52838abd8ac5?w=800&h=600&fit=crop',
@@ -252,20 +278,22 @@ async function seedRoomImages(dataSource: DataSource) {
         'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&h=600&fit=crop'
     ];
 
-    for (let roomId = 1; roomId <= 100; roomId++) {
-        const imageCount = Math.floor(Math.random() * 4) + 3; // 3~6개 이미지
-        for (let j = 1; j <= imageCount; j++) {
+    let imageCount = 0;
+    for (const roomId of roomIds) {
+        const count = Math.floor(Math.random() * 4) + 3; // 3~6개 이미지
+        for (let j = 1; j <= count; j++) {
             await dataSource.query(`
                 INSERT INTO room_images (room_id, image_name, path, status)
                 VALUES ($1, $2, $3, 'active')
             `, [
                 roomId,
-                `room_${roomId}_${j}.jpg`,
-                roomImages[(roomId * 10 + j) % roomImages.length]
+                `room_image_${j}.jpg`,
+                roomImages[Math.floor(Math.random() * roomImages.length)]
             ]);
+            imageCount++;
         }
     }
-    console.log('🖼️ RoomImages: ~400개 생성');
+    console.log(`🖼️ RoomImages: ${imageCount}개 생성`);
 }
 
 // ========== 숙소 (listings) ==========
@@ -451,8 +479,9 @@ async function seedBookings(dataSource: DataSource) {
 }
 
 // ========== 예약 상세 (reservations) ==========
-async function seedReservations(dataSource: DataSource) {
-    for (let i = 1; i <= 100; i++) {
+// ========== 예약 상세 (reservations) ==========
+async function seedReservations(dataSource: DataSource, roomIds: string[]) {
+    for (let i = 0; i < 100; i++) {
         const checkIn = new Date();
         checkIn.setDate(checkIn.getDate() + Math.floor(Math.random() * 60));
         const checkOut = new Date(checkIn);
@@ -469,7 +498,7 @@ async function seedReservations(dataSource: DataSource) {
             Math.floor(Math.random() * 2),
             Math.floor(Math.random() * 2),
             'confirmed',
-            (i % 100) + 1
+            roomIds[i % roomIds.length]
         ]);
     }
     console.log('📋 Reservations: 100개 생성');
