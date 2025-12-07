@@ -184,21 +184,21 @@ export default function HeaderSearchBar() {
     // -------------------------------------------------------------------------
 
     const DestinationDropdown = () => (
-        <div className="absolute top-full mt-6 left-0 w-[450px] bg-white rounded-3xl shadow-2xl p-6 z-50 border border-gray-100">
-            <h4 className="text-lg font-semibold mb-5">추천 여행지</h4>
-            <div className="space-y-4">
+        <div className="absolute top-full mt-6 -left-2 w-[350px] bg-white rounded-3xl shadow-2xl p-5 z-50 border border-gray-100">
+            <h4 className="text-base font-semibold mb-4">추천 여행지</h4>
+            <div className="space-y-3">
                 {filteredDestinations.map((dest) => (
                     <div
                         key={dest.name}
                         onClick={() => handleDestinationClick(dest.name)}
-                        className="flex items-center p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition group"
+                        className="flex items-center p-2 rounded-xl hover:bg-gray-50 cursor-pointer transition group"
                     >
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl group-hover:bg-gray-200 transition">
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-xl group-hover:bg-gray-200 transition">
                             {dest.icon}
                         </div>
-                        <div className="ml-4">
-                            <span className="text-base font-medium text-gray-800 block">{dest.name}</span>
-                            <span className="text-sm text-gray-500">{dest.description}</span>
+                        <div className="ml-3">
+                            <span className="text-sm font-medium text-gray-800 block">{dest.name}</span>
+                            <span className="text-xs text-gray-500">{dest.description}</span>
                         </div>
                     </div>
                 ))}
@@ -211,7 +211,7 @@ export default function HeaderSearchBar() {
 
     const DatesDropdown = () => (
         // 드롭다운 너비
-        <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-[650px] bg-white rounded-3xl shadow-2xl p-6 z-50 border border-gray-100">
+        <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 -ml-10 w-[550px] bg-white rounded-3xl shadow-2xl p-5 z-50 border border-gray-100">
             
             {/* 캘린더 헤더 */}
             <div className="flex items-center justify-end px-4 mb-4">
@@ -370,7 +370,7 @@ export default function HeaderSearchBar() {
 
 
     const GuestsDropdown = () => (
-        <div className="absolute top-full mt-6 right-0 w-[400px] bg-white rounded-3xl shadow-2xl p-6 z-50 border border-gray-100">
+        <div className="absolute top-full mt-6 -right-8 w-[320px] bg-white rounded-3xl shadow-2xl p-5 z-50 border border-gray-100">
             <GuestCounter 
                 label="성인" 
                 description="13세 이상" 

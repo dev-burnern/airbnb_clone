@@ -76,10 +76,11 @@ export default function Header() {
       <Suspense fallback={null}>
         <AuthTokenHandler setIsLoggedIn={setIsLoggedIn} />
       </Suspense>
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <div className="w-full pl-6 pr-2 py-4">
+        <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
 
         {/* 좌측 로고 */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" style={{ minWidth: '150px' }}>
           <div
             onClick={() => handleNavigation("/")}
             className="cursor-pointer"
@@ -96,7 +97,7 @@ export default function Header() {
         <div className="flex-1"></div>
 
         {/* 우측 프로필 + 메뉴 */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0 justify-end ml-auto">
           <HeaderProfile
             isLoggedIn={isLoggedIn}
             setIsLoggedIn={setIsLoggedIn}
@@ -205,6 +206,7 @@ export default function Header() {
           setIsLoggedIn(true);
         }}
       />
+      </div>
     </header>
   );
 }
