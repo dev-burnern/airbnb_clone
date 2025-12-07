@@ -28,6 +28,10 @@ export interface ProfileData {
   verified: boolean;
   reviews: Review[];
   trips: Trip[];
+  job?: string;
+  location?: string;
+  introduction?: string;
+  languages?: string;
 }
 
 // API 응답 타입
@@ -189,11 +193,32 @@ export const useProfile = (id: string | null) => {
   return { profile, loading, error };
 };
 
+// --- 사용자 프로필 업데이트 함수 ---
+export const updateUserProfile = async (data: any) => {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('로그인이 필요합니다.');
+
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error('프로필 업데이트에 실패했습니다.');
+  }
+
+  return response.json();
+};
+
 // --- 리뷰 관련 유틸리티 함수들 ---
 export const reviewApi = {
   // 내 리뷰 목록 조회
   async getMyReviews(): Promise<ApiReview[]> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('accessToken');
     if (!token) throw new Error('로그인이 필요합니다.');
 
     const response = await fetch(`${API_BASE_URL}/reviews`, {
@@ -220,7 +245,7 @@ export const reviewApi = {
 
   // 리뷰 작성
   async createReview(data: { listingId: string; content: string; rating: number }): Promise<ApiReview> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('accessToken');
     if (!token) throw new Error('로그인이 필요합니다.');
 
     const response = await fetch(`${API_BASE_URL}/reviews`, {
@@ -238,7 +263,7 @@ export const reviewApi = {
 
   // 리뷰 수정
   async updateReview(id: string, data: { content?: string; rating?: number }): Promise<ApiReview> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('accessToken');
     if (!token) throw new Error('로그인이 필요합니다.');
 
     const response = await fetch(`${API_BASE_URL}/reviews/${id}`, {
@@ -256,7 +281,7 @@ export const reviewApi = {
 
   // 리뷰 삭제
   async deleteReview(id: string): Promise<void> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('accessToken');
     if (!token) throw new Error('로그인이 필요합니다.');
 
     const response = await fetch(`${API_BASE_URL}/reviews/${id}`, {
