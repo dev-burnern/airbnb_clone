@@ -10,7 +10,10 @@ import { ChatModule } from './chat/chat.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { typeOrmConfig } from './config/typeorm.config';
-
+import { AppController } from './app.controller';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { ChatbotModule } from './chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -18,6 +21,10 @@ import { typeOrmConfig } from './config/typeorm.config';
       isGlobal: true,
       envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`, '.env'],
       cache: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/',
     }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
     AuthModule,
@@ -28,8 +35,9 @@ import { typeOrmConfig } from './config/typeorm.config';
     ChatModule,
     WishlistsModule,
     ReviewsModule,
+    ChatbotModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule { }
