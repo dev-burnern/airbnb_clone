@@ -83,30 +83,14 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - /app/.next
     networks:
       - airbnb_network
     command: npm run dev
 
-  # NGINX
-  nginx:
-    image: nginx:latest
-    container_name: airbnb-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - airbnb_network
-    restart: always
-
 volumes:
   postgres_data:
-  ollama_data:
+    driver: local
 
 networks:
   airbnb_network:
