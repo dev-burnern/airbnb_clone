@@ -26,7 +26,6 @@ services:
     ports:
       - "11500:11434"
 
-
   # Backend (NestJS)
   backend:
     build:
@@ -69,6 +68,8 @@ services:
       - backend
     volumes:
       - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
     networks:
       - airbnb_network
     command: npm run dev
