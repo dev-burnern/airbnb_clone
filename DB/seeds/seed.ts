@@ -436,7 +436,7 @@ async function seedListings(dataSource: DataSource) {
                 `${loc.addressPrefix} ${j + 1}번지`,
                 randomLat,
                 randomLng,
-                selectedImages.join(','),
+                JSON.stringify(selectedImages),
                 JSON.stringify(amenities[j % amenities.length]),
                 Math.floor(Math.random() * 6) + 2,
                 50000 + (Math.floor(Math.random() * 150000)),
