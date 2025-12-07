@@ -94,11 +94,11 @@ export class UsersService {
             }
 
             // Map frontend fields to DB fields if necessary
-            if (profileUpdateData['introduction']) {
+            if ('introduction' in profileUpdateData) {
                 profileUpdateData['introduction_text'] = profileUpdateData['introduction'];
                 delete profileUpdateData['introduction'];
             }
-            if (profileUpdateData['profileImage']) {
+            if ('profileImage' in profileUpdateData) {
                 profileUpdateData['path'] = profileUpdateData['profileImage'];
                 delete profileUpdateData['profileImage'];
             }
