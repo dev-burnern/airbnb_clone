@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AccommodationList } from '@/widgets/accommodation-list/AccommodationList';
 
 interface AccommodationData {
@@ -24,13 +25,19 @@ interface Listing {
 }
 
 export default function MainPage() {
-  const [jejuListings, setJejuListings] = useState<AccommodationData[]>([]);
-  const [osakaListings, setOsakaListings] = useState<AccommodationData[]>([]);
+  const searchParams = useSearchParams();
+  const [listingsByRegion, setListingsByRegion] = useState<{ [key: string]: AccommodationData[] }>({});
   const [loading, setLoading] = useState(true);
+
+  // 검색 파라미터 추출
+  const destination = searchParams?.get('destination');
+  const checkIn = searchParams?.get('checkIn');
+  const checkOut = searchParams?.get('checkOut');
+  const guests = searchParams?.get('guests');
 
   useEffect(() => {
     fetchListings();
-  }, []);
+  }, [searchParams]);
 
   const fetchListings = async () => {
     try {
@@ -47,24 +54,110 @@ export default function MainPage() {
 
       console.log(`총 ${data.length}개 숙소 로드됨`);
 
-      // 총 25개 표시 (5열 기준)
-      const allListings = data
-        .slice(0, 25)
-        .map((listing: Listing) => ({
-          id: listing.id,
-          title: listing.title,
-          location: listing.address.split(',')[0] || listing.address,
-          imageSrc: listing.images?.[0] || 'https://placehold.co/400x400/FF385C/FFFFFF/png?text=Airbnb',
-          price: listing.basePrice,
-          rating: Math.random() * 0.5 + 4.5,
-          dates: '예약 가능',
-          isWished: false,
-        }));
+      // 이미지가 있는 숙소만 필터링 (배열이 존재하고, 유효한 이미지가 하나라도 있는 경우)
+      let filteredListings = data.filter((listing: Listing) => {
+        if (!listing.images || !Array.isArray(listing.images) || listing.images.length === 0) {
+          return false;
+        }
+        
+        // 유효한 이미지가 하나라도 있는지 확인
+        const hasValidImage = listing.images.some((img: string) => {
+          if (!img || typeof img !== 'string' || img.trim() === '') {
+            return false;
+          }
+          // 유효한 URL인지 확인 (http, https, data:image로 시작)
+          return img.startsWith('http://') || 
+                 img.startsWith('https://') || 
+                 img.startsWith('data:image/');
+        });
+        
+        return hasValidImage;
+      });
+      console.log(`유효한 이미지가 있는 숙소: ${filteredListings.length}개 (전체 ${data.length}개 중)`);
 
-      // 서울의 숙소: 15개 (5열 × 3행)
-      setJejuListings(allListings.slice(0, 15));
-      // 강남구 추천: 10개 (5열 × 2행)
-      setOsakaListings(allListings.slice(15, 25));
+      // 여행지 필터 (한국: 대구, 부산, 제주, 서울 / 해외: 일본, 필리핀, 미국)
+      if (destination) {
+        const destLower = destination.toLowerCase();
+        filteredListings = filteredListings.filter((listing: Listing) => {
+          const addressLower = listing.address.toLowerCase();
+          const titleLower = listing.title.toLowerCase();
+          
+          // 정확한 도시/국가명 매칭
+          return addressLower.includes(destLower) || 
+                 titleLower.includes(destLower) ||
+                 // 한국 도시
+                 (destLower === '서울' && (addressLower.includes('seoul') || addressLower.includes('서울'))) ||
+                 (destLower === '부산' && (addressLower.includes('busan') || addressLower.includes('부산'))) ||
+                 (destLower === '제주' && (addressLower.includes('jeju') || addressLower.includes('제주'))) ||
+                 (destLower === '대구' && (addressLower.includes('daegu') || addressLower.includes('대구'))) ||
+                 // 해외 국가
+                 (destLower === '일본' && (addressLower.includes('japan') || addressLower.includes('일본') || addressLower.includes('tokyo') || addressLower.includes('osaka'))) ||
+                 (destLower === '필리핀' && (addressLower.includes('philippines') || addressLower.includes('필리핀') || addressLower.includes('manila'))) ||
+                 (destLower === '미국' && (addressLower.includes('usa') || addressLower.includes('america') || addressLower.includes('미국') || addressLower.includes('new york') || addressLower.includes('los angeles')));
+        });
+        console.log(`여행지 "${destination}" 필터 후: ${filteredListings.length}개`);
+      }
+
+      // 게스트 수 필터 (여기서는 간단히 모든 숙소가 게스트를 수용한다고 가정)
+      // 실제로는 listing.maxGuests 같은 필드와 비교해야 함
+      if (guests) {
+        console.log(`게스트 ${guests}명 검색`);
+        // TODO: 실제 게스트 수 필터링 로직
+      }
+
+      // 날짜 필터 (체크인/체크아웃)
+      if (checkIn || checkOut) {
+        console.log(`날짜 검색: ${checkIn} ~ ${checkOut}`);
+        // TODO: 실제 예약 가능 날짜 필터링 로직
+      }
+
+      // 숙소 데이터 변환 및 지역별 그룹화
+      const allListings = filteredListings
+        .map((listing: Listing) => {
+          // 유효한 첫 번째 이미지 찾기
+          const validImage = listing.images?.find((img: string) => 
+            img && 
+            typeof img === 'string' && 
+            img.trim() !== '' && 
+            (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('data:image/'))
+          );
+
+          return {
+            id: listing.id,
+            title: listing.title,
+            location: listing.address.split(',')[0] || listing.address,
+            imageSrc: validImage || '',
+            price: listing.basePrice,
+            rating: Math.random() * 0.5 + 4.5,
+            dates: '예약 가능',
+            isWished: false,
+          };
+        })
+        // 이미지가 실제로 있는 것만 최종 필터링
+        .filter(listing => listing.imageSrc && listing.imageSrc.trim() !== '');
+
+      // 지역별로 그룹화
+      const grouped: { [key: string]: AccommodationData[] } = {};
+      
+      allListings.forEach((listing) => {
+        const location = listing.location.toLowerCase();
+        let region = '기타';
+        
+        // 한국 도시
+        if (location.includes('서울') || location.includes('seoul')) region = '서울';
+        else if (location.includes('부산') || location.includes('busan')) region = '부산';
+        else if (location.includes('제주') || location.includes('jeju')) region = '제주';
+        else if (location.includes('대구') || location.includes('daegu')) region = '대구';
+        // 해외
+        else if (location.includes('일본') || location.includes('japan') || location.includes('tokyo') || location.includes('osaka')) region = '일본';
+        else if (location.includes('필리핀') || location.includes('philippines') || location.includes('manila')) region = '필리핀';
+        else if (location.includes('미국') || location.includes('usa') || location.includes('america') || location.includes('new york') || location.includes('los angeles')) region = '미국';
+        
+        if (!grouped[region]) grouped[region] = [];
+        grouped[region].push(listing);
+      });
+
+      setListingsByRegion(grouped);
 
     } catch (error) {
       console.error('숙소 데이터 로딩 실패:', error);
@@ -81,26 +174,90 @@ export default function MainPage() {
     );
   }
 
-  return (
-    <div className="px-6 py-8 max-w-screen-2xl mx-auto">
-      {/* 서울의 숙소 - 15개 (5열 × 3행) */}
-      {jejuListings.length > 0 && (
-        <section className="mb-12">
-          <AccommodationList
-            title="서울의 숙소"
-            data={jejuListings}
-          />
-        </section>
-      )}
+  // 검색 결과가 있을 때
+  const hasSearchParams = destination || checkIn || checkOut || guests;
+  const searchTitle = hasSearchParams 
+    ? `검색 결과${destination ? `: ${destination}` : ''}`
+    : null;
 
-      {/* 강남구의 추천 숙소 - 10개 (5열 × 2행) */}
-      {osakaListings.length > 0 && (
+  // 검색 모드
+  if (hasSearchParams) {
+    const allListings = Object.values(listingsByRegion).flat();
+    
+    return (
+      <div className="px-6 py-8 max-w-screen-2xl mx-auto">
+        {/* 검색 정보 표시 */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h2 className="text-xl font-semibold mb-2">검색 조건</h2>
+          <div className="flex flex-wrap gap-3 text-sm text-gray-700">
+            {destination && <span className="px-3 py-1 bg-white rounded-full">📍 {destination}</span>}
+            {checkIn && <span className="px-3 py-1 bg-white rounded-full">📅 {checkIn}</span>}
+            {checkOut && <span className="px-3 py-1 bg-white rounded-full">📅 {checkOut}</span>}
+            {guests && <span className="px-3 py-1 bg-white rounded-full">👥 게스트 {guests}명</span>}
+          </div>
+        </div>
+
+        {/* 검색 결과 */}
         <section>
           <AccommodationList
-            title="강남구의 추천 숙소"
-            data={osakaListings}
+            title={searchTitle || '검색 결과'}
+            data={allListings}
           />
+          {allListings.length === 0 && (
+            <div className="text-center py-20 text-gray-500">
+              검색 조건에 맞는 숙소가 없습니다.
+            </div>
+          )}
         </section>
+      </div>
+    );
+  }
+
+  // 일반 모드: 지역별로 표시
+  const regions = Object.keys(listingsByRegion).sort((a, b) => {
+    // 한국 도시를 먼저 표시
+    const koreanCities = ['서울', '부산', '제주', '대구'];
+    const aIndex = koreanCities.indexOf(a);
+    const bIndex = koreanCities.indexOf(b);
+    
+    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+    if (aIndex !== -1) return -1;
+    if (bIndex !== -1) return 1;
+    return a.localeCompare(b);
+  });
+
+  // 지역별 표시 개수 제한 (1행 = 5개)
+  const limitedListings: { [key: string]: AccommodationData[] } = {};
+  const limitToOneRow = ['기타', '일본', '제주', '미국']; // 1행만 표시할 지역
+  
+  regions.forEach(region => {
+    const listings = listingsByRegion[region];
+    if (limitToOneRow.includes(region)) {
+      // 1행(5개)만 표시
+      limitedListings[region] = listings.slice(0, 5);
+    } else {
+      // 전체 표시
+      limitedListings[region] = listings;
+    }
+  });
+
+  return (
+    <div className="px-6 py-8 max-w-screen-2xl mx-auto">
+      {regions.map((region, index) => (
+        limitedListings[region] && limitedListings[region].length > 0 && (
+          <section key={region} className={index > 0 ? 'mt-12' : ''}>
+            <AccommodationList
+              title={`${region}의 숙소`}
+              data={limitedListings[region]}
+            />
+          </section>
+        )
+      ))}
+      
+      {regions.length === 0 && (
+        <div className="text-center py-20 text-gray-500">
+          표시할 숙소가 없습니다.
+        </div>
       )}
     </div>
   );
