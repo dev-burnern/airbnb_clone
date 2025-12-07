@@ -628,18 +628,18 @@ async function seedReviews(dataSource: DataSource) {
         '체크인/체크아웃이 간편해서 좋았습니다.'
     ];
 
-    // 실제 user ID (UUID) 조회
+    // 실제 user ID와 listing ID (UUID) 조회
     const users = await dataSource.query(`SELECT id FROM users`);
+    const listings = await dataSource.query(`SELECT id FROM listings`);
 
     for (let i = 1; i <= 200; i++) {
         await dataSource.query(`
-            INSERT INTO reviews (content_text, status, star_point, room_id, user_id)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO reviews (content, rating, listing_id, author_id)
+            VALUES ($1, $2, $3, $4)
         `, [
             reviewTexts[i % reviewTexts.length],
-            'approved',
             Math.floor(Math.random() * 2) + 4, // 4~5점
-            (i % 100) + 1,
+            listings[(i - 1) % listings.length].id,
             users[(i - 1) % users.length].id
         ]);
     }
