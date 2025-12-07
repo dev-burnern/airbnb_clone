@@ -38,26 +38,48 @@ export default function ListingEditorPage() {
     if (listingId) {
       localStorage.setItem("hasListing", "true");
       
-      // localStorage에서 리스팅 데이터 로드
-      const savedData = localStorage.getItem(`listing_${listingId}`);
-      if (savedData) {
-        try {
-          const data = JSON.parse(savedData);
-          
-          // blob URL 필터링 (blob:로 시작하는 URL 제거)
-          if (data.photos && Array.isArray(data.photos)) {
-            data.photos = data.photos.filter((photo: string) => !photo.startsWith('blob:'));
-            // 필터링 후 다시 저장
-            localStorage.setItem(`listing_${listingId}`, JSON.stringify(data));
-          }
-          
-          setListing(data);
-        } catch (error) {
-          console.error('Failed to load listing:', error);
-        }
-      }
+      // 백엔드 API에서 리스팅 데이터 로드
+      fetchListing();
     }
   }, [listingId]);
+
+  const fetchListing = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`);
+      if (!response.ok) {
+        console.error('Failed to fetch listing:', response.status);
+        return;
+      }
+      
+      const result = await response.json();
+      const data = result.data || result;
+      
+      console.log('Fetched listing from backend:', data);
+      console.log('Images array:', data.images);
+      console.log('Images count:', data.images?.length);
+      
+      // 백엔드 데이터를 프론트엔드 형식으로 변환
+      const listingData: ListingData = {
+        propertyName: data.title || '',
+        propertyType: data.type || '주택',
+        basePrice: data.basePrice || 0,
+        photos: data.images || [],
+        bedrooms: data.bedrooms || 1,
+        beds: data.beds || 1,
+        bathrooms: data.bathrooms || 1,
+        guests: data.maxGuests || 1,
+        popularAmenities: Array.isArray(data.amenities) ? data.amenities.slice(0, 5) : [],
+        standoutAmenities: Array.isArray(data.amenities) ? data.amenities.slice(5) : [],
+      };
+      
+      console.log('Converted listing data:', listingData);
+      console.log('Photos in listing:', listingData.photos);
+      
+      setListing(listingData);
+    } catch (error) {
+      console.error('Failed to load listing:', error);
+    }
+  };
 
   const handlePhotoUpload = async () => {
     // input 엘리먼트를 생성하고 클릭
@@ -136,19 +158,30 @@ export default function ListingEditorPage() {
           <div className="p-4 space-y-4">
             {/* Listing Preview Card */}
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <div className="aspect-video bg-gray-200 flex items-center justify-center">
+              <div className="aspect-video bg-gray-200 flex items-center justify-center relative">
                 {listing.photos.length > 0 ? (
                   <img
                     src={listing.photos[0]}
                     alt="Listing"
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = "";
+                      console.error('Failed to load image:', listing.photos[0]?.substring(0, 100));
                       e.currentTarget.style.display = "none";
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'flex flex-col items-center justify-center text-gray-400';
+                        fallback.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-xs mt-2">이미지 로드 실패</span>';
+                        parent.appendChild(fallback);
+                      }
                     }}
+                    onLoad={() => console.log('Image loaded successfully')}
                   />
                 ) : (
-                  <Upload size={32} className="text-gray-400" />
+                  <div className="flex flex-col items-center justify-center text-gray-400">
+                    <Upload size={32} />
+                    <span className="text-xs mt-2">이미지 없음</span>
+                  </div>
                 )}
               </div>
               <div className="p-3">
