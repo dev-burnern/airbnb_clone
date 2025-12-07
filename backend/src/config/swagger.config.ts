@@ -26,7 +26,7 @@ export function setupSwagger(app: INestApplication): void {
         .addTag('Chat', '실시간 채팅')
         .addTag('Chatbot', 'AI 챗봇')
         .addTag('Payments', '결제 관리')
-        .addTag('Support', '고객 지원')
+
         .build();
 
     const document = SwaggerModule.createDocument(app, config);

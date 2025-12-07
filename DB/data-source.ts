@@ -13,7 +13,10 @@ export const dataSourceOptions: DataSourceOptions = {
     username: process.env.DB_USERNAME || 'airbnb',
     password: process.env.DB_PASSWORD || 'airbnb',
     database: process.env.DB_DATABASE || 'airbnb',
-    entities: [path.join(__dirname, '../backend/dist/**/*.entity.js')],
+    entities: [
+        path.join(__dirname, '../backend/dist/**/*.entity.js'),
+        path.join(__dirname, '../backend/src/**/*.entity.ts')
+    ],
     migrations: [path.join(__dirname, './migrations/*.ts')],
     synchronize: false, // 마이그레이션 사용 시 false로 설정
     logging: true,
