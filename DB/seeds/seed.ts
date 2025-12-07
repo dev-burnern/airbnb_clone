@@ -341,7 +341,7 @@ async function seedListings(dataSource: DataSource) {
             'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=800&h=600&fit=crop', // Ocean view
         ],
         korea_nature: [
-            'https://images.unsplash.com/photo-1449156493391-d2cfa28e468b?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop',
@@ -366,10 +366,10 @@ async function seedListings(dataSource: DataSource) {
         ],
         japan: [
             'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1528360983277-13d9b15143b3?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1596276020587-8044fe049813?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1493936734716-77ba6da663d9?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1503899036084-c55cdd92a805?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=800&h=600&fit=crop',
@@ -377,7 +377,7 @@ async function seedListings(dataSource: DataSource) {
             'https://images.unsplash.com/photo-1518281361980-b26bfd556770?w=800&h=600&fit=crop',
         ],
         philippines: [
-            'https://images.unsplash.com/photo-1512356181113-853a150849f0?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?w=800&h=600&fit=crop',
             'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&h=600&fit=crop',
