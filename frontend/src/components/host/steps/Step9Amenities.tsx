@@ -61,22 +61,22 @@ const Step9Amenities: React.FC<Step9AmenitiesProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full px-8 py-12 overflow-y-auto">
-      <div className="max-w-4xl mx-auto w-full">
-        <h1 className="text-4xl font-semibold mb-4">
+    <div className="py-6">
+      <div className="w-full">
+        <h1 className="text-3xl font-semibold mb-3">
           숙소 편의시설 정보를 추가하세요
         </h1>
-        <p className="text-gray-600 mb-12">
+        <p className="text-sm text-gray-600 mb-8">
           여기에 추가하려는 편의시설이 보이지 않더라도 걱정하지 마세요! 숙소를
           등록한 후에 편의시설을 추가할 수 있습니다.
         </p>
 
         {/* Popular Amenities */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">
             다음 인기 편의시설이 있나요?
           </h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {popularAmenities.map((amenity) => {
               const Icon = amenity.icon;
               const isSelected = formData.popularAmenities.includes(amenity.id);
@@ -84,7 +84,7 @@ const Step9Amenities: React.FC<Step9AmenitiesProps> = ({
                 <button
                   key={amenity.id}
                   onClick={() => toggleAmenity("popular", amenity.id)}
-                  className={`flex items-center gap-4 p-4 rounded-lg border-2 transition ${
+                  className={`flex items-center gap-3 p-3 rounded-lg border-2 transition text-sm ${
                     isSelected
                       ? "border-gray-900 bg-gray-50"
                       : "border-gray-300 hover:border-gray-900"

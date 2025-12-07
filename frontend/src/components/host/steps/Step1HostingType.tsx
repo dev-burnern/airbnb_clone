@@ -33,12 +33,12 @@ export default function Step1HostingType({
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16">
-      <h1 className="text-5xl font-semibold mb-16">
+    <div className="py-6">
+      <h1 className="text-3xl font-semibold mb-8">
         원하시는 호스팅 유형을 선택하세요
       </h1>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {options.map((option) => {
           const Icon = option.icon;
           const isSelected = selectedType === option.id;
@@ -48,7 +48,7 @@ export default function Step1HostingType({
               key={option.id}
               onClick={() => option.enabled && onSelect(option.id)}
               disabled={!option.enabled}
-              className={`w-full p-6 rounded-xl border-2 transition text-left ${
+              className={`w-full p-4 rounded-lg border-2 transition text-left ${
                 isSelected
                   ? "border-gray-900 bg-gray-50"
                   : option.enabled
@@ -58,9 +58,9 @@ export default function Step1HostingType({
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold mb-1">{option.title}</h3>
+                  <h3 className="text-base font-semibold">{option.title}</h3>
                 </div>
-                <Icon className="w-8 h-8 text-gray-700" />
+                <Icon className="w-6 h-6 text-gray-700" />
               </div>
             </button>
           );
