@@ -49,13 +49,39 @@ export default function Header() {
   // 현재 호스트 모드인지 확인
   const isHostMode = pathname?.startsWith('/host') ?? false;
 
-  // 페이지 로드 시 저장된 토큰으로 로그인 상태 복원
+  // 페이지 로드 시 저장된 토큰 유효성 검증
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      setIsLoggedIn(true);
-    }
-    
+    const validateToken = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setIsLoggedIn(false);
+        return;
+      }
+
+      try {
+        // 토큰 유효성 검증을 위한 API 호출
+        const response = await fetch('http://localhost:3001/api/v1/users/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          setIsLoggedIn(true);
+        } else {
+          // 토큰이 만료되었거나 유효하지 않음
+          localStorage.removeItem('accessToken');
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        // 네트워크 오류 등 - 토큰은 유지하고 오프라인 상태로 간주
+        console.warn('토큰 검증 실패:', error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    validateToken();
+
     // 리스팅 존재 여부 확인
     const listingStatus = localStorage.getItem('hasListing');
     if (listingStatus === 'true') {
@@ -150,7 +176,7 @@ export default function Header() {
             <HeaderSearchBar />
           </div>
         )}
-        
+
         {/* 우측 프로필 + 메뉴 */}
         <div className="flex items-center gap-3">
           {/* 호스트 되기 / 호스트 모드로 전환 / 게스트 모드로 전환 버튼 */}
@@ -198,52 +224,52 @@ export default function Header() {
             {menuOpen && (
               <div className="absolute top-12 right-0 bg-white border border-gray-100 rounded-xl shadow-2xl w-56 py-3 animate-fadeIn z-50 flex flex-col">
 
-            {/* 메인 메뉴 섹션 */}
-            {menuItems.filter(item => item.isLoggedInRequired !== false).map((item, index) => (
-              <div key={item.name}>
-                {/* 로그인 상태 필터링: isLoggedInRequired가 true이고 로그인 안된 경우, 또는 path가 없는 경우 건너뛰기 */}
-                {!(item.isLoggedInRequired === true && !isLoggedIn) && (
-                  <button
-                    type="button"
-                    onClick={() => handleNavigation(item.path)}
-                    className={`flex items-center gap-3 text-left px-4 py-3 hover:bg-gray-100 transition-colors w-full ${item.name === '프로필' || item.name === '위시리스트' ? 'font-semibold' : 'font-normal text-gray-700'}`}
-                  >
-                    <item.icon size={18} className="text-gray-600" />
-                    {item.name}
-                  </button>
-                )}
-                {/* 프로필, 메시지 다음 구분선 추가 (UI 이미지 기반) */}
-                {((isLoggedIn && item.name === '프로필') || (!isLoggedIn && item.name === '홈')) && <hr className="my-2 border-gray-200" />}
-              </div>
-            ))}
+                {/* 메인 메뉴 섹션 */}
+                {menuItems.filter(item => item.isLoggedInRequired !== false).map((item, index) => (
+                  <div key={item.name}>
+                    {/* 로그인 상태 필터링: isLoggedInRequired가 true이고 로그인 안된 경우, 또는 path가 없는 경우 건너뛰기 */}
+                    {!(item.isLoggedInRequired === true && !isLoggedIn) && (
+                      <button
+                        type="button"
+                        onClick={() => handleNavigation(item.path)}
+                        className={`flex items-center gap-3 text-left px-4 py-3 hover:bg-gray-100 transition-colors w-full ${item.name === '프로필' || item.name === '위시리스트' ? 'font-semibold' : 'font-normal text-gray-700'}`}
+                      >
+                        <item.icon size={18} className="text-gray-600" />
+                        {item.name}
+                      </button>
+                    )}
+                    {/* 프로필, 메시지 다음 구분선 추가 (UI 이미지 기반) */}
+                    {((isLoggedIn && item.name === '프로필') || (!isLoggedIn && item.name === '홈')) && <hr className="my-2 border-gray-200" />}
+                  </div>
+                ))}
 
-            {/* 로그인/로그아웃 및 기타 메뉴 */}
-            <div className="mt-1">
-              {/* 로그인 상태에 따른 메뉴 표시 */}
-              {!isLoggedIn ? (
-                <button
-                  type="button"
-                  onClick={handleLoginOpen}
-                  className="flex items-center gap-3 text-left px-4 py-3 hover:bg-gray-100 transition-colors w-full font-normal text-gray-700"
-                >
-                  <LogIn size={18} className="text-gray-600" />
-                  로그인 및 회원가입
-                </button>
-              ) : (
-                <>
-                  {/* 언어 및 통화는 이미 위에서 처리되었거나, 필요하다면 여기에 다시 분류 */}
-                  {/* <hr className="my-2 border-gray-200" /> */}
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="flex items-center gap-3 text-left px-4 py-3 hover:bg-gray-100 transition-colors w-full font-normal text-gray-700"
-                  >
-                    <LogOut size={18} className="text-gray-600" />
-                    로그아웃
-                  </button>
-                </>
-              )}
-            </div>
+                {/* 로그인/로그아웃 및 기타 메뉴 */}
+                <div className="mt-1">
+                  {/* 로그인 상태에 따른 메뉴 표시 */}
+                  {!isLoggedIn ? (
+                    <button
+                      type="button"
+                      onClick={handleLoginOpen}
+                      className="flex items-center gap-3 text-left px-4 py-3 hover:bg-gray-100 transition-colors w-full font-normal text-gray-700"
+                    >
+                      <LogIn size={18} className="text-gray-600" />
+                      로그인 및 회원가입
+                    </button>
+                  ) : (
+                    <>
+                      {/* 언어 및 통화는 이미 위에서 처리되었거나, 필요하다면 여기에 다시 분류 */}
+                      {/* <hr className="my-2 border-gray-200" /> */}
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 text-left px-4 py-3 hover:bg-gray-100 transition-colors w-full font-normal text-gray-700"
+                      >
+                        <LogOut size={18} className="text-gray-600" />
+                        로그아웃
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>
