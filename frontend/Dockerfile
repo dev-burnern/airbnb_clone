@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # 2️⃣ 실행 단계
-FROM node:20-alpine AS runner
+FROM node:20 AS runner
 
 WORKDIR /app
 
@@ -30,5 +30,5 @@ COPY --from=build /app/node_modules ./node_modules
 EXPOSE 3000
 
 # Next.js 프로덕션 서버 실행
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
 

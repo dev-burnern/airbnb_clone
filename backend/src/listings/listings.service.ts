@@ -76,4 +76,21 @@ export class ListingsService {
     async findOne(id: string): Promise<Listing | null> {
         return this.listingsRepository.findOne({ where: { id }, relations: ['host', 'reviews'] });
     }
+
+    async update(id: string, updateData: Partial<Listing>): Promise<Listing> {
+        await this.listingsRepository.update(id, updateData);
+        const updated = await this.findOne(id);
+        if (!updated) {
+            throw new Error('업데이트된 숙소를 찾을 수 없습니다');
+        }
+        return updated;
+    }
+
+    async remove(id: string): Promise<{ deleted: boolean; message: string }> {
+        const result = await this.listingsRepository.delete(id);
+        return {
+            deleted: result.affected ? result.affected > 0 : false,
+            message: result.affected ? '숙소가 삭제되었습니다' : '삭제할 숙소를 찾을 수 없습니다',
+        };
+    }
 }

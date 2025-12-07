@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request, Query, NotFoundException } from '@nestjs/common';
 import { ListingsService } from './listings.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Listings')
 @Controller('listings')
@@ -26,10 +26,15 @@ export class ListingsController {
     @Get(':id')
     @ApiOperation({ summary: 'ID로 숙소 상세 조회' })
     async findOne(@Param('id') id: string) {
-        return this.listingsService.findOne(id);
+        const listing = await this.listingsService.findOne(id);
+        if (!listing) {
+            throw new NotFoundException(`숙소를 찾을 수 없습니다: ${id}`);
+        }
+        return listing;
     }
 
     @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
     @Post()
     @ApiOperation({ summary: '새 숙소 등록' })
     async create(@Request() req, @Body() listingData: any) {
@@ -37,5 +42,29 @@ export class ListingsController {
             ...listingData,
             host: req.user,
         });
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
+    @Patch(':id')
+    @ApiOperation({ summary: '숙소 정보 수정' })
+    async update(@Param('id') id: string, @Request() req, @Body() updateData: any) {
+        const listing = await this.listingsService.findOne(id);
+        if (!listing) {
+            throw new NotFoundException(`숙소를 찾을 수 없습니다: ${id}`);
+        }
+        return this.listingsService.update(id, updateData);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
+    @Delete(':id')
+    @ApiOperation({ summary: '숙소 삭제' })
+    async remove(@Param('id') id: string, @Request() req) {
+        const listing = await this.listingsService.findOne(id);
+        if (!listing) {
+            throw new NotFoundException(`숙소를 찾을 수 없습니다: ${id}`);
+        }
+        return this.listingsService.remove(id);
     }
 }
