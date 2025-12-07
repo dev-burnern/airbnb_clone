@@ -13,15 +13,40 @@ import {
   Plus,
 } from "lucide-react";
 
+interface ListingData {
+  propertyName: string;
+  propertyType: string;
+  basePrice: number;
+  photos: string[];
+  bedrooms: number;
+  beds: number;
+  bathrooms: number;
+  guests: number;
+  popularAmenities: string[];
+  standoutAmenities: string[];
+}
+
 export default function ListingEditorPage() {
   const params = useParams();
   const router = useRouter();
   const listingId = (params?.id as string) || "";
+  const [listing, setListing] = useState<ListingData | null>(null);
 
   useEffect(() => {
     // 리스팅 ID를 로컬 스토리지에 저장 (호스트 모드 활성화)
     if (listingId) {
       localStorage.setItem("hasListing", "true");
+      
+      // localStorage에서 리스팅 데이터 로드
+      const savedData = localStorage.getItem(`listing_${listingId}`);
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          setListing(data);
+        } catch (error) {
+          console.error('Failed to load listing:', error);
+        }
+      }
     }
   }, [listingId]);
 
@@ -29,22 +54,16 @@ export default function ListingEditorPage() {
     router.push("/");
   };
 
-  // 임시 데이터 (나중에 API에서 가져올 것)
-  const [listing] = useState({
-    name: "바다가 보이는 아늑한 집",
-    type: "주택",
-    basePrice: 64115,
-    photos: [
-      "/images/placeholder-room.jpg",
-      "/images/placeholder-room.jpg",
-      "/images/placeholder-room.jpg",
-    ],
-    bedrooms: 1,
-    beds: 1,
-    bathrooms: 1,
-    guests: 4,
-    amenities: ["와이파이", "TV", "주방", "무료 주차", "에어컨"],
-  });
+  // 로딩 중이거나 데이터가 없을 때
+  if (!listing) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-gray-600">리스팅 정보를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  const allAmenities = [...(listing.popularAmenities || []), ...(listing.standoutAmenities || [])];
 
   return (
     <div className="min-h-screen bg-white">
@@ -71,10 +90,10 @@ export default function ListingEditorPage() {
                 )}
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-lg mb-2">{listing.name}</h3>
-                <p className="text-sm text-gray-600 mb-1">{listing.type}</p>
+                <h3 className="font-semibold text-lg mb-2">{listing.propertyName}</h3>
+                <p className="text-sm text-gray-600 mb-1">{listing.propertyType || '주택'}</p>
                 <p className="text-sm font-medium">
-                  ₩{listing.basePrice.toLocaleString()} / 박
+                  ₩{listing.basePrice?.toLocaleString() || '64,115'} / 박
                 </p>
               </div>
             </div>
@@ -120,7 +139,7 @@ export default function ListingEditorPage() {
             <div className="space-y-4">
               <h3 className="font-semibold">편의시설</h3>
               <div className="space-y-2">
-                {listing.amenities.slice(0, 5).map((amenity, index) => (
+                {allAmenities.slice(0, 5).map((amenity, index) => (
                   <div key={index} className="flex items-center gap-2 text-sm">
                     {amenity === "와이파이" && <Wifi size={16} />}
                     {amenity === "TV" && <Tv size={16} />}
@@ -131,7 +150,7 @@ export default function ListingEditorPage() {
                 ))}
               </div>
               <button className="text-sm font-medium underline">
-                편의시설 {listing.amenities.length}개 모두 보기
+                편의시설 {allAmenities.length}개 모두 보기
               </button>
             </div>
 
