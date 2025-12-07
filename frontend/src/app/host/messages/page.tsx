@@ -36,9 +36,7 @@ export default function HostMessagesPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <KeyInfoAlert />
-
-        <h1 className="text-3xl font-semibold mb-6">메시지</h1>
+        <h1 className="text-3xl font-semibold mb-8">메시지</h1>
 
         <div className="grid grid-cols-12 gap-6 h-[calc(100vh-250px)]">
           {/* Left - Message List */}

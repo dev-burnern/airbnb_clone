@@ -14,14 +14,21 @@ const Step12PhotoUpload: React.FC<Step12PhotoUploadProps> = ({
   formData,
   onUpdate,
 }) => {
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      // 실제로는 파일을 업로드하고 URL을 받아와야 하지만, 
-      // 여기서는 더미 URL을 생성합니다
-      const newPhotos = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
+      // 파일을 Base64로 변환하여 localStorage에 저장 가능하게 함
+      const filePromises = Array.from(files).map((file) => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+      
+      const newPhotos = await Promise.all(filePromises);
       onUpdate({
         ...formData,
         photos: [...formData.photos, ...newPhotos],
@@ -37,30 +44,30 @@ const Step12PhotoUpload: React.FC<Step12PhotoUploadProps> = ({
   const hasMinimumPhotos = formData.photos.length >= 5;
 
   return (
-    <div className="flex flex-col h-full px-8 py-12">
-      <div className="max-w-4xl mx-auto w-full">
-        <h1 className="text-4xl font-semibold mb-2">
+    <div className="py-6">
+      <div className="w-full">
+        <h1 className="text-3xl font-semibold mb-2">
           5장 이상의 사진을 선택하세요.
         </h1>
-        <p className="text-gray-600 mb-8">드래그하여 순서 변경</p>
+        <p className="text-sm text-gray-600 mb-6">드래그하여 순서 변경</p>
 
         {/* Cover Photo */}
         {formData.photos.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-4">
             <div className="relative group">
-              <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-sm font-semibold z-10">
+              <div className="absolute top-3 left-3 bg-white px-2 py-1 rounded-full text-xs font-semibold z-10">
                 커버 사진
               </div>
               <button
                 onClick={() => removePhoto(0)}
-                className="absolute top-4 right-4 bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition z-10"
+                className="absolute top-3 right-3 bg-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition z-10"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
               <img
                 src={formData.photos[0]}
                 alt="Cover"
-                className="w-full h-96 object-cover rounded-lg"
+                className="w-full h-64 object-cover rounded-lg"
               />
             </div>
           </div>

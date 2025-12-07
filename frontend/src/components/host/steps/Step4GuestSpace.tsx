@@ -35,10 +35,10 @@ export default function Step4GuestSpace({
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16">
-      <h1 className="text-5xl font-semibold mb-16">게스트가 사용할 숙소 유형</h1>
+    <div className="py-6">
+      <h1 className="text-3xl font-semibold mb-8">게스트가 사용할 숙소 유형</h1>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {spaceOptions.map((option) => {
           const Icon = option.icon;
           const isSelected = selectedSpace === option.id;
@@ -47,7 +47,7 @@ export default function Step4GuestSpace({
             <button
               key={option.id}
               onClick={() => onSelect(option.id)}
-              className={`w-full p-6 rounded-xl border-2 transition text-left ${
+              className={`w-full p-4 rounded-lg border-2 transition text-left ${
                 isSelected
                   ? "border-gray-900 bg-gray-50"
                   : "border-gray-300 hover:border-gray-900"
@@ -55,10 +55,10 @@ export default function Step4GuestSpace({
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold mb-2">{option.title}</h3>
+                  <h3 className="text-base font-semibold mb-1">{option.title}</h3>
                   <p className="text-gray-600 text-sm">{option.description}</p>
                 </div>
-                <Icon className="w-8 h-8 text-gray-700 ml-4" />
+                <Icon className="w-6 h-6 text-gray-700 ml-3" />
               </div>
             </button>
           );

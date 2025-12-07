@@ -2,7 +2,6 @@
 
 import { BookOpen } from "lucide-react";
 import { useState } from "react";
-import KeyInfoAlert from "@/components/host/KeyInfoAlert";
 import HostRegistrationModal from "@/components/host/HostRegistrationModal";
 
 export default function HostDashboardPage() {
@@ -12,8 +11,6 @@ export default function HostDashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <KeyInfoAlert />
-
         {/* Tabs */}
         <div className="flex gap-4 mb-8 border-b border-gray-200">
           <button 
