@@ -5,13 +5,13 @@ import { Listing } from '../listings/listing.entity';
 @Entity('wishlists')
 export class Wishlist {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id!: string;
 
     @Column()
-    name: string;
+    name!: string;
 
     @ManyToOne(() => User, user => user.wishlists) // Need to add wishlists to User
-    user: User;
+    user!: User;
 
     @ManyToMany(() => Listing)
     @JoinTable({
@@ -25,11 +25,12 @@ export class Wishlist {
             referencedColumnName: 'id',
         },
     })
-    listings: Listing[];
+    listings!: Listing[];
 
     @CreateDateColumn()
-    createdAt: Date;
+    createdAt!: Date;
 
     @UpdateDateColumn()
-    updatedAt: Date;
+    updatedAt!: Date;
 }
+
