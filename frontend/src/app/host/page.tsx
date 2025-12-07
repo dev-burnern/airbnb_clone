@@ -7,6 +7,7 @@ import HostRegistrationModal from "@/components/host/HostRegistrationModal";
 
 export default function HostDashboardPage() {
   const [hostModalOpen, setHostModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"today" | "scheduled">("today");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -15,15 +16,29 @@ export default function HostDashboardPage() {
 
         {/* Tabs */}
         <div className="flex gap-4 mb-8 border-b border-gray-200">
-          <button className="pb-3 px-1 border-b-2 border-gray-900 font-semibold">
+          <button 
+            onClick={() => setActiveTab("today")}
+            className={`pb-3 px-1 border-b-2 font-semibold ${
+              activeTab === "today" 
+                ? "border-gray-900" 
+                : "border-transparent text-gray-600 hover:text-gray-900"
+            }`}
+          >
             오늘
           </button>
-          <button className="pb-3 px-1 text-gray-600 hover:text-gray-900">
+          <button 
+            onClick={() => setActiveTab("scheduled")}
+            className={`pb-3 px-1 border-b-2 font-semibold ${
+              activeTab === "scheduled" 
+                ? "border-gray-900" 
+                : "border-transparent text-gray-600 hover:text-gray-900"
+            }`}
+          >
             예정
           </button>
         </div>
 
-        {/* Empty State */}
+        {/* Empty State - 두 탭 모두 동일한 내용 표시 */}
         <div className="flex flex-col items-center justify-center py-20">
           <BookOpen size={64} className="text-gray-300 mb-4" />
           <h2 className="text-2xl font-semibold mb-2">예약이 없습니다</h2>
