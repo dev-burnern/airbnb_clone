@@ -1,11 +1,16 @@
 import { DataSource } from 'typeorm';
 import { dataSourceOptions } from '../data-source';
+import * as bcrypt from 'bcryptjs';
 
 // 시드 실행 함수
 async function runSeed() {
     const dataSource = new DataSource(dataSourceOptions);
     await dataSource.initialize();
     console.log('📦 데이터베이스 연결 완료');
+
+    // DB 초기화 (Schema Drop & Sync)
+    await dataSource.synchronize(true);
+    console.log('⚠️ 데이터베이스 초기화 및 스키마 동기화 완료');
 
     try {
         // 순서대로 시드 실행 (의존성 순서)
@@ -20,6 +25,7 @@ async function runSeed() {
         await seedRooms(dataSource);
         await seedRoomImages(dataSource);
         await seedListings(dataSource);
+
         await seedBookings(dataSource);
         await seedReservations(dataSource);
         await seedConversations(dataSource);
@@ -31,7 +37,7 @@ async function runSeed() {
         await seedReviews(dataSource);
         await seedWishlists(dataSource);
 
-        console.log('✅ 모든 시드 데이터 생성 완료!');
+        console.log('✅ 전체 시드 데이터 생성 완료!');
     } catch (error) {
         console.error('❌ 시드 실행 오류:', error);
     } finally {
@@ -42,19 +48,21 @@ async function runSeed() {
 // ========== 사용자 ==========
 async function seedUsers(dataSource: DataSource) {
     const users = [];
-    const names = ['김민수', '이영희', '박철수', '최지은', '정대현', '강서연', '윤재호', '송미래', '임준영', '한소희',
-        '오승민', '배수지', '조현우', '신예린', '권도훈', '문채원', '황민호', '안지영', '유승호', '장서윤'];
+    const names = ['김민수', '이영희', '박철수', '최지은', '정대현', '강서연', '윤재호'];
 
-    for (let i = 1; i <= 50; i++) {
-        const name = names[i % names.length];
+    // 비밀번호 통일: 123456
+    const hashedPassword = await bcrypt.hash('123456', 10);
+
+    for (let i = 1; i <= 7; i++) {
+        const name = names[i - 1];
         users.push({
             email: `user${i}@example.com`,
-            password: '$2b$10$abcdefghijklmnopqrstuv', // bcrypt hash
-            name: `${name}${i}`,
+            password: hashedPassword,
+            name: name,
             avatarUrl: `https://i.pravatar.cc/150?img=${i}`,
-            roles: i <= 10 ? 'host,guest' : 'guest',
-            provider: i % 5 === 0 ? 'github' : 'local',
-            githubId: i % 5 === 0 ? `github_${i}` : null,
+            roles: 'host,guest', // 모든 유저가 호스트 가능
+            provider: 'local',
+            githubId: null,
         });
     }
 
@@ -71,17 +79,27 @@ async function seedUsers(dataSource: DataSource) {
         users.map(u => u.provider),
         users.map(u => u.githubId),
     ]);
-    console.log('👤 Users: 50개 생성');
+    console.log('👤 Users: 7명 생성 (패스워드: 123456)');
 }
 
 // ========== 사용자 프로필 ==========
 async function seedUserProfiles(dataSource: DataSource) {
-    const locations = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '제주'];
+    const locations = ['서울', '부산', '대구', '제주', '일본', '미국', '필리핀'];
     const languages = ['한국어', '영어', '일본어', '중국어', '한국어, 영어'];
-    const jobs = ['개발자', '디자이너', '마케터', '학생', '프리랜서', '사업가', '교사', '의사', '변호사', '요리사'];
+    const jobs = ['개발자', '디자이너', '마케터', '학생', '프리랜서', '사업가', '교사'];
 
     // 실제 user ID (UUID) 조회
-    const users = await dataSource.query(`SELECT id FROM users ORDER BY "createdAt" LIMIT 30`);
+    const users = await dataSource.query(`SELECT id FROM users ORDER BY "createdAt" LIMIT 7`);
+
+    const profileImages = [
+        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop'
+    ];
 
     for (let i = 0; i < users.length; i++) {
         await dataSource.query(`
@@ -91,7 +109,7 @@ async function seedUserProfiles(dataSource: DataSource) {
         `, [
             users[i].id,
             `profile_${i + 1}.jpg`,
-            `/uploads/profiles/profile_${i + 1}.jpg`,
+            profileImages[i % profileImages.length],
             `안녕하세요! 여행을 좋아하는 ${jobs[i % jobs.length]}입니다.`,
             locations[i % locations.length],
             languages[i % languages.length],
@@ -99,23 +117,23 @@ async function seedUserProfiles(dataSource: DataSource) {
             'active'
         ]);
     }
-    console.log('📝 UserProfiles: 30개 생성');
+    console.log('📝 UserProfiles: 7개 생성');
 }
 
 
 // ========== 호스트 ==========
 async function seedHosts(dataSource: DataSource) {
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= 7; i++) {
         await dataSource.query(`
             INSERT INTO hosts (host_name, identity_verified, listing_count)
             VALUES ($1, $2, $3)
         `, [
             `호스트${i}`,
-            i % 3 === 0 ? 'verified' : 'pending',
-            Math.floor(Math.random() * 10) + 1
+            'verified',
+            70 // 70 listings
         ]);
     }
-    console.log('🏠 Hosts: 20개 생성');
+    console.log('🏠 Hosts: 7개 생성');
 }
 
 // ========== 숙소 유형 ==========
@@ -134,21 +152,13 @@ async function seedProperty(dataSource: DataSource) {
 // ========== 위치 ==========
 async function seedLocations(dataSource: DataSource) {
     const locationData = [
-        { name: '강남구', desc: '서울의 중심 비즈니스 지구', traffic: '지하철 2호선, 신분당선', lat: 37.4979, lng: 127.0276, neighbourhood: '역삼동', group: '서울' },
-        { name: '홍대입구', desc: '젊음의 거리, 예술과 문화의 중심', traffic: '지하철 2호선, 경의중앙선', lat: 37.5563, lng: 126.9237, neighbourhood: '서교동', group: '서울' },
-        { name: '해운대', desc: '부산 최고의 해변 휴양지', traffic: '지하철 2호선', lat: 35.1631, lng: 129.1635, neighbourhood: '해운대동', group: '부산' },
-        { name: '제주시', desc: '제주도의 중심 도시', traffic: '버스, 렌터카', lat: 33.4996, lng: 126.5312, neighbourhood: '연동', group: '제주' },
-        { name: '서귀포', desc: '제주 남부의 아름다운 관광지', traffic: '버스, 렌터카', lat: 33.2541, lng: 126.5601, neighbourhood: '서귀동', group: '제주' },
-        { name: '경복궁', desc: '서울의 역사적 명소', traffic: '지하철 3호선', lat: 37.5796, lng: 126.9770, neighbourhood: '세종로', group: '서울' },
-        { name: '명동', desc: '쇼핑과 맛집의 천국', traffic: '지하철 4호선', lat: 37.5636, lng: 126.9869, neighbourhood: '명동', group: '서울' },
-        { name: '이태원', desc: '다문화 거리, 외국인 관광 명소', traffic: '지하철 6호선', lat: 37.5347, lng: 126.9946, neighbourhood: '이태원동', group: '서울' },
-        { name: '강릉', desc: '동해안 최고의 휴양지', traffic: 'KTX, 버스', lat: 37.7519, lng: 128.8761, neighbourhood: '강문동', group: '강원' },
-        { name: '전주', desc: '한옥마을과 전통 문화의 도시', traffic: 'KTX, 버스', lat: 35.8242, lng: 127.1480, neighbourhood: '풍남동', group: '전북' },
-        { name: '경주', desc: '천년 고도, 역사 문화 도시', traffic: 'KTX, 버스', lat: 35.8562, lng: 129.2247, neighbourhood: '황남동', group: '경북' },
-        { name: '여수', desc: '아름다운 밤바다의 도시', traffic: 'KTX, 버스', lat: 34.7604, lng: 127.6622, neighbourhood: '충무동', group: '전남' },
-        { name: '속초', desc: '설악산과 동해의 조화', traffic: '버스', lat: 38.2070, lng: 128.5918, neighbourhood: '조양동', group: '강원' },
         { name: '대구', desc: '패션과 음식의 도시', traffic: '지하철, KTX', lat: 35.8714, lng: 128.6014, neighbourhood: '동성로', group: '대구' },
-        { name: '인천', desc: '서해안 최대의 항구 도시', traffic: '지하철, 공항철도', lat: 37.4563, lng: 126.7052, neighbourhood: '송도동', group: '인천' },
+        { name: '부산', desc: '항구 도시', traffic: '지하철, KTX', lat: 35.1796, lng: 129.0756, neighbourhood: '해운대', group: '부산' },
+        { name: '서울', desc: '대한민국의 수도', traffic: '지하철, 버스', lat: 37.5665, lng: 126.9780, neighbourhood: '강남', group: '서울' },
+        { name: '제주', desc: '아름다운 섬', traffic: '공항', lat: 33.4996, lng: 126.5312, neighbourhood: '제주시', group: '제주' },
+        { name: '일본', desc: '가깝고도 먼 나라', traffic: '항공', lat: 35.6762, lng: 139.6503, neighbourhood: '도쿄', group: '해외' },
+        { name: '미국', desc: '자유의 나라', traffic: '항공', lat: 40.7128, lng: -74.0060, neighbourhood: '뉴욕', group: '해외' },
+        { name: '필리핀', desc: '휴양의 천국', traffic: '항공', lat: 14.5995, lng: 120.9842, neighbourhood: '마닐라', group: '해외' },
     ];
 
     for (const loc of locationData) {
@@ -157,7 +167,7 @@ async function seedLocations(dataSource: DataSource) {
             VALUES ($1, $2, $3, $4, $5, $6, $7)
         `, [loc.name, loc.desc, loc.traffic, loc.lat, loc.lng, loc.neighbourhood, loc.group]);
     }
-    console.log('📍 Locations: 15개 생성');
+    console.log('📍 Locations: 7개 생성');
 }
 
 // ========== 객실 유형 ==========
@@ -220,7 +230,7 @@ async function seedRooms(dataSource: DataSource) {
             '15:00',
             '11:00',
             'active',
-            (i % 15) + 1,
+            (i % 7) + 1, // location_id (7 locations)
             (i % 10) + 1,
             (i % 20) + 1,
             (i % 15) + 1
@@ -231,6 +241,17 @@ async function seedRooms(dataSource: DataSource) {
 
 // ========== 객실 이미지 ==========
 async function seedRoomImages(dataSource: DataSource) {
+    const roomImages = [
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1502005229766-52838abd8ac5?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1522771753035-48482b0d3db5?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&h=600&fit=crop'
+    ];
+
     for (let roomId = 1; roomId <= 100; roomId++) {
         const imageCount = Math.floor(Math.random() * 4) + 3; // 3~6개 이미지
         for (let j = 1; j <= imageCount; j++) {
@@ -240,7 +261,7 @@ async function seedRoomImages(dataSource: DataSource) {
             `, [
                 roomId,
                 `room_${roomId}_${j}.jpg`,
-                `https://picsum.photos/800/600?random=${roomId * 10 + j}`
+                roomImages[(roomId * 10 + j) % roomImages.length]
             ]);
         }
     }
@@ -249,7 +270,98 @@ async function seedRoomImages(dataSource: DataSource) {
 
 // ========== 숙소 (listings) ==========
 async function seedListings(dataSource: DataSource) {
-    const types = ['아파트', '주택', '빌라', '펜션', '호텔'];
+    const types = ['아파트', '주택', '빌라', '펜션', '호텔', '전통가옥'];
+
+    // 위치 데이터 정의: 국내(대구, 부산, 서울, 제주), 해외(일본, 미국, 필리핀)
+    const locations = [
+        { name: '대구', lat: 35.8714, lng: 128.6014, addressPrefix: '대구시 중구', imagesType: 'korea_city' },
+        { name: '부산', lat: 35.1796, lng: 129.0756, addressPrefix: '부산시 해운대구', imagesType: 'korea_beach' },
+        { name: '서울', lat: 37.5665, lng: 126.9780, addressPrefix: '서울시 강남구', imagesType: 'korea_city' },
+        { name: '제주', lat: 33.4996, lng: 126.5312, addressPrefix: '제주특별자치도', imagesType: 'korea_nature' },
+        { name: '일본', lat: 35.6762, lng: 139.6503, addressPrefix: 'Tokyo, Shibuya', imagesType: 'japan' },
+        { name: '미국', lat: 40.7128, lng: -74.0060, addressPrefix: 'New York, Manhattan', imagesType: 'usa' },
+        { name: '필리핀', lat: 11.9804, lng: 121.9189, addressPrefix: 'Boracay, Malay', imagesType: 'philippines' },
+    ];
+
+    // 이미지 풀 (Location 별 분리) - 카테고리별 10개 내외 확보
+    const imagePools = {
+        korea_city: [
+            'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&h=600&fit=crop',
+            // Safe replacements (London/UK style but works for city)
+            'https://images.unsplash.com/photo-1486304873000-235643847519?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&h=600&fit=crop',
+            // Replaced 404s again with working images
+            'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&h=600&fit=crop',
+        ],
+        korea_beach: [
+            'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1544550581-5f7ceaf7f992?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1437719417032-8595fd9e9dc6?w=800&h=600&fit=crop',
+            // Replacements for broken beach images
+            'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&h=600&fit=crop', // Maldives/Beach
+            'https://images.unsplash.com/photo-1540206351-d6465b3ac5c1?w=800&h=600&fit=crop', // Beach resort
+            'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=800&h=600&fit=crop', // Ocean view
+        ],
+        korea_nature: [
+            'https://images.unsplash.com/photo-1449156493391-d2cfa28e468b?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1504643030425-38fbd48ac67a?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&h=600&fit=crop',
+        ],
+        usa: [
+            'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&h=600&fit=crop', // US home
+            'https://images.unsplash.com/photo-1460317442991-0ec2aa9a15cd?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1504624244670-3cce6d936942?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1516156008625-3a9d60da1aeb?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=800&h=600&fit=crop',
+        ],
+        japan: [
+            'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1528360983277-13d9b15143b3?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1596276020587-8044fe049813?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1493936734716-77ba6da663d9?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1503899036084-c55cdd92a805?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1518281361980-b26bfd556770?w=800&h=600&fit=crop',
+        ],
+        philippines: [
+            'https://images.unsplash.com/photo-1512356181113-853a150849f0?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1515238152791-8216bfdf89a7?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1520699049698-acd2fcc51056?w=800&h=600&fit=crop',
+        ]
+    };
+
     const amenities = [
         ['WiFi', '에어컨', '주방', '세탁기'],
         ['WiFi', '에어컨', '주방', '주차장', '수영장'],
@@ -257,32 +369,57 @@ async function seedListings(dataSource: DataSource) {
         ['WiFi', '에어컨', '조식', '청소서비스'],
     ];
 
-    // 먼저 user ID들을 가져옴
-    const users = await dataSource.query(`SELECT id FROM users LIMIT 10`);
+    // 먼저 user ID들을 가져옴 (Create된 7명)
+    const users = await dataSource.query(`SELECT id FROM users ORDER BY "createdAt" LIMIT 7`);
 
-    for (let i = 1; i <= 80; i++) {
-        const hostId = users[(i - 1) % users.length].id;
-        await dataSource.query(`
-            INSERT INTO listings (title, description, type, address, latitude, longitude, images, amenities, 
-                                "maxGuests", "basePrice", "weekendPrice", "smartPricingEnabled", "hostId")
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-        `, [
-            `멋진 ${types[i % types.length]} #${i}`,
-            `서울의 중심에 위치한 아늑하고 깨끗한 숙소입니다. 대중교통 접근성이 좋고, 주변에 맛집과 관광지가 많습니다.`,
-            types[i % types.length],
-            `서울시 강남구 역삼동 ${i}번지`,
-            37.5 + (Math.random() * 0.1),
-            127.0 + (Math.random() * 0.1),
-            `image${i}_1.jpg,image${i}_2.jpg,image${i}_3.jpg`,
-            JSON.stringify(amenities[i % amenities.length]),
-            Math.floor(Math.random() * 6) + 2,
-            50000 + (Math.floor(Math.random() * 150000)),
-            70000 + (Math.floor(Math.random() * 180000)),
-            i % 3 === 0,
-            hostId
-        ]);
+    let listingCount = 0;
+
+    // 7명의 유저와 7개의 지역을 1:1 매칭
+    for (let i = 0; i < 7; i++) {
+        const user = users[i];
+        const loc = locations[i];
+
+        // 해당 지역에 맞는 이미지 풀
+        const pool = imagePools[loc.imagesType as keyof typeof imagePools] || imagePools['korea_city'];
+
+        // 각 유저는 할당된 지역에 10개의 숙소 생성
+        for (let j = 0; j < 10; j++) {
+            const randomLat = loc.lat + (Math.random() * 0.05) - 0.025;
+            const randomLng = loc.lng + (Math.random() * 0.05) - 0.025;
+
+            // 이미지 선택 전략:
+            // - 첫 번째 이미지(메인): pool에서 순차적으로 하나씩 가져옴 (j % pool.length) -> pool이 10개 이상이면 고유함
+            // - 나머지 이미지: 랜덤하게 섞음 (단, 첫 번째 이미지와는 다르게)
+            const img1 = pool[j % pool.length];
+            const img2 = pool[(j + 1) % pool.length];
+            const img3 = pool[(j + 2) % pool.length];
+            const img4 = 'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&h=600&fit=crop'; // fallback
+
+            const selectedImages = [img1, img2, img3, img4];
+
+            await dataSource.query(`
+                INSERT INTO listings (title, description, type, address, latitude, longitude, images, amenities, 
+                                    "maxGuests", "basePrice", "weekendPrice", "smartPricingEnabled", "hostId")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            `, [
+                `${loc.name}의 ${types[j % types.length]} #${j + 1}`,
+                `${loc.name} 중심부에 위치한 멋진 숙소입니다. 편안한 휴식을 즐기세요.`,
+                types[j % types.length],
+                `${loc.addressPrefix} ${j + 1}번지`,
+                randomLat,
+                randomLng,
+                selectedImages.join(','),
+                JSON.stringify(amenities[j % amenities.length]),
+                Math.floor(Math.random() * 6) + 2,
+                50000 + (Math.floor(Math.random() * 150000)),
+                70000 + (Math.floor(Math.random() * 180000)),
+                j % 3 === 0,
+                user.id
+            ]);
+            listingCount++;
+        }
     }
-    console.log('🏘️ Listings: 80개 생성');
+    console.log(`🏘️ Listings: 총 ${listingCount}개 생성 (7유저 x 1지역 x 10숙소 = 70개)`);
 }
 
 // ========== 예약 (bookings) ==========
