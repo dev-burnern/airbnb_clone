@@ -26,7 +26,7 @@ export class Listing {
     @Column('decimal', { precision: 10, scale: 6 })
     longitude: number;
 
-    @Column('simple-array')
+    @Column('json', { nullable: true, default: '[]' })
     images: string[];
 
     @Column('json')

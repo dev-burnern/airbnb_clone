@@ -22,7 +22,6 @@ const parseDate = (dateStr: string | null): Date | null => {
 
 // 여행지 데이터
 const DESTINATIONS = [
-    { name: "근처 체험 찾기", type: "experience", description: "가까운 곳에서 즐길 수 있는 체험을 찾아보세요.", icon: "✈️" },
     // 한국
     { name: "서울", type: "city", description: "대한민국의 수도", icon: "🏙️" },
     { name: "부산", type: "city", description: "해변으로 인기 있는 곳", icon: "🏖️" },
@@ -64,6 +63,34 @@ export default function HeaderSearchBar() {
 
     // 검색바 전체를 참조하기 위한 ref
     const searchBarRef = useRef<HTMLDivElement>(null);
+
+    // 컴포넌트 마운트 시 상태 초기화
+    useEffect(() => {
+        // 혹시 잘못된 값이 들어있다면 초기화
+        setSearchText("");
+        setSelectedDestination(null);
+    }, []);
+
+    // searchText가 변경될 때마다 유효성 검사
+    useEffect(() => {
+        // searchText에 값이 있고, DESTINATIONS에 없는 값이면 제거
+        if (searchText && !DESTINATIONS.some(d => 
+            d.name.toLowerCase().includes(searchText.toLowerCase()) || 
+            searchText.toLowerCase().includes(d.name.toLowerCase())
+        )) {
+            console.log('[HeaderSearchBar] 잘못된 값 감지, 제거:', searchText);
+            setSearchText("");
+        }
+    }, [searchText]);
+
+    // 디버깅: 컴포넌트 마운트 및 상태 변화 추적
+    useEffect(() => {
+        console.log('[HeaderSearchBar] State:', {
+            searchText,
+            selectedDestination,
+            activeField
+        });
+    }, [searchText, selectedDestination, activeField]);
 
     // 컴포넌트 외부 클릭 시 드롭다운을 닫는 useEffect 훅
     useEffect(() => {
@@ -469,11 +496,32 @@ export default function HeaderSearchBar() {
                     <span className="text-xs font-semibold text-gray-800">여행지</span>
                     <input
                         type="text"
-                        placeholder={selectedDestination || "여행지 검색"}
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        onFocus={() => setActiveField('destination')}
-                        className="text-sm text-gray-500 bg-transparent focus:outline-none w-full"
+                        placeholder="여행지 검색"
+                        value={selectedDestination || searchText}
+                        onChange={(e) => {
+                            setSearchText(e.target.value);
+                            setSelectedDestination(null);
+                        }}
+                        onFocus={(e) => {
+                            setActiveField('destination');
+                            // readonly 해제
+                            e.target.readOnly = false;
+                        }}
+                        onClick={(e) => {
+                            // 클릭 시에도 readonly 해제
+                            e.currentTarget.readOnly = false;
+                        }}
+                        readOnly
+                        className="text-sm text-gray-500 bg-transparent focus:outline-none w-full cursor-text"
+                        autoComplete="new-password"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck="false"
+                        name="search-destination-query-field"
+                        id="airbnb-search-destination-input"
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-1p-ignore="true"
                     />
                 </div>
 
