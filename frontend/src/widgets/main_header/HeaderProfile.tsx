@@ -23,7 +23,10 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
       const fetchUserProfile = async () => {
         try {
           const token = localStorage.getItem('accessToken');
-          if (!token) return;
+          if (!token) {
+            setIsLoggedIn(false);
+            return;
+          }
 
           const response = await fetch('http://localhost:3001/api/v1/users/profile', {
             headers: {
@@ -36,6 +39,11 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
             // API 응답이 { success: true, data: {...} } 형식이면 data 추출
             const userData = result.data || result;
             setUserProfile(userData);
+          } else if (response.status === 401) {
+            // 토큰이 만료되었거나 유효하지 않음 - 로그아웃 처리
+            localStorage.removeItem('accessToken');
+            setIsLoggedIn(false);
+            setUserProfile(null);
           }
         } catch (error) {
           console.error('프로필 정보 가져오기 실패:', error);
@@ -46,7 +54,7 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
     } else {
       setUserProfile(null);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, setIsLoggedIn]);
 
   const handleProfileClick = () => {
     if (isLoggedIn) {
@@ -70,9 +78,9 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
           title="프로필 보기"
         >
           {userProfile?.avatarUrl ? (
-            <img 
-              src={userProfile.avatarUrl} 
-              alt={userProfile.name || "프로필"} 
+            <img
+              src={userProfile.avatarUrl}
+              alt={userProfile.name || "프로필"}
               className="w-full h-full object-cover"
             />
           ) : (
