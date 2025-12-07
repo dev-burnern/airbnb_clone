@@ -16,8 +16,8 @@ import { RoomImage } from './room-image.entity';
 
 @Entity('rooms')
 export class Room {
-    @PrimaryGeneratedColumn('increment')
-    room_id: number;
+    @PrimaryGeneratedColumn('uuid')
+    room_id: string;
 
     @Column({ type: 'varchar', length: 50, nullable: false })
     room_name: string;
@@ -54,29 +54,29 @@ export class Room {
     @JoinColumn({ name: 'location_id' })
     location: Location;
 
-    @Column({ type: 'int', nullable: false })
-    location_id: number;
+    @Column({ type: 'uuid', nullable: false })
+    location_id: string;
 
     @ManyToOne(() => RoomType, { nullable: false })
     @JoinColumn({ name: 'room_types_id' })
     roomType: RoomType;
 
-    @Column({ type: 'int', nullable: false })
-    room_types_id: number;
+    @Column({ type: 'uuid', nullable: false })
+    room_types_id: string;
 
     @ManyToOne(() => RoomOption, { nullable: false })
     @JoinColumn({ name: 'room_option_id' })
     roomOption: RoomOption;
 
-    @Column({ type: 'int', nullable: false })
-    room_option_id: number;
+    @Column({ type: 'uuid', nullable: false })
+    room_option_id: string;
 
     @ManyToOne(() => Category, { nullable: false })
     @JoinColumn({ name: 'category_id' })
     category: Category;
 
-    @Column({ type: 'int', nullable: false })
-    category_id: number;
+    @Column({ type: 'uuid', nullable: false })
+    category_id: string;
 
     @OneToMany(() => RoomImage, (image) => image.room)
     images: RoomImage[];

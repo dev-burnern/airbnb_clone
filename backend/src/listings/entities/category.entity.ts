@@ -8,8 +8,8 @@ import {
 
 @Entity('categories')
 export class Category {
-    @PrimaryGeneratedColumn('increment')
-    category_id: number;
+    @PrimaryGeneratedColumn('uuid')
+    category_id: string;
 
     @Column({ type: 'varchar', length: 50, nullable: false })
     category_name: string;
