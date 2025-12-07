@@ -186,16 +186,29 @@ export default function MainPage() {
     
     return (
       <div className="px-6 py-8 max-w-screen-2xl mx-auto">
-        {/* 검색 정보 표시 */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <h2 className="text-xl font-semibold mb-2">검색 조건</h2>
-          <div className="flex flex-wrap gap-3 text-sm text-gray-700">
-            {destination && <span className="px-3 py-1 bg-white rounded-full">📍 {destination}</span>}
-            {checkIn && <span className="px-3 py-1 bg-white rounded-full">📅 {checkIn}</span>}
-            {checkOut && <span className="px-3 py-1 bg-white rounded-full">📅 {checkOut}</span>}
-            {guests && <span className="px-3 py-1 bg-white rounded-full">👥 게스트 {guests}명</span>}
-          </div>
+        {/* 검색 조건 표시 - 에어비앤비 스타일 */}
+        <div className="mb-8 flex items-center justify-center gap-2 text-sm">
+          <span className="font-semibold text-gray-900">
+            {destination ? `${destination} 숙소 검색 계속하기` : '숙소 검색 계속하기'}
+          </span>
+          {(checkIn || checkOut || guests) && <span className="text-gray-400">|</span>}
+          {checkIn && checkOut && (
+            <>
+              <span className="text-gray-700">{checkIn}~{checkOut}</span>
+              {guests && <span className="text-gray-400">|</span>}
+            </>
+          )}
+          {guests && (
+            <>
+              <span className="text-gray-700">게스트 {guests}명</span>
+            </>
+          )}
+          <button className="text-gray-900 hover:underline flex items-center gap-1">
+          </button>
         </div>
+
+        {/* 구분선 */}
+        <div className="border-t border-gray-200 mb-8"></div>
 
         {/* 검색 결과 */}
         <section>
