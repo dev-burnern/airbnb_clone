@@ -40,7 +40,7 @@ export default function ChatWidget() {
     setMessages([...newMessages, loadingMsg]);
     
     try {
-      const res = await fetch("http://localhost:3001/chatbot", {
+      const res = await fetch("http://localhost:3001/api/v1/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
