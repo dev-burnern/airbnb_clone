@@ -24,7 +24,7 @@ export class Booking {
     @Column('int')
     guestCount: number;
 
-    @Column('int')
+    @Column('decimal', { precision: 12, scale: 2, nullable: true, default: 0 })
     totalPrice: number;
 
     @Column({

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsUUID, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateConversationDto {
@@ -8,5 +8,7 @@ export class CreateConversationDto {
     participantId: string;
 
     @ApiProperty({ description: '대화방 제목 (선택)', required: false })
+    @IsOptional()
+    @IsString()
     title?: string;
 }

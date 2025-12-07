@@ -3,7 +3,7 @@
  * 백엔드 /chat 엔드포인트와 통신
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 // 타입 정의
 export interface User {
@@ -34,7 +34,7 @@ export interface Conversation {
 
 // API 헬퍼
 const getAuthHeaders = (): HeadersInit => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('accessToken');
     return {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -46,7 +46,9 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
         const error = await response.json().catch(() => ({ message: '요청 실패' }));
         throw new Error(error.message || '요청에 실패했습니다.');
     }
-    return response.json();
+    const json = await response.json();
+    // TransformInterceptor가 { success: true, data: T } 형태로 래핑
+    return json.data !== undefined ? json.data : json;
 };
 
 // Chat API

@@ -20,7 +20,14 @@ export class ChatController {
     @Post('conversations')
     @ApiOperation({ summary: '새 대화방 생성' })
     async createConversation(@Request() req, @Body() dto: CreateConversationDto) {
-        return this.chatService.createConversation(req.user, dto);
+        const conversation = await this.chatService.createConversation(req.user, dto);
+        // 순환 참조 방지를 위해 필요한 필드만 반환
+        return {
+            id: conversation.id,
+            title: conversation.title,
+            createdAt: conversation.createdAt,
+            lastMessageAt: conversation.lastMessageAt,
+        };
     }
 
     @Get('conversations/:id')

@@ -105,7 +105,7 @@ const formatDate = (dateString: string | null): string => {
 const getCurrentUserId = (): string | undefined => {
   if (typeof window === "undefined") return undefined;
   try {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("accessToken");
     if (!token) return undefined;
     const payload = JSON.parse(atob(token.split(".")[1]));
     return payload.sub || payload.id;
