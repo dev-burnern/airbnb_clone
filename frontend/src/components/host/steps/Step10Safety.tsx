@@ -34,13 +34,13 @@ const Step10Safety: React.FC<Step10SafetyProps> = ({ formData, onUpdate }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full px-8">
-      <div className="max-w-3xl w-full">
-        <h1 className="text-4xl font-semibold mb-12">
+    <div className="py-6">
+      <div className="w-full">
+        <h1 className="text-3xl font-semibold mb-8">
           다음과 같은 안전 관련 물품이 있나요?
         </h1>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {safetyItems.map((item) => {
             const Icon = item.icon;
             const isSelected = formData.safetyItems.includes(item.id);
@@ -48,7 +48,7 @@ const Step10Safety: React.FC<Step10SafetyProps> = ({ formData, onUpdate }) => {
               <button
                 key={item.id}
                 onClick={() => toggleSafetyItem(item.id)}
-                className={`flex flex-col items-center gap-4 p-8 rounded-lg border-2 transition ${
+                className={`flex items-center gap-3 p-3 rounded-lg border-2 transition text-sm ${
                   isSelected
                     ? "border-gray-900 bg-gray-50"
                     : "border-gray-300 hover:border-gray-900"

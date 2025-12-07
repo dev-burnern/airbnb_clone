@@ -118,11 +118,27 @@ export default function HostRegistrationModal({
 
   const handleCreateListing = async () => {
     try {
-      // TODO: API 호출로 리스팅 생성
-      console.log("Creating listing with data:", formData);
-      
       // 임시: 더미 ID로 리다이렉션
       const newListingId = "temp-" + Date.now();
+      
+      // localStorage에 리스팅 데이터 저장
+      const listingData = {
+        propertyName: formData.propertyName,
+        propertyType: formData.propertyType,
+        basePrice: formData.basePrice,
+        photos: formData.photos,
+        bedrooms: formData.bedrooms,
+        beds: formData.beds,
+        bathrooms: formData.bathrooms,
+        guests: formData.guests,
+        popularAmenities: formData.popularAmenities,
+        standoutAmenities: formData.standoutAmenities,
+      };
+      
+      localStorage.setItem(`listing_${newListingId}`, JSON.stringify(listingData));
+      localStorage.setItem("hasListing", "true");
+      
+      console.log("Listing created:", newListingId, listingData);
       
       // 리스팅 에디터 페이지로 이동
       router.push(`/host/listings/${newListingId}`);
@@ -216,7 +232,8 @@ export default function HostRegistrationModal({
         </div>
 
         {/* 메인 콘텐츠 영역 */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto px-6 py-8 scrollbar-hide">
+          <div className="max-w-2xl mx-auto">
           {step === 1 && (
             <Step1HostingType
               selectedType={formData.hostingType}
@@ -328,6 +345,7 @@ export default function HostRegistrationModal({
               onCreateListing={handleCreateListing}
             />
           )}
+          </div>
         </div>
 
         {/* 하단 네비게이션 - Step 21에서는 숨김 (자체 버튼 포함) */}

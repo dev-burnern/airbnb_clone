@@ -61,15 +61,15 @@ const Step20Discounts: React.FC<Step20DiscountsProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full px-8">
-      <div className="max-w-3xl w-full">
-        <h1 className="text-4xl font-semibold mb-4">할인 추가</h1>
-        <p className="text-gray-600 mb-12">
+    <div className="py-6">
+      <div className="w-full">
+        <h1 className="text-3xl font-semibold mb-3">할인 추가</h1>
+        <p className="text-sm text-gray-600 mb-8">
           더 빨리 예약을 받고 첫 후기를 받을 수 있도록 게스트의 관심을
           끌어보세요.
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {discountOptions.map((option) => {
             const Icon = option.icon;
             const isSelected = formData.discounts.includes(option.id);
@@ -77,18 +77,18 @@ const Step20Discounts: React.FC<Step20DiscountsProps> = ({
             return (
               <div
                 key={option.id}
-                className={`p-6 rounded-lg border-2 transition ${
+                className={`p-4 rounded-lg border-2 transition ${
                   isSelected
                     ? "border-gray-900 bg-gray-50"
                     : "border-gray-300 hover:border-gray-900"
                 }`}
               >
-                <div className="flex items-start gap-4">
-                  <Icon size={32} className="flex-shrink-0 mt-1" />
+                <div className="flex items-start gap-3">
+                  <Icon size={24} className="flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold">{option.title}</h3>
-                      <span className="text-2xl font-bold text-pink-600">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-base font-semibold">{option.title}</h3>
+                      <span className="text-xl font-bold text-pink-600">
                         {option.discount}
                       </span>
                     </div>

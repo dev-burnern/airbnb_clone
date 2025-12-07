@@ -40,12 +40,12 @@ export default function Step3PropertyType({
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16">
-      <h1 className="text-5xl font-semibold mb-16">
+    <div className="py-6">
+      <h1 className="text-3xl font-semibold mb-8">
         다음 중 숙소를 가장 잘 설명하는 것은 무엇인가요?
       </h1>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {propertyTypes.map((type) => {
           const Icon = type.icon;
           const isSelected = selectedType === type.id;
@@ -54,13 +54,13 @@ export default function Step3PropertyType({
             <button
               key={type.id}
               onClick={() => onSelect(type.id)}
-              className={`p-6 rounded-xl border-2 transition flex flex-col items-start ${
+              className={`p-4 rounded-lg border-2 transition flex flex-col items-start ${
                 isSelected
                   ? "border-gray-900 bg-gray-50"
                   : "border-gray-300 hover:border-gray-900"
               }`}
             >
-              <Icon className="w-8 h-8 mb-4 text-gray-700" />
+              <Icon className="w-6 h-6 mb-3 text-gray-700" />
               <span className="text-sm font-semibold">{type.label}</span>
             </button>
           );

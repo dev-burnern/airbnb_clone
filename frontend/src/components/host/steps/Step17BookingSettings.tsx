@@ -32,17 +32,17 @@ const Step17BookingSettings: React.FC<Step17BookingSettingsProps> = ({
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center h-full px-8">
-      <div className="max-w-3xl w-full">
-        <h1 className="text-4xl font-semibold mb-4">예약 설정 선택</h1>
-        <p className="text-gray-600 mb-12">
+    <div className="py-6">
+      <div className="w-full">
+        <h1 className="text-3xl font-semibold mb-3">예약 설정 선택</h1>
+        <p className="text-sm text-gray-600 mb-8">
           이 설정은 언제든지 변경하실 수 있습니다.{" "}
           <a href="#" className="underline font-medium">
             자세히 알아보기
           </a>
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {options.map((option) => {
             const Icon = option.icon;
             const isSelected = formData.bookingSetting === option.id;
@@ -53,24 +53,24 @@ const Step17BookingSettings: React.FC<Step17BookingSettingsProps> = ({
                 onClick={() =>
                   onUpdate({ ...formData, bookingSetting: option.id })
                 }
-                className={`w-full p-6 rounded-lg border-2 transition text-left ${
+                className={`w-full p-4 rounded-lg border-2 transition text-left ${
                   isSelected
                     ? "border-gray-900 bg-gray-50"
                     : "border-gray-300 hover:border-gray-900"
                 }`}
               >
-                <div className="flex items-start gap-4">
-                  <Icon size={32} className="flex-shrink-0 mt-1" />
+                <div className="flex items-start gap-3">
+                  <Icon size={24} className="flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-semibold">{option.title}</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-base font-semibold">{option.title}</h3>
                       {option.badge && (
-                        <span className="bg-gray-900 text-white text-xs px-2 py-1 rounded-full">
+                        <span className="bg-gray-900 text-white text-xs px-2 py-0.5 rounded-full">
                           {option.badge}
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600">{option.description}</p>
+                    <p className="text-sm text-gray-600">{option.description}</p>
                   </div>
                 </div>
               </button>

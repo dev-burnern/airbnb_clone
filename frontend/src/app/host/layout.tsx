@@ -1,4 +1,4 @@
-import Header from "@/widgets/main_header/Header";
+import HostHeader from "@/components/host/HostHeader";
 
 export default function HostLayout({
   children,
@@ -7,7 +7,7 @@ export default function HostLayout({
 }) {
   return (
     <>
-      <Header />
+      <HostHeader />
       {children}
     </>
   );

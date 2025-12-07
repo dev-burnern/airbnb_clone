@@ -31,23 +31,23 @@ const Step19WeekendPricing: React.FC<Step19WeekendPricingProps> = ({
   );
 
   return (
-    <div className="flex flex-col items-center justify-center h-full px-8">
-      <div className="max-w-2xl w-full">
-        <h1 className="text-4xl font-semibold mb-4">주말 요금을 설정하세요</h1>
-        <p className="text-gray-600 mb-12">
+    <div className="py-6">
+      <div className="w-full">
+        <h1 className="text-3xl font-semibold mb-3">주말 요금을 설정하세요</h1>
+        <p className="text-sm text-gray-600 mb-8">
           금요일과 토요일에는 주말 할증을 추가하세요.
         </p>
 
         {/* Base Price Display */}
-        <div className="text-center mb-12">
-          <div className="text-7xl font-bold mb-4">
+        <div className="text-center mb-8">
+          <div className="text-5xl font-bold mb-3">
             ₩{formData.basePrice.toLocaleString()}
           </div>
-          <p className="text-gray-600 text-lg">1박 기본 요금</p>
+          <p className="text-sm text-gray-600">1박 기본 요금</p>
         </div>
 
         {/* Guest Payment Dropdown */}
-        <div className="mb-8 p-4 border-2 border-gray-300 rounded-lg">
+        <div className="mb-6 p-3 border-2 border-gray-300 rounded-lg">
           <button className="w-full flex items-center justify-between">
             <span className="text-gray-600">게스트 지불 요금</span>
             <div className="flex items-center gap-2">
@@ -60,10 +60,10 @@ const Step19WeekendPricing: React.FC<Step19WeekendPricingProps> = ({
         </div>
 
         {/* Weekend Premium Slider */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold">주말 프리미엄</h3>
-            <span className="text-lg font-semibold">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold">주말 프리미엄</h3>
+            <span className="text-base font-semibold">
               {formData.weekendPremium}%
             </span>
           </div>

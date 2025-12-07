@@ -26,22 +26,22 @@ export default function Step2GettingStarted() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16">
-      <h1 className="text-5xl font-semibold mb-16">
+    <div className="py-6">
+      <h1 className="text-3xl font-semibold mb-8">
         간단하게 에어비앤비 호스팅을 시작할 수 있습니다
       </h1>
 
-      <div className="space-y-12">
+      <div className="space-y-8">
         {steps.map((step, index) => (
-          <div key={index} className="flex gap-8">
+          <div key={index} className="flex gap-6">
             <div className="flex-1">
-              <div className="text-sm font-semibold text-gray-600 mb-2">
+              <div className="text-xs font-semibold text-gray-600 mb-1">
                 {step.number}
               </div>
-              <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-              <p className="text-gray-600 leading-relaxed">{step.description}</p>
+              <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
             </div>
-            <div className="w-40 h-32 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+            <div className="w-32 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
               {/* 이미지 플레이스홀더 */}
               <div className="w-full h-full bg-gradient-to-br from-pink-100 to-purple-100"></div>
             </div>

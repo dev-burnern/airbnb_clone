@@ -43,18 +43,18 @@ const Step16Highlights: React.FC<Step16HighlightsProps> = ({
   const selectedCount = formData.highlights.length;
 
   return (
-    <div className="flex flex-col items-center justify-center h-full px-8">
-      <div className="max-w-3xl w-full">
-        <h1 className="text-4xl font-semibold mb-4">
+    <div className="py-6">
+      <div className="w-full">
+        <h1 className="text-3xl font-semibold mb-3">
           이제 주택에 대해 설명해주세요
         </h1>
-        <p className="text-gray-600 mb-12">
+        <p className="text-sm text-gray-600 mb-8">
           숙소의 특징이 잘 드러나는 로고를 최대 {maxSelections}개까지 선택하실
           수 있습니다. 선택한 로고로 숙소 설명을 작성하실 수 있도록
           도와드릴게요.
         </p>
 
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-3 gap-3 mb-4">
           {highlights.map((highlight) => {
             const Icon = highlight.icon;
             const isSelected = formData.highlights.includes(highlight.id);
@@ -65,7 +65,7 @@ const Step16Highlights: React.FC<Step16HighlightsProps> = ({
                 key={highlight.id}
                 onClick={() => toggleHighlight(highlight.id)}
                 disabled={isDisabled}
-                className={`flex flex-col items-center gap-4 p-6 rounded-lg border-2 transition ${
+                className={`flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition ${
                   isSelected
                     ? "border-gray-900 bg-gray-50"
                     : isDisabled
@@ -73,8 +73,8 @@ const Step16Highlights: React.FC<Step16HighlightsProps> = ({
                     : "border-gray-300 hover:border-gray-900"
                 }`}
               >
-                <Icon size={32} />
-                <span className="text-lg font-medium text-center">
+                <Icon size={24} />
+                <span className="text-sm font-medium text-center">
                   {highlight.label}
                 </span>
               </button>

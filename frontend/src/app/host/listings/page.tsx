@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import KeyInfoAlert from "@/components/host/KeyInfoAlert";
+import HostRegistrationModal from "@/components/host/HostRegistrationModal";
 
 interface Listing {
   id: string;
@@ -21,6 +21,7 @@ interface Listing {
 export default function HostListingsPage() {
   const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // localStorage에서 모든 리스팅 데이터 가져오기
@@ -55,12 +56,10 @@ export default function HostListingsPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <KeyInfoAlert />
-
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-semibold">리스팅</h1>
           <button
-            onClick={() => router.push("/host/listings/new")}
+            onClick={() => setIsModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 border border-gray-900 rounded-lg font-medium hover:bg-gray-50"
           >
             <Plus size={20} />
@@ -109,17 +108,14 @@ export default function HostListingsPage() {
               </button>
             );
           })}
-
-          {/* Add New Listing Card */}
-          <button
-            onClick={() => router.push("/host/listings/new")}
-            className="border-2 border-dashed border-gray-300 rounded-lg aspect-video flex flex-col items-center justify-center hover:border-gray-900 transition"
-          >
-            <Plus size={48} className="text-gray-400 mb-2" />
-            <span className="text-gray-600 font-medium">새 리스팅 추가</span>
-          </button>
         </div>
       </div>
+
+      {/* Host Registration Modal */}
+      <HostRegistrationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
