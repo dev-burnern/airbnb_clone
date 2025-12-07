@@ -1,5 +1,5 @@
 services:
-  # PostgreSQL Database
+  # POSTGRES
   db:
     image: postgres:16-alpine
     container_name: airbnb_db
@@ -15,18 +15,29 @@ services:
     networks:
       - airbnb_network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U airbnb" ]
+      test: ["CMD-SHELL", "pg_isready -U airbnb"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # OLLAMA
   ollama:
+    container_name: ollama
     image: ollama/ollama:latest
     restart: unless-stopped
     ports:
       - "11500:11434"
+    volumes:
+      - ./ollama_models:/root/.ollama
+    networks:
+      - airbnb_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
-  # Backend (NestJS)
+  # BACKEND (NESTJS)
   backend:
     build:
       context: ./backend
@@ -40,8 +51,12 @@ services:
     environment:
       - NODE_ENV=development
       - DB_HOST=db
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=airbnb-bot
     depends_on:
       db:
+        condition: service_healthy
+      ollama:
         condition: service_healthy
     volumes:
       - ./backend:/app
@@ -50,7 +65,7 @@ services:
       - airbnb_network
     command: npm run start:dev
 
-  # Frontend (Next.js)
+  # FRONTEND (NEXT.JS)
   frontend:
     build:
       context: ./frontend
@@ -59,13 +74,12 @@ services:
     restart: always
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
-    # env_file:
-    #   - ./frontend/.env.local
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://backend:3001
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -73,6 +87,7 @@ services:
       - airbnb_network
     command: npm run dev
 
+  # NGINX
   nginx:
     image: nginx:latest
     container_name: airbnb-nginx
@@ -85,13 +100,13 @@ services:
     depends_on:
       - frontend
       - backend
+    networks:
+      - airbnb_network
     restart: always
 
 volumes:
   postgres_data:
-    driver: local
   ollama_data:
-
 
 networks:
   airbnb_network:

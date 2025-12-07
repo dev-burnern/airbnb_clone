@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20
 
 # 작업 디렉토리
 WORKDIR /app
@@ -17,4 +17,4 @@ RUN npm run build
 EXPOSE 3001
 
 # 프로덕션 모드 실행
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]
