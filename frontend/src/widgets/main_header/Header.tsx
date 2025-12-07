@@ -124,10 +124,11 @@ export default function Header() {
       <Suspense fallback={null}>
         <AuthTokenHandler setIsLoggedIn={setIsLoggedIn} />
       </Suspense>
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <div className="w-full pl-6 pr-2 py-4">
+        <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
 
         {/* 좌측 로고 (클릭 시 홈으로 이동) */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" style={{ minWidth: '150px' }}>
           <div
             onClick={() => handleNavigation("/")}
             className="cursor-pointer"
@@ -172,8 +173,10 @@ export default function Header() {
             </div>
           </nav>
         ) : (
-          <div className="flex-1 flex justify-center">
-            <HeaderSearchBar />
+          <div className="flex-1 flex justify-center px-4 ml-45">
+            <div className="max-w-3xl w-full">
+              <HeaderSearchBar />
+            </div>
           </div>
         )}
 
@@ -274,6 +277,7 @@ export default function Header() {
             )}
           </div>
         </div>
+      </div>
       </div>
 
       {/* 모달들은 이전과 동일하게 유지 */}
