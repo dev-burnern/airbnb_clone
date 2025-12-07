@@ -36,17 +36,17 @@ export default function MainPage() {
     try {
       const response = await fetch('http://localhost:3001/api/v1/listings');
       const result = await response.json();
-      
+
       // 백엔드 응답 구조 처리 (배열 또는 { data: [] } 형태)
       const data = Array.isArray(result) ? result : (result.data || result.listings || []);
-      
+
       if (!Array.isArray(data)) {
         console.error('API 응답이 배열 형태가 아닙니다:', result);
         return;
       }
 
       console.log(`총 ${data.length}개 숙소 로드됨`);
-      
+
       // 총 25개 표시 (5열 기준)
       const allListings = data
         .slice(0, 25)
@@ -54,7 +54,7 @@ export default function MainPage() {
           id: listing.id,
           title: listing.title,
           location: listing.address.split(',')[0] || listing.address,
-          imageSrc: 'https://via.placeholder.com/400x400/FF385C/FFFFFF?text=Airbnb',
+          imageSrc: listing.images?.[0] || 'https://placehold.co/400x400/FF385C/FFFFFF/png?text=Airbnb',
           price: listing.basePrice,
           rating: Math.random() * 0.5 + 4.5,
           dates: '예약 가능',
