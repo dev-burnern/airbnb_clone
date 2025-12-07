@@ -22,7 +22,6 @@ const parseDate = (dateStr: string | null): Date | null => {
 
 // 여행지 데이터
 const DESTINATIONS = [
-    { name: "근처 체험 찾기", type: "experience", description: "가까운 곳에서 즐길 수 있는 체험을 찾아보세요.", icon: "✈️" },
     // 한국
     { name: "서울", type: "city", description: "대한민국의 수도", icon: "🏙️" },
     { name: "부산", type: "city", description: "해변으로 인기 있는 곳", icon: "🏖️" },
