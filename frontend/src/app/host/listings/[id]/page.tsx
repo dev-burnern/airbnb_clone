@@ -34,29 +34,59 @@ export default function ListingEditorPage() {
   const [showAllAmenities, setShowAllAmenities] = useState(false);
 
   useEffect(() => {
-    // 리스팅 ID를 로컬 스토리지에 저장 (호스트 모드 활성화)
-    if (listingId) {
+    const loadListing = async () => {
+      if (!listingId) return;
+
       localStorage.setItem("hasListing", "true");
-      
-      // localStorage에서 리스팅 데이터 로드
+
+      try {
+        // 1. 먼저 백엔드 API에서 데이터 로드 시도
+        const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`);
+        if (response.ok) {
+          const apiData = await response.json();
+          // 백엔드의 'images' 필드를 프론트엔드의 'photos'로 매핑
+          const listingData: ListingData = {
+            propertyName: apiData.title || '',
+            propertyType: apiData.type || '주택',
+            basePrice: apiData.basePrice || 0,
+            photos: apiData.images || [], // 필드명 매핑: images -> photos
+            bedrooms: apiData.bedrooms || 1,
+            beds: apiData.beds || 1,
+            bathrooms: apiData.bathrooms || 1,
+            guests: apiData.maxGuests || 2,
+            popularAmenities: Array.isArray(apiData.amenities) ? apiData.amenities.slice(0, 4) : [],
+            standoutAmenities: Array.isArray(apiData.amenities) ? apiData.amenities.slice(4) : [],
+          };
+          setListing(listingData);
+          console.log('Listing loaded from API:', listingData);
+          return;
+        }
+      } catch (error) {
+        console.warn('Failed to load from API, trying localStorage:', error);
+      }
+
+      // 2. API 실패 시 localStorage에서 로드 (호스트 등록 중 임시 데이터)
       const savedData = localStorage.getItem(`listing_${listingId}`);
       if (savedData) {
         try {
           const data = JSON.parse(savedData);
-          
+
           // blob URL 필터링 (blob:로 시작하는 URL 제거)
           if (data.photos && Array.isArray(data.photos)) {
             data.photos = data.photos.filter((photo: string) => !photo.startsWith('blob:'));
             // 필터링 후 다시 저장
             localStorage.setItem(`listing_${listingId}`, JSON.stringify(data));
           }
-          
+
           setListing(data);
+          console.log('Listing loaded from localStorage:', data);
         } catch (error) {
-          console.error('Failed to load listing:', error);
+          console.error('Failed to load listing from localStorage:', error);
         }
       }
-    }
+    };
+
+    loadListing();
   }, [listingId]);
 
   const handlePhotoUpload = async () => {
@@ -65,11 +95,11 @@ export default function ListingEditorPage() {
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
-    
+
     input.onchange = async (event) => {
       const files = (event.target as HTMLInputElement).files;
       console.log('Files selected:', files?.length);
-      
+
       if (files && files.length > 0 && listing) {
         console.log('Processing files...');
         // 파일을 Base64로 변환
@@ -82,25 +112,25 @@ export default function ListingEditorPage() {
             reader.readAsDataURL(file);
           });
         });
-        
+
         const newPhotos = await Promise.all(filePromises);
         console.log('New photos converted:', newPhotos.length);
-        
+
         const updatedListing = {
           ...listing,
           photos: [...listing.photos, ...newPhotos],
         };
-        
+
         console.log('Updated listing photos count:', updatedListing.photos.length);
-        
+
         // localStorage 업데이트
         localStorage.setItem(`listing_${listingId}`, JSON.stringify(updatedListing));
         setListing(updatedListing);
-        
+
         console.log('Listing updated successfully');
       }
     };
-    
+
     input.click();
   };
 
@@ -211,7 +241,7 @@ export default function ListingEditorPage() {
                   </div>
                 ))}
               </div>
-              <button 
+              <button
                 onClick={() => setShowAllAmenities(!showAllAmenities)}
                 className="text-xs font-medium underline hover:text-gray-900"
               >
@@ -225,7 +255,7 @@ export default function ListingEditorPage() {
               <p className="text-xs text-gray-600">
                 접근성 기능을 추가하지 않았습니다.
               </p>
-              <button 
+              <button
                 onClick={handleAddAccessibility}
                 className="text-xs font-medium underline hover:text-gray-900"
               >
@@ -266,7 +296,7 @@ export default function ListingEditorPage() {
                     <p className="text-sm text-gray-600">커버 사진 추가</p>
                   </div>
                 )}
-                <button 
+                <button
                   onClick={handlePhotoUpload}
                   className="absolute bottom-3 right-3 px-3 py-1.5 text-sm bg-white border border-gray-900 rounded-lg font-medium shadow-lg hover:bg-gray-50"
                 >
@@ -279,7 +309,7 @@ export default function ListingEditorPage() {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm">침실 {listing.bedrooms}개</h3>
-                <button 
+                <button
                   onClick={() => handleEdit('침실')}
                   className="text-xs font-medium underline hover:text-gray-900"
                 >
@@ -303,7 +333,7 @@ export default function ListingEditorPage() {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm">욕실 {listing.bathrooms}개</h3>
-                <button 
+                <button
                   onClick={() => handleEdit('욕실')}
                   className="text-xs font-medium underline hover:text-gray-900"
                 >
@@ -327,7 +357,7 @@ export default function ListingEditorPage() {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm">추가 사진</h3>
-                <button 
+                <button
                   onClick={() => handleEdit('추가 사진')}
                   className="text-xs font-medium underline hover:text-gray-900"
                 >
@@ -351,7 +381,7 @@ export default function ListingEditorPage() {
                     />
                   </div>
                 ))}
-                <div 
+                <div
                   className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 cursor-pointer"
                   onClick={handlePhotoUpload}
                 >
@@ -364,7 +394,7 @@ export default function ListingEditorPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">편의시설</h2>
-                <button 
+                <button
                   onClick={() => handleEdit('편의시설')}
                   className="text-sm font-medium underline hover:text-gray-900"
                 >
@@ -388,7 +418,7 @@ export default function ListingEditorPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">장소</h2>
-                <button 
+                <button
                   onClick={() => handleEdit('장소')}
                   className="text-sm font-medium underline hover:text-gray-900"
                 >
@@ -404,7 +434,7 @@ export default function ListingEditorPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">호스트 소개</h2>
-                <button 
+                <button
                   onClick={() => handleEdit('호스트 소개')}
                   className="text-sm font-medium underline hover:text-gray-900"
                 >
@@ -420,7 +450,7 @@ export default function ListingEditorPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">예약 설정</h2>
-                <button 
+                <button
                   onClick={() => handleEdit('예약 설정')}
                   className="text-sm font-medium underline hover:text-gray-900"
                 >
@@ -438,7 +468,7 @@ export default function ListingEditorPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">숙소 이용규칙</h2>
-                <button 
+                <button
                   onClick={() => handleEdit('숙소 이용규칙')}
                   className="text-sm font-medium underline hover:text-gray-900"
                 >
@@ -461,7 +491,7 @@ export default function ListingEditorPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">게스트 안전</h2>
-                <button 
+                <button
                   onClick={() => handleEdit('게스트 안전')}
                   className="text-sm font-medium underline hover:text-gray-900"
                 >
@@ -488,7 +518,7 @@ export default function ListingEditorPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">환불 정책</h2>
-                <button 
+                <button
                   onClick={() => handleEdit('환불 정책')}
                   className="text-sm font-medium underline hover:text-gray-900"
                 >
@@ -507,7 +537,7 @@ export default function ListingEditorPage() {
             <div className="mt-8 pt-6 border-t border-gray-200 mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">맞춤 링크</h2>
-                <button 
+                <button
                   onClick={() => handleEdit('맞춤 링크')}
                   className="text-sm font-medium underline hover:text-gray-900"
                 >
