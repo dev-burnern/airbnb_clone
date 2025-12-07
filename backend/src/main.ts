@@ -1,56 +1,44 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { setupSwagger } from './config/swagger.config';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-    const logger = new Logger('Bootstrap');
-    const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule);
 
-    // ConfigService
-    const configService = app.get(ConfigService);
-    const port = configService.get<number>('PORT', 3001);
-    const apiPrefix = configService.get<string>('API_PREFIX', 'api/v1');
+  // ⚡⚡⚡ CORS 설정 추가 (최우선!)
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://frontend:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
-    // Global Prefix
-    app.setGlobalPrefix(apiPrefix);
+  // Global prefix
+  app.setGlobalPrefix('api/v1');
 
-    // CORS
-    app.enableCors({
-        origin: configService.get<string>('FRONTEND_URL', 'http://localhost:3000'),
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-    });
+  // Validation Pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
-    // Global Pipes
-    app.useGlobalPipes(
-        new ValidationPipe({
-            whitelist: true,
-            forbidNonWhitelisted: true,
-            transform: true,
-            transformOptions: {
-                enableImplicitConversion: true,
-            },
-        }),
-    );
+  // Swagger 설정
+  const config = new DocumentBuilder()
+    .setTitle('Airbnb Clone API')
+    .setDescription('에어비앤비 클론 프로젝트 API')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
 
-    // Global Filters
-    app.useGlobalFilters(new HttpExceptionFilter());
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/v1/docs', app, document);
 
-    // Global Interceptors
-    app.useGlobalInterceptors(new TransformInterceptor());
-
-    // Swagger Setup
-    setupSwagger(app);
-
-    await app.listen(port);
-    logger.log(`🚀 Application is running on: http://localhost:${port}/${apiPrefix}`);
-    logger.log(`📚 Swagger documentation: http://localhost:${port}/${apiPrefix}/docs`);
+  await app.listen(3001);
+  console.log('🚀 Application is running on: http://localhost:3001/api/v1');
+  console.log('📚 Swagger documentation: http://localhost:3001/api/v1/docs');
 }
-
 bootstrap();
-// Restart trigger 6
