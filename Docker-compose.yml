@@ -20,6 +20,13 @@ services:
       timeout: 5s
       retries: 5
 
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11500:11434"
+
+
   # Backend (NestJS)
   backend:
     build:
@@ -62,15 +69,29 @@ services:
       - backend
     volumes:
       - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
     networks:
       - airbnb_network
     command: npm run dev
 
+  nginx:
+    image: nginx:latest
+    container_name: airbnb-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    restart: always
+
 volumes:
   postgres_data:
     driver: local
+  ollama_data:
+
 
 networks:
   airbnb_network:

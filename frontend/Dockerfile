@@ -30,4 +30,4 @@ COPY --from=build /frontend/node_modules ./node_modules
 EXPOSE 3000
 
 # Next.js 프로덕션 서버 실행
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
