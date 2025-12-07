@@ -102,38 +102,81 @@ export const useProfile = (id: string | null) => {
       setError(null);
 
       try {
-        // 사용자 정보와 리뷰를 병렬로 가져옴
-        const token = localStorage.getItem('access_token');
+        const token = localStorage.getItem('accessToken');
+        let targetId = id;
+        let userData: any = null;
 
-        // 리뷰 API 호출 (사용자 ID가 있는 경우)
+        // 1. 사용자 기본 정보 가져오기 (/users/me 또는 /users/:id가 있다면 좋겠지만 없으므로 내 정보는 /me로)
+        // 만약 id가 주어졌는데 내 아이디와 같다면? 혹은 그냥 공개 프로필 API가 필요한데...
+        // 현재는 본인 프로필 조회(/users/me)만 가능하다고 가정하거나, API 구조상 타인 프로필 조회 기능이 제한적일 수 있음.
+        // 일단은 '프로필 페이지'가 '나의 프로필'을 보여주는 용도라고 가정하고 진행.
+
+        if (!id || id === 'current_user_id') {
+          if (token) {
+            const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
+              headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (userResponse.ok) {
+              const json = await userResponse.json();
+              userData = json.data || json;
+              targetId = userData.id;
+            }
+          }
+        } else {
+          // 다른 사람 프로필 조회 API가 있다면 여기서 호출
+          // const otherUserResponse = await fetch(`${API_BASE_URL}/users/${id}`);
+        }
+
+        // 2. 리뷰 가져오기
         let reviews: Review[] = [];
-        if (id) {
+        if (targetId) {
           try {
-            const reviewsResponse = await fetch(`${API_BASE_URL}/reviews/user/${id}`, {
+            const reviewsResponse = await fetch(`${API_BASE_URL}/reviews/user/${targetId}`, {
               headers: token ? { 'Authorization': `Bearer ${token}` } : {},
             });
 
             if (reviewsResponse.ok) {
-              const apiReviews: ApiReview[] = await reviewsResponse.json();
-              reviews = apiReviews.map(transformApiReview);
+              const json = await reviewsResponse.json();
+              const apiReviews: ApiReview[] = (json.data || json) as ApiReview[];
+              if (Array.isArray(apiReviews)) {
+                reviews = apiReviews.map(transformApiReview);
+              }
             }
           } catch (reviewError) {
             console.warn('리뷰를 불러오는데 실패했습니다:', reviewError);
           }
         }
 
-        // 프로필 데이터 구성 (API 데이터 + 기본값)
-        const profileData: ProfileData = {
-          ...MOCK_PROFILE,
-          reviews: reviews.length > 0 ? reviews : MOCK_PROFILE.reviews,
-          reviewCount: reviews.length > 0 ? reviews.length : MOCK_PROFILE.reviewCount,
-        };
+        // 3. 데이터 병합 (API 데이터 우선, 없으면 Mock)
+        if (userData) {
+          const userProfile = userData.profile || {};
+          const createdDate = new Date(userData.createdAt);
+          const memberSince = `${createdDate.getFullYear()}년`;
 
-        setProfile(profileData);
+          setProfile({
+            name: userData.name || '사용자',
+            role: userData.roles?.[0] || '게스트',
+            profileImage: userProfile.path || userData.avatarUrl || MOCK_PROFILE.profileImage,
+            tripCount: 0, // 아직 API 없음
+            reviewCount: reviews.length,
+            memberSince: memberSince,
+            verified: true,
+            reviews: reviews,
+            trips: [], // 아직 API 없음
+            // 추가 필드 (컴포넌트에서 사용한다면)
+            job: userProfile.job,
+            location: userProfile.location,
+            introduction: userProfile.introduction_text,
+            languages: userProfile.language
+          } as any); // Type assertion for extra fields
+        } else {
+          // 로그인 안되어있거나 데이터 없으면 Mock
+          setProfile(MOCK_PROFILE);
+        }
+
       } catch (err) {
         console.error('프로필 데이터를 불러오는 데 실패했습니다:', err);
         setError('프로필 데이터를 불러오는 데 실패했습니다.');
-        // 오류 시 목업 데이터 사용
         setProfile(MOCK_PROFILE);
       } finally {
         setLoading(false);
