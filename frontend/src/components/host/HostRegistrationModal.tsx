@@ -130,14 +130,65 @@ export default function HostRegistrationModal({
       }
 
       // 백엔드 API 스키마에 맞게 데이터 변환
+      // 이미지 리사이징: Base64 크기 줄이기
+      console.log('📸 Original photos in formData:', formData.photos.length);
+      console.log('📸 First photo preview:', formData.photos[0]?.substring(0, 50));
+      
+      const resizedImages = await Promise.all(
+        formData.photos.map(photo => {
+          return new Promise<string>((resolve) => {
+            if (!photo || photo.startsWith('http')) {
+              resolve(photo); // URL은 그대로
+              return;
+            }
+            
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const MAX_WIDTH = 1200;
+              const MAX_HEIGHT = 900;
+              
+              let width = img.width;
+              let height = img.height;
+              
+              if (width > MAX_WIDTH) {
+                height = (height * MAX_WIDTH) / width;
+                width = MAX_WIDTH;
+              }
+              if (height > MAX_HEIGHT) {
+                width = (width * MAX_HEIGHT) / height;
+                height = MAX_HEIGHT;
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx?.drawImage(img, 0, 0, width, height);
+              
+              // JPEG 품질 0.7로 압축
+              const resized = canvas.toDataURL('image/jpeg', 0.7);
+              console.log('✅ Image resized:', resized.substring(0, 50));
+              resolve(resized);
+            };
+            img.onerror = (e) => {
+              console.error('❌ Image load error:', e);
+              resolve(photo); // 실패 시 원본 반환
+            };
+            img.src = photo;
+          });
+        })
+      );
+      
+      console.log('📸 Resized images count:', resizedImages.length);
+      
       const listingPayload = {
         title: formData.propertyName,
         description: formData.propertyDescription,
         type: formData.propertyType,
         address: `${formData.address.state} ${formData.address.city} ${formData.address.district} ${formData.address.street} ${formData.address.detail}`.trim(),
-        latitude: 37.5665, // TODO: 실제 주소로부터 좌표 변환 필요
+        latitude: 37.5665,
         longitude: 126.9780,
-        images: formData.photos,
+        images: resizedImages,
         amenities: [...formData.popularAmenities, ...formData.standoutAmenities],
         maxGuests: formData.guests,
         basePrice: formData.basePrice,
@@ -150,7 +201,14 @@ export default function HostRegistrationModal({
         },
       };
 
-      console.log('Sending listing data:', listingPayload);
+      // 디버깅: 전송 데이터 확인
+      console.log('Creating listing with data:', {
+        ...listingPayload,
+        images: `[${resizedImages.length} images]`,
+        originalSizeMB: (JSON.stringify({ images: formData.photos }).length / 1024 / 1024).toFixed(2),
+        resizedSizeMB: (JSON.stringify({ images: resizedImages }).length / 1024 / 1024).toFixed(2),
+        payloadSizeMB: (JSON.stringify(listingPayload).length / 1024 / 1024).toFixed(2),
+      });
 
       // 백엔드 API 호출
       const response = await fetch('http://localhost:3001/api/v1/listings', {
