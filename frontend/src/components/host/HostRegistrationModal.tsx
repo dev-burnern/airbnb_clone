@@ -35,6 +35,8 @@ export default function HostRegistrationModal({
 }: HostRegistrationModalProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     hostingType: "",
     propertyType: "",
@@ -117,37 +119,76 @@ export default function HostRegistrationModal({
   };
 
   const handleCreateListing = async () => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      // 임시: 더미 ID로 리다이렉션
-      const newListingId = "temp-" + Date.now();
-      
-      // localStorage에 리스팅 데이터 저장
-      const listingData = {
-        propertyName: formData.propertyName,
-        propertyType: formData.propertyType,
+      // JWT 토큰 가져오기
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('로그인이 필요합니다.');
+      }
+
+      // 백엔드 API 스키마에 맞게 데이터 변환
+      const listingPayload = {
+        title: formData.propertyName,
+        description: formData.propertyDescription,
+        type: formData.propertyType,
+        address: `${formData.address.state} ${formData.address.city} ${formData.address.district} ${formData.address.street} ${formData.address.detail}`.trim(),
+        latitude: 37.5665, // TODO: 실제 주소로부터 좌표 변환 필요
+        longitude: 126.9780,
+        images: formData.photos,
+        amenities: [...formData.popularAmenities, ...formData.standoutAmenities],
+        maxGuests: formData.guests,
         basePrice: formData.basePrice,
-        photos: formData.photos,
-        bedrooms: formData.bedrooms,
-        beds: formData.beds,
-        bathrooms: formData.bathrooms,
-        guests: formData.guests,
-        popularAmenities: formData.popularAmenities,
-        standoutAmenities: formData.standoutAmenities,
+        weekendPrice: formData.basePrice + (formData.basePrice * formData.weekendPremium / 100),
+        smartPricingEnabled: false,
+        priceConfig: {
+          weekday: formData.basePrice,
+          weekend: formData.basePrice + (formData.basePrice * formData.weekendPremium / 100),
+          extraGuest: 0,
+        },
       };
+
+      console.log('Sending listing data:', listingPayload);
+
+      // 백엔드 API 호출
+      const response = await fetch('http://localhost:3001/api/v1/listings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(listingPayload),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem('accessToken');
+          throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
+        }
+        const errorData = await response.json().catch(() => ({ message: '알 수 없는 오류' }));
+        console.error('Backend error response:', response.status, errorData);
+        throw new Error(errorData.message || errorData.error || `숙소 등록에 실패했습니다 (${response.status})`);
+      }
+
+      const result = await response.json();
+      const newListingId = result.data?.id || result.id;
+
+      console.log('Listing created successfully:', newListingId);
       
-      localStorage.setItem(`listing_${newListingId}`, JSON.stringify(listingData));
+      // localStorage에 hasListing 플래그 설정
       localStorage.setItem("hasListing", "true");
-      
-      console.log("Listing created:", newListingId, listingData);
       
       // 리스팅 에디터 페이지로 이동
       router.push(`/host/listings/${newListingId}`);
       
       // 모달 닫기
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create listing:", error);
-      // TODO: 에러 처리
+      setError(error.message || '숙소 등록 중 오류가 발생했습니다.');
+      setIsLoading(false);
     }
   };
 
@@ -208,6 +249,30 @@ export default function HostRegistrationModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       {/* 모달 컨테이너 */}
       <div className="relative w-full h-full bg-white flex flex-col">
+        {/* 에러 메시지 */}
+        {error && (
+          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="flex-shrink-0 text-red-600 hover:text-red-800"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* 상단 헤더 */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <button
@@ -343,6 +408,7 @@ export default function HostRegistrationModal({
               formData={{ hostAddress: formData.hostAddress }}
               onUpdate={(data) => setFormData({ ...formData, ...data })}
               onCreateListing={handleCreateListing}
+              isLoading={isLoading}
             />
           )}
           </div>
@@ -367,13 +433,19 @@ export default function HostRegistrationModal({
               {/* 다음/시작하기 버튼 */}
               <button
                 onClick={handleNext}
-                disabled={!canProceed()}
-                className={`px-6 py-3 rounded-lg font-semibold transition ${
-                  canProceed()
+                disabled={!canProceed() || isLoading}
+                className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${
+                  canProceed() && !isLoading
                     ? "bg-gradient-to-r from-[#E61E4D] to-[#D70466] text-white hover:from-[#D70466] hover:to-[#BD1E59]"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
+                {isLoading && (
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                )}
                 {step === 2 || step === 18 ? "시작하기" : "다음"}
               </button>
             </div>

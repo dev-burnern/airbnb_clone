@@ -16,12 +16,14 @@ interface Step21FinalDetailsProps {
   };
   onUpdate: (data: any) => void;
   onCreateListing: () => void;
+  isLoading?: boolean;
 }
 
 const Step21FinalDetails: React.FC<Step21FinalDetailsProps> = ({
   formData,
   onUpdate,
   onCreateListing,
+  isLoading = false,
 }) => {
   const updateAddress = (field: string, value: string) => {
     onUpdate({
@@ -129,14 +131,20 @@ const Step21FinalDetails: React.FC<Step21FinalDetailsProps> = ({
         {/* Create Listing Button */}
         <button
           onClick={onCreateListing}
-          disabled={!canCreate}
-          className={`w-full mt-8 px-5 py-3 rounded-lg font-semibold text-base transition ${
-            canCreate
+          disabled={!canCreate || isLoading}
+          className={`w-full mt-8 px-5 py-3 rounded-lg font-semibold text-base transition flex items-center justify-center gap-2 ${
+            canCreate && !isLoading
               ? "bg-gradient-to-r from-[#E61E4D] to-[#D70466] text-white hover:from-[#D70466] hover:to-[#BD1E59]"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
-          리스팅 만들기
+          {isLoading && (
+            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          )}
+          {isLoading ? '등록 중...' : '리스팅 만들기'}
         </button>
       </div>
     </div>
