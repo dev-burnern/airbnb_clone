@@ -43,7 +43,20 @@ export default function ListingEditorPage() {
         // 1. 먼저 백엔드 API에서 데이터 로드 시도
         const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`);
         if (response.ok) {
-          const apiData = await response.json();
+          const apiResponse = await response.json();
+          const apiData = apiResponse.data || apiResponse; // data 안에 실제 리스팅 정보가 있음
+          
+          // 디버깅: 백엔드 응답 전체 확인
+          console.log('🔍 Full backend response:', apiResponse);
+          console.log('🔍 Actual listing data:', apiData);
+          console.log('🔍 Backend response:', {
+            hasImages: !!apiData.images,
+            imagesType: typeof apiData.images,
+            imagesIsArray: Array.isArray(apiData.images),
+            imagesLength: apiData.images?.length,
+            firstImagePreview: apiData.images?.[0]?.substring(0, 50),
+          });
+          
           // 백엔드의 'images' 필드를 프론트엔드의 'photos'로 매핑
           const listingData: ListingData = {
             propertyName: apiData.title || '',
@@ -57,6 +70,12 @@ export default function ListingEditorPage() {
             popularAmenities: Array.isArray(apiData.amenities) ? apiData.amenities.slice(0, 4) : [],
             standoutAmenities: Array.isArray(apiData.amenities) ? apiData.amenities.slice(4) : [],
           };
+          
+          console.log('✅ Mapped listing data:', {
+            photosCount: listingData.photos.length,
+            firstPhoto: listingData.photos[0]?.substring(0, 50),
+          });
+          
           setListing(listingData);
           console.log('Listing loaded from API:', listingData);
           return;
@@ -140,40 +159,167 @@ export default function ListingEditorPage() {
 
       if (files && files.length > 0 && listing) {
         console.log('Processing files...');
-        // 파일을 Base64로 변환
+        // 파일을 Base64로 변환 + 리사이징
         const filePromises = Array.from(files).map((file) => {
           return new Promise<string>((resolve) => {
             const reader = new FileReader();
             reader.onloadend = () => {
-              resolve(reader.result as string);
+              const base64 = reader.result as string;
+              
+              // 이미지 리사이징
+              const img = new Image();
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1200;
+                const MAX_HEIGHT = 900;
+                
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > MAX_WIDTH) {
+                  height = (height * MAX_WIDTH) / width;
+                  width = MAX_WIDTH;
+                }
+                if (height > MAX_HEIGHT) {
+                  width = (width * MAX_HEIGHT) / height;
+                  height = MAX_HEIGHT;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+                
+                // JPEG 품질 0.7로 압축
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+              };
+              img.src = base64;
             };
             reader.readAsDataURL(file);
           });
         });
 
         const newPhotos = await Promise.all(filePromises);
-        console.log('New photos converted:', newPhotos.length);
+        console.log('New photos converted and resized:', newPhotos.length);
 
-        const updatedListing = {
-          ...listing,
-          photos: [...listing.photos, ...newPhotos],
-        };
+        const updatedPhotos = [...listing.photos, ...newPhotos];
+        
+        // 디버깅: 전송할 데이터 크기 확인
+        const payload = { images: updatedPhotos };
+        const payloadSize = JSON.stringify(payload).length;
+        console.log('Payload info:', {
+          totalImages: updatedPhotos.length,
+          newImagesCount: newPhotos.length,
+          payloadSizeMB: (payloadSize / 1024 / 1024).toFixed(2),
+          firstImageSizeKB: newPhotos[0] ? (newPhotos[0].length / 1024).toFixed(2) : 0,
+        });
+        
+        // 백엔드 API로 사진 업데이트
+        try {
+          const token = localStorage.getItem('accessToken');
+          const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          });
 
-        console.log('Updated listing photos count:', updatedListing.photos.length);
-
-        // localStorage 업데이트
-        localStorage.setItem(`listing_${listingId}`, JSON.stringify(updatedListing));
-        setListing(updatedListing);
-
-        console.log('Listing updated successfully');
+          if (response.ok) {
+            const result = await response.json();
+            console.log('Photos updated successfully:', result);
+            
+            // 로컬 상태 업데이트
+            setListing({
+              ...listing,
+              photos: updatedPhotos,
+            });
+            alert('사진이 업로드되었습니다.');
+          } else {
+            // 에러 상세 정보 확인
+            const errorData = await response.json().catch(() => null);
+            console.error('Failed to update photos:', response.status, errorData);
+            
+            if (response.status === 500) {
+              alert('서버 오류로 사진 업로드에 실패했습니다. 이미지 크기를 줄여보세요.');
+            } else if (response.status === 413) {
+              alert('이미지 파일이 너무 큽니다. 더 작은 이미지를 선택해주세요.');
+            } else {
+              alert(`사진 업로드에 실패했습니다 (${response.status})`);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to upload photos:', error);
+          alert('사진 업로드 중 오류가 발생했습니다.');
+        }
       }
     };
 
     input.click();
   };
 
-  const handleEdit = (section: string) => {
-    alert(`${section} 편집 기능은 준비 중입니다.`);
+  const handleEdit = async (section: string) => {
+    // 섹션별 편집 로직 (추후 구현)
+    if (section === '숙소 이름') {
+      const newName = prompt('새 숙소 이름을 입력하세요:', listing?.propertyName);
+      if (newName && newName !== listing?.propertyName) {
+        await updateListing({ title: newName });
+      }
+    } else if (section === '가격') {
+      const newPrice = prompt('새 기본 가격을 입력하세요:', listing?.basePrice.toString());
+      if (newPrice && !isNaN(Number(newPrice))) {
+        await updateListing({ basePrice: Number(newPrice) });
+      }
+    } else {
+      alert(`${section} 편집 기능은 준비 중입니다.`);
+    }
+  };
+
+  const updateListing = async (updates: any) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Listing updated successfully:', result);
+        
+        // 데이터 다시 로드
+        const response2 = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`);
+        if (response2.ok) {
+          const apiData = await response2.json();
+          const listingData: ListingData = {
+            propertyName: apiData.title || '',
+            propertyType: apiData.type || '주택',
+            basePrice: apiData.basePrice || 0,
+            photos: apiData.images || [],
+            bedrooms: apiData.bedrooms || 1,
+            beds: apiData.beds || 1,
+            bathrooms: apiData.bathrooms || 1,
+            guests: apiData.maxGuests || 1,
+            popularAmenities: Array.isArray(apiData.amenities) ? apiData.amenities.slice(0, 5) : [],
+            standoutAmenities: Array.isArray(apiData.amenities) ? apiData.amenities.slice(5) : [],
+          };
+          setListing(listingData);
+        }
+        
+        alert('수정되었습니다.');
+      } else {
+        console.error('Failed to update listing:', response.status);
+        alert('수정에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to update listing:', error);
+      alert('수정 중 오류가 발생했습니다.');
+    }
   };
 
   const handleAddAccessibility = () => {
