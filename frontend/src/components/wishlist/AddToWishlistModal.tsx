@@ -15,6 +15,7 @@ interface AddToWishlistModalProps {
   onClose: () => void;
   listingId: string;
   onCreateNew: () => void;
+  onSuccess?: () => void;
 }
 
 const API_BASE_URL = "http://localhost:3001/api/v1";
@@ -33,6 +34,7 @@ export const AddToWishlistModal: React.FC<AddToWishlistModalProps> = ({
   onClose,
   listingId,
   onCreateNew,
+  onSuccess,
 }) => {
   const [wishlists, setWishlists] = useState<Wishlist[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,19 +49,19 @@ export const AddToWishlistModal: React.FC<AddToWishlistModalProps> = ({
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/wishlists`, getAuthHeaders());
-      
+
       console.log('위시리스트 응답:', response.data);
-      
+
       // 백엔드 응답: { success: true, data: [...] }
       const dataArray = Array.isArray(response.data) ? response.data : (response.data.data || []);
-      
+
       const wishlistData = dataArray.map((item: any) => ({
         id: item.id,
         name: item.name || item.title,
         listingsCount: item.listings?.length || 0,
         thumbnail: item.listings?.[0]?.mainImageUrl,
       }));
-      
+
       setWishlists(wishlistData);
     } catch (error: any) {
       console.error('위시리스트 조회 실패:', error);
@@ -74,22 +76,25 @@ export const AddToWishlistModal: React.FC<AddToWishlistModalProps> = ({
   const handleAddToWishlist = async (wishlistId: string) => {
     try {
       console.log('위시리스트에 숙소 추가:', { wishlistId, listingId });
-      
+
       await axios.post(
         `${API_BASE_URL}/wishlists/${wishlistId}/listings`,
         { listingId },
         getAuthHeaders()
       );
-      
+
       alert('위시리스트에 추가되었습니다!');
-      onClose();
-      
-      // 페이지 새로고침으로 위시리스트 페이지 업데이트
-      window.location.reload();
+
+      // 성공 콜백 호출 (하트 색상 변경)
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        onClose();
+      }
     } catch (error: any) {
       console.error('위시리스트 추가 실패:', error);
       console.error('에러 상세:', error.response?.data);
-      
+
       if (error.response?.status === 404) {
         alert('숙소를 찾을 수 없습니다.');
       } else {
