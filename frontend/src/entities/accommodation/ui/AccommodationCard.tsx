@@ -28,6 +28,10 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({
   isWished = false,
 }) => {
   const [wished, setWished] = useState(isWished);
+  // isWished prop이 변경될 때마다 wished 상태를 동기화
+  React.useEffect(() => {
+    setWished(isWished);
+  }, [isWished]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
