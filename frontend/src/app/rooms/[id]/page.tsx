@@ -65,74 +65,19 @@ export default function ListingDetailsPage() {
             return;
         }
 
-        setIsBooking(true);
-        setBookingError(null);
+        // 결제 페이지로 이동 (예약 정보를 쿼리 파라미터로 전달)
+        const mainImage = listing.images?.[0] || 'https://placehold.co/600x400?text=No+Image';
+        const params = new URLSearchParams({
+            listingId: id,
+            listingTitle: listing.title,
+            checkIn: checkIn,
+            checkOut: checkOut,
+            guests: guests.toString(),
+            totalPrice: totalPrice.toString(),
+            imageUrl: mainImage,
+        });
 
-        try {
-            // 1. 호스트와 채팅방 생성
-            const chatResponse = await fetch('http://localhost:3001/api/v1/chat/conversations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    participantId: listing.host.id,
-                    title: `${listing.title} 예약 문의`,
-                }),
-            });
-
-            if (!chatResponse.ok) {
-                const errorData = await chatResponse.json();
-                console.error('Chat creation error:', errorData);
-                throw new Error('채팅방 생성에 실패했습니다.');
-            }
-
-            const response = await chatResponse.json();
-            console.log('Created conversation response:', response);
-
-            // TransformInterceptor가 { success: true, data: {...} } 형태로 래핑
-            const conversation = response.data || response;
-            const conversationId = conversation.id;
-            if (!conversationId) {
-                console.error('No conversation ID in response:', response);
-                throw new Error('채팅방 ID를 가져올 수 없습니다.');
-            }
-
-            // 2. 예약 내역 메시지 전송
-            const bookingMessage = `🏠 예약 요청
-
-📍 숙소: ${listing.title}
-📆 체크인: ${checkIn}
-📆 체크아웃: ${checkOut}
-👥 게스트: ${guests}명
-💰 예상 금액: ₩${totalPrice.toLocaleString()}
-
-예약 가능 여부를 확인해주세요!`;
-
-            const messageResponse = await fetch(`http://localhost:3001/api/v1/chat/conversations/${conversationId}/messages`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    content: bookingMessage,
-                }),
-            });
-
-            if (!messageResponse.ok) {
-                console.error('Message send failed');
-            }
-
-            // 3. 채팅 페이지로 이동 (새 창이 아닌 현재 창에서)
-            router.push(`/messages/${conversationId}`);
-        } catch (err) {
-            console.error('Booking error:', err);
-            setBookingError(err instanceof Error ? err.message : '예약 요청 중 오류가 발생했습니다.');
-        } finally {
-            setIsBooking(false);
-        }
+        router.push(`/payment/checkout?${params.toString()}`);
     };
 
     if (loading) return <div className="text-center py-20">잠시만 기다려주세요...</div>;
