@@ -11,7 +11,6 @@ import PasswordLogin from "../login_or_signup/PasswordLogin";
 import SignupModal from "@/widgets/login_or_signup/SignupModal";
 import AuthTokenHandler from "./AuthTokenHandler";
 import HostRegistrationModal from "@/components/host/HostRegistrationModal";
-import { useTranslations } from 'next-intl';
 // Lucide-React 아이콘 임포트
 import {
   Heart, // 위시리스트
@@ -35,7 +34,6 @@ interface MenuItem {
 }
 
 export default function Header() {
-  const t = useTranslations('header');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
@@ -138,12 +136,12 @@ export default function Header() {
 
   // --- 메뉴 항목 정의 ---
   const menuItems: MenuItem[] = [
-    { name: t('home'), path: "/", icon: Home, isLoggedInRequired: null },
-    { name: t('wishlist'), path: "/wishlist", icon: Heart, isLoggedInRequired: true },
-    { name: t('messages'), path: "/messages", icon: MessageSquare, isLoggedInRequired: true },
-    { name: t('profile'), path: "/account/profile", icon: User, isLoggedInRequired: true },
-    { name: t('accountSettings'), path: "/account", icon: Settings, isLoggedInRequired: true },
-    { name: t('languageAndCurrency'), path: "/account/language-and-currency", icon: Globe, isLoggedInRequired: true },
+    { name: "홈", path: "/", icon: Home, isLoggedInRequired: null },
+    { name: "위시리스트", path: "/wishlist", icon: Heart, isLoggedInRequired: true },
+    { name: "메시지", path: "/messages", icon: MessageSquare, isLoggedInRequired: true },
+    { name: "프로필", path: "/account/profile", icon: User, isLoggedInRequired: true },
+    { name: "계정 관리", path: "/account", icon: Settings, isLoggedInRequired: true },
+    { name: "언어 및 통화", path: "/account/language-and-currency", icon: Globe, isLoggedInRequired: true },
   ];
   // ----------------------
 
@@ -230,7 +228,7 @@ export default function Header() {
                 onClick={() => setHostModalOpen(true)}
                 className="text-sm font-semibold hover:bg-gray-100 px-4 py-2 rounded-full transition whitespace-nowrap"
               >
-                {t('hosting')}
+                호스팅하기
               </button>
             )}
 
@@ -284,7 +282,7 @@ export default function Header() {
                         className="flex items-center gap-3 text-left px-4 py-3 hover:bg-gray-100 transition-colors w-full font-normal text-gray-700"
                       >
                         <LogIn size={18} className="text-gray-600" />
-                        {t('login')}
+                        로그인 및 회원가입
                       </button>
                     ) : (
                       <>
@@ -296,7 +294,7 @@ export default function Header() {
                           className="flex items-center gap-3 text-left px-4 py-3 hover:bg-gray-100 transition-colors w-full font-normal text-gray-700"
                         >
                           <LogOut size={18} className="text-gray-600" />
-                          {t('logout')}
+                          로그아웃
                         </button>
                       </>
                     )}
