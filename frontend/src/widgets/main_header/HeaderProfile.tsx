@@ -35,10 +35,21 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
           });
 
           if (response.ok) {
-            const result = await response.json();
-            // API 응답이 { success: true, data: {...} } 형식이면 data 추출
-            const userData = result.data || result;
-            setUserProfile(userData);
+            // 응답이 비어있는지 확인
+            const text = await response.text();
+            if (!text) {
+              console.warn('빈 응답 수신');
+              return;
+            }
+
+            try {
+              const result = JSON.parse(text);
+              // API 응답이 { success: true, data: {...} } 형식이면 data 추출
+              const userData = result.data || result;
+              setUserProfile(userData);
+            } catch (parseError) {
+              console.error('JSON 파싱 실패:', parseError);
+            }
           } else if (response.status === 401) {
             // 토큰이 만료되었거나 유효하지 않음 - 로그아웃 처리
             localStorage.removeItem('accessToken');

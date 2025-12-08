@@ -31,7 +31,7 @@ export default function HostListingsPage() {
       }
 
       // 백엔드 API에서 현재 사용자의 리스팅 가져오기
-      const response = await fetch('http://localhost:3001/api/v1/listings', {
+      const response = await fetch('http://localhost:3001/api/v1/listings/my', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -45,17 +45,17 @@ export default function HostListingsPage() {
 
       const result = await response.json();
       const data = Array.isArray(result) ? result : (result.data || []);
-      
+
       console.log('Fetched listings from backend:', data);
-      
+
       // 현재 사용자의 리스팅만 필터링 (백엔드에서 필터링하는 것이 더 좋지만, 임시로 클라이언트에서 처리)
       setListings(data);
-      
+
       // 리스팅이 있으면 hasListing 플래그 설정
       if (data.length > 0) {
         localStorage.setItem("hasListing", "true");
       }
-      
+
       setLoading(false);
     } catch (error) {
       console.error('Failed to load listings:', error);
@@ -69,7 +69,7 @@ export default function HostListingsPage() {
 
   const handleDelete = async (e: React.MouseEvent, listingId: string) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
-    
+
     if (confirm('정말 이 리스팅을 삭제하시겠습니까?')) {
       try {
         const token = localStorage.getItem('accessToken');
@@ -136,7 +136,7 @@ export default function HostListingsPage() {
                 month: 'long',
                 day: 'numeric'
               });
-              
+
               return (
                 <div
                   key={listing.id}
@@ -169,7 +169,7 @@ export default function HostListingsPage() {
                       </p>
                     </div>
                   </button>
-                  
+
                   {/* Delete Button */}
                   <button
                     onClick={(e) => handleDelete(e, listing.id)}

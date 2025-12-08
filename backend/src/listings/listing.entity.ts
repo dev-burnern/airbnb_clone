@@ -20,6 +20,9 @@ export class Listing {
     @Column()
     address: string;
 
+    @Column('text', { nullable: true })
+    introduction: string; // 호스트 소개
+
     @Column('decimal', { precision: 10, scale: 6 })
     latitude: number;
 
