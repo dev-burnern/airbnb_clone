@@ -59,7 +59,7 @@ export default function ListingDetailsPage() {
         }
 
         // 호스트 ID 확인
-        if (!listing.host?.id) {
+        if (!listing || !listing.host?.id) {
             setBookingError('호스트 정보를 찾을 수 없습니다.');
             return;
         }
