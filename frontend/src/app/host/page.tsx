@@ -224,7 +224,7 @@ export default function HostDashboardPage() {
                   <div className="flex flex-col items-end gap-3">
                     {getStatusBadge(booking.status)}
                     <div className="text-lg font-semibold">
-                      ₩{booking.totalPrice.toLocaleString()}
+                      ₩{Math.round(Number(booking.totalPrice)).toLocaleString()}
                     </div>
 
                     {/* 대기중인 예약에 대한 액션 버튼 */}
