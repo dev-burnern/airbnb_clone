@@ -60,7 +60,7 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
       // 전화번호 저장 (국가코드 포함)
       const fullPhone = countryCode + numbersOnly;
 
-      const response = await fetch('http://localhost:3001/api/v1/users/profile', {
+      const response = await fetch('http://localhost:3001/api/v1/users/me', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

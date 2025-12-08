@@ -40,7 +40,7 @@ export const EmailEditForm = ({ currentEmail, onSave, onClose }: EmailEditFormPr
         return;
       }
 
-      const response = await fetch('http://localhost:3001/api/v1/users/profile', {
+      const response = await fetch('http://localhost:3001/api/v1/users/me', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
