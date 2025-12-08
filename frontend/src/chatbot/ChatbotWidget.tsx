@@ -120,7 +120,7 @@ export default function ChatWidget() {
 
       {/* 챗봇 창 */}
       {opened && (
-        <div className="fixed bottom-28 right-8 w-[450px] h-[650px] bg-white shadow-2xl rounded-2xl flex flex-col z-40 overflow-hidden border border-gray-200 animate-slideUp">
+        <div className="fixed bottom-28 right-8 w-[420px] h-[580px] bg-white shadow-2xl rounded-2xl flex flex-col z-40 overflow-hidden border border-gray-200 animate-slideUp">
           
           {/* 헤더 */}
           <div className={`${AIRBNB_RED} text-white px-6 py-4 flex items-center justify-between`}>
@@ -180,7 +180,7 @@ export default function ChatWidget() {
                     sendMessage();
                   }
                 }}
-                placeholder={isLoading ? "답변 생성 중..." : "메시지를 입력하세요... (Shift+Enter로 줄바꿈)"}
+                placeholder={isLoading ? "답변 생성 중..." : "메시지를 입력하세요..."}
                 disabled={isLoading}
                 rows={1}
                 style={{ minHeight: "44px", maxHeight: "120px" }}

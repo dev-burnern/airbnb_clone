@@ -8,6 +8,7 @@ import { useListing } from '@/hooks/useListing';
 import { Heart, Share, Star } from 'lucide-react';
 import Calendar from '@/components/booking/Calendar';
 import GuestSelector from '@/components/booking/GuestSelector';
+import Header from '@/widgets/side_header/Header';
 
 export default function ListingDetailsPage() {
     const params = useParams();
@@ -140,6 +141,8 @@ export default function ListingDetailsPage() {
     const mainImage = listing.images?.[0] || 'https://placehold.co/600x400?text=No+Image';
 
     return (
+        <>
+        <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Title Header */}
             <h1 className="text-2xl font-bold text-gray-900 mb-2">{listing.title}</h1>
@@ -268,33 +271,33 @@ export default function ListingDetailsPage() {
 
                 {/* Right Column: Booking Widget */}
                 <div className="relative">
-                    <div className="sticky top-24 border rounded-xl shadow-xl p-6 bg-white">
-                        <div className="flex justify-between items-end mb-4">
+                    <div className="sticky top-24 border border-gray-300 rounded-xl shadow-xl p-6 bg-white">
+                        <div className="flex justify-between items-center mb-6">
                             <div>
-                                <span className="text-xl font-bold">₩{price.toLocaleString('ko-KR')}</span>
-                                <span className="text-gray-500 text-sm"> / 박</span>
+                                <span className="text-2xl font-bold">₩{price.toLocaleString('ko-KR')}</span>
+                                <span className="text-gray-500 text-base"> / 박</span>
                             </div>
                             <div className="flex items-center gap-1 text-sm">
-                                <Star className="w-3 h-3 fill-black" />
-                                <span className="font-medium">{listing.rating || "New"}</span>
+                                <Star className="w-4 h-4 fill-black" />
+                                <span className="font-semibold">{listing.rating || "New"}</span>
                             </div>
                         </div>
 
                         {/* 날짜 선택 영역 */}
                         <div
-                            className="border rounded-lg mb-4 overflow-hidden cursor-pointer hover:border-gray-900 transition"
+                            className="border-2 border-gray-900 rounded-lg mb-4 overflow-hidden cursor-pointer hover:border-black transition"
                             onClick={() => setShowCalendar(!showCalendar)}
                         >
-                            <div className="flex border-b">
-                                <div className="flex-1 p-3 border-r">
-                                    <label className="block text-[10px] font-bold uppercase text-gray-700">체크인</label>
-                                    <div className={`text-sm ${checkIn ? 'text-gray-900' : 'text-gray-400'}`}>
+                            <div className="flex">
+                                <div className="flex-1 p-4 border-r border-gray-900">
+                                    <label className="block text-xs font-bold text-gray-900 mb-1">체크인</label>
+                                    <div className={`text-base ${checkIn ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
                                         {checkIn || '날짜 추가'}
                                     </div>
                                 </div>
-                                <div className="flex-1 p-3">
-                                    <label className="block text-[10px] font-bold uppercase text-gray-700">체크아웃</label>
-                                    <div className={`text-sm ${checkOut ? 'text-gray-900' : 'text-gray-400'}`}>
+                                <div className="flex-1 p-4">
+                                    <label className="block text-xs font-bold text-gray-900 mb-1">체크아웃</label>
+                                    <div className={`text-base ${checkOut ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
                                         {checkOut || '날짜 추가'}
                                     </div>
                                 </div>
@@ -303,20 +306,22 @@ export default function ListingDetailsPage() {
 
                         {/* 캘린더 팝업 */}
                         {showCalendar && (
-                            <div className="absolute left-0 right-0 top-28 z-50 bg-white border rounded-xl shadow-2xl p-4">
-                                <Calendar
-                                    checkIn={checkIn}
-                                    checkOut={checkOut}
-                                    onDateSelect={(ci, co) => {
-                                        handleDateSelect(ci, co);
-                                        if (ci && co) setShowCalendar(false);
-                                    }}
-                                />
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setShowCalendar(false)}>
+                                <div className="bg-white border-2 border-gray-900 rounded-2xl shadow-2xl max-w-3xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                                    <Calendar
+                                        checkIn={checkIn}
+                                        checkOut={checkOut}
+                                        onDateSelect={(ci, co) => {
+                                            handleDateSelect(ci, co);
+                                            if (ci && co) setShowCalendar(false);
+                                        }}
+                                    />
+                                </div>
                             </div>
                         )}
 
                         {/* 인원 선택 */}
-                        <div className="mb-4">
+                        <div className="mb-6">
                             <GuestSelector
                                 guests={guests}
                                 maxGuests={listing.maxGuests || 10}
@@ -334,7 +339,7 @@ export default function ListingDetailsPage() {
                         <button
                             onClick={handleBooking}
                             disabled={isBooking || !checkIn || !checkOut}
-                            className={`w-full py-3 rounded-lg font-semibold transition mb-4 ${isBooking || !checkIn || !checkOut
+                            className={`w-full py-3.5 rounded-lg font-semibold text-base transition mb-4 ${isBooking || !checkIn || !checkOut
                                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 : 'bg-rose-600 text-white hover:bg-rose-700'
                                 }`}
@@ -371,5 +376,6 @@ export default function ListingDetailsPage() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
