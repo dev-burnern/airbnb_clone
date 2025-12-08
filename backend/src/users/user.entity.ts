@@ -22,6 +22,12 @@ export class User {
     name?: string;
 
     @Column({ nullable: true })
+    preferredName?: string;
+
+    @Column({ nullable: true })
+    phone?: string;
+
+    @Column({ nullable: true })
     avatarUrl?: string;
 
     @Column({ type: 'simple-array', default: 'guest' })

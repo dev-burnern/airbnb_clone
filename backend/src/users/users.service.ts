@@ -59,7 +59,7 @@ export class UsersService {
         }
 
         // Separate fields
-        const userFields = ['name', 'avatarUrl', 'email', 'password', 'githubId', 'provider'];
+        const userFields = ['name', 'preferredName', 'phone', 'avatarUrl', 'email', 'password', 'githubId', 'provider'];
         const userUpdateData = {};
         const profileUpdateData = {};
 

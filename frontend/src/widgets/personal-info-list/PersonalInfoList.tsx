@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { InfoRow } from "@/shared/ui/InfoRow";
 
 import { NameEditForm } from '@/shared/ui/NameEditForm';
@@ -44,35 +44,35 @@ export const PersonalInfoList = () => {
     const [loading, setLoading] = useState(true);
 
     // 사용자 정보 가져오기
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    setLoading(false);
-                    return;
-                }
-
-                const response = await fetch('http://localhost:3001/api/v1/users/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    const data = result.data || result;
-                    setUserData(data);
-                }
-            } catch (error) {
-                console.error('사용자 정보 가져오기 실패:', error);
-            } finally {
+    const fetchUserData = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
                 setLoading(false);
+                return;
             }
-        };
 
-        fetchUserData();
+            const response = await fetch('http://localhost:3001/api/v1/users/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                const data = result.data || result;
+                setUserData(data);
+            }
+        } catch (error) {
+            console.error('사용자 정보 가져오기 실패:', error);
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchUserData();
+    }, [fetchUserData]);
 
     // 특정 폼을 토글하는 핸들러
     const handleToggle = (formName: OpenForm) => {
@@ -82,6 +82,12 @@ export const PersonalInfoList = () => {
 
     // 폼을 닫는 함수 (수정 폼 내부에서 저장이 완료된 후 호출하기 위함)
     const closeForm = () => setOpenForm(null);
+
+    // 저장 후 데이터 새로고침
+    const handleSaveSuccess = async () => {
+        closeForm();
+        await fetchUserData();
+    };
 
     if (loading) {
         return (
@@ -108,18 +114,26 @@ export const PersonalInfoList = () => {
                     onActionClick={() => handleToggle('name')}
                     isOpen={openForm === 'name'}
                 >
-                    <NameEditForm onClose={closeForm} />
+                    <NameEditForm
+                        currentName={userData?.name || ''}
+                        onSave={handleSaveSuccess}
+                        onClose={closeForm}
+                    />
                 </InfoRow>
 
                 {/* 선호하는 이름 */}
                 <InfoRow
                     label="선호하는 이름"
                     value={userData?.preferredName || '미제출'}
-                    buttonText="추가"
+                    buttonText={userData?.preferredName ? "수정" : "추가"}
                     onActionClick={() => handleToggle('preferredName')}
                     isOpen={openForm === 'preferredName'}
                 >
-                    <PreferredNameEditForm onClose={closeForm} />
+                    <PreferredNameEditForm
+                        currentPreferredName={userData?.preferredName || ''}
+                        onSave={handleSaveSuccess}
+                        onClose={closeForm}
+                    />
                 </InfoRow>
 
                 {/* 이메일 주소 */}
@@ -129,7 +143,11 @@ export const PersonalInfoList = () => {
                     onActionClick={() => handleToggle('email')}
                     isOpen={openForm === 'email'}
                 >
-                    <EmailEditForm onClose={closeForm} />
+                    <EmailEditForm
+                        currentEmail={userData?.email || ''}
+                        onSave={handleSaveSuccess}
+                        onClose={closeForm}
+                    />
                 </InfoRow>
 
                 {/* 전화번호 */}
@@ -137,10 +155,15 @@ export const PersonalInfoList = () => {
                     label="전화번호"
                     value={userData?.phone ? maskPhone(userData.phone) : '미제출'}
                     isBorderBottom={false}
+                    buttonText={userData?.phone ? "수정" : "추가"}
                     onActionClick={() => handleToggle('phone')}
                     isOpen={openForm === 'phone'}
                 >
-                    <PhoneEditForm onClose={closeForm} />
+                    <PhoneEditForm
+                        currentPhone={userData?.phone || ''}
+                        onSave={handleSaveSuccess}
+                        onClose={closeForm}
+                    />
                 </InfoRow>
 
             </section>
