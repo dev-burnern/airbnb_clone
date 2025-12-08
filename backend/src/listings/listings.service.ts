@@ -15,6 +15,13 @@ export class ListingsService {
         return this.listingsRepository.save(listing);
     }
 
+    async findByHost(hostId: string): Promise<Listing[]> {
+        return this.listingsRepository.find({
+            where: { host: { id: hostId } },
+            order: { createdAt: 'DESC' },
+        });
+    }
+
     async findAll(query: any): Promise<Listing[]> {
         const qb = this.listingsRepository.createQueryBuilder('listing');
 
