@@ -1,7 +1,7 @@
 // Header.tsx (수정됨)
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import HeaderSearchBar from "./HeaderSearchBar";
@@ -49,6 +49,34 @@ export default function Header() {
   // 현재 호스트 모드인지 확인
   const isHostMode = pathname?.startsWith('/host') ?? false;
 
+  // 사용자의 리스팅 보유 여부 확인 함수 (로그인 시에도 호출)
+  const checkUserListings = useCallback(async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const listingsResponse = await fetch('http://localhost:3001/api/v1/listings/my', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (listingsResponse.ok) {
+        const listingsData = await listingsResponse.json();
+        const listings = Array.isArray(listingsData) ? listingsData : (listingsData.data || []);
+        if (listings.length > 0) {
+          setHasListing(true);
+          localStorage.setItem('hasListing', 'true');
+        } else {
+          setHasListing(false);
+          localStorage.removeItem('hasListing');
+        }
+      }
+    } catch (listingError) {
+      console.warn('리스팅 확인 실패:', listingError);
+    }
+  }, []);
+
   // 페이지 로드 시 저장된 토큰 유효성 검증
   useEffect(() => {
     const validateToken = async () => {
@@ -68,29 +96,8 @@ export default function Header() {
 
         if (response.ok) {
           setIsLoggedIn(true);
-
-          // 사용자의 리스팅 보유 여부 확인
-          try {
-            const listingsResponse = await fetch('http://localhost:3001/api/v1/listings/my', {
-              headers: {
-                'Authorization': `Bearer ${token}`,
-              },
-            });
-
-            if (listingsResponse.ok) {
-              const listingsData = await listingsResponse.json();
-              const listings = Array.isArray(listingsData) ? listingsData : (listingsData.data || []);
-              if (listings.length > 0) {
-                setHasListing(true);
-                localStorage.setItem('hasListing', 'true');
-              } else {
-                setHasListing(false);
-                localStorage.removeItem('hasListing');
-              }
-            }
-          } catch (listingError) {
-            console.warn('리스팅 확인 실패:', listingError);
-          }
+          // 리스팅 보유 여부 확인
+          await checkUserListings();
         } else {
           // 토큰이 만료되었거나 유효하지 않음
           localStorage.removeItem('accessToken');
@@ -104,7 +111,7 @@ export default function Header() {
     };
 
     validateToken();
-  }, []);
+  }, [checkUserListings]);
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -321,9 +328,11 @@ export default function Header() {
           setPasswordModalOpen(false);
           setEmailModalOpen(true);
         }}
-        onSubmit={() => {
+        onSubmit={async () => {
           setPasswordModalOpen(false);
           setIsLoggedIn(true);
+          // 로그인 성공 시 리스팅 확인
+          await checkUserListings();
         }}
       />
 
@@ -335,9 +344,11 @@ export default function Header() {
           setSignupModalOpen(false);
           setEmailModalOpen(true);
         }}
-        onSubmit={() => {
+        onSubmit={async () => {
           setSignupModalOpen(false);
           setIsLoggedIn(true);
+          // 회원가입 성공 시에도 리스팅 확인 (새 사용자는 없겠지만 일관성 유지)
+          await checkUserListings();
         }}
       />
 
