@@ -123,7 +123,9 @@ export default function Header() {
   // 로그아웃 처리 함수
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('hasListing');
     setIsLoggedIn(false);
+    setHasListing(false);
     setMenuOpen(false);
   };
 
