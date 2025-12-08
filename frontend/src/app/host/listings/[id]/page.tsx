@@ -46,7 +46,7 @@ export default function ListingEditorPage() {
   const listingId = (params?.id as string) || "";
   const [listing, setListing] = useState<ListingData | null>(null);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
-  
+
   // ⭐️⭐️⭐️ 모달 상태 추가 ⭐️⭐️⭐️
   const [modal, setModal] = useState<ModalState>({
     isOpen: false,
@@ -73,7 +73,7 @@ export default function ListingEditorPage() {
 
       if (response.ok) {
         // 성공 시, 전체 리스팅 데이터를 다시 불러와 상태 업데이트
-        await fetchListing(); 
+        await fetchListing();
         alert('수정되었습니다.');
       } else {
         console.error('Failed to update listing:', response.status);
@@ -90,16 +90,16 @@ export default function ListingEditorPage() {
   // ----------------------------------------------------
   const fetchListing = useCallback(async () => {
     if (!listingId) return;
-    
+
     try {
       const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch listing: ${response.status}`);
       }
-      
+
       const result = await response.json();
       const data = result.data || result;
-      
+
       // 백엔드 데이터를 프론트엔드 형식으로 변환 (location 및 introductionText 추가)
       const listingData: ListingData = {
         propertyName: data.title || '',
@@ -112,10 +112,10 @@ export default function ListingEditorPage() {
         guests: data.maxGuests || 1,
         popularAmenities: Array.isArray(data.amenities) ? data.amenities.slice(0, 5) : [],
         standoutAmenities: Array.isArray(data.amenities) ? data.amenities.slice(5) : [],
-        location: data.location || '대한민국, 서울', // 장소 데이터 필드 매핑
+        location: data.address || '대한민국, 서울', // 장소 데이터 필드 매핑 (백엔드에서는 address)
         introductionText: data.introduction || '게스트에게 본인과 숙소에 대해 소개하세요.', // 호스트 소개 데이터 필드 매핑
       };
-      
+
       setListing(listingData);
       return true; // API 로드 성공
     } catch (error) {
@@ -128,7 +128,7 @@ export default function ListingEditorPage() {
     const loadData = async () => {
       localStorage.setItem("hasListing", "true");
       const apiLoaded = await fetchListing();
-      
+
       // API 실패 시 localStorage에서 로드 (기존 로직 유지)
       if (!apiLoaded) {
         const savedData = localStorage.getItem(`listing_${listingId}`);
@@ -150,13 +150,13 @@ export default function ListingEditorPage() {
 
     loadData();
   }, [listingId, fetchListing]);
-  
+
   // ----------------------------------------------------
   // 모달 제어 핸들러
   // ----------------------------------------------------
   const handleModalOpen = (field: 'location' | 'introduction') => {
     if (!listing) return;
-    
+
     let title = '';
     let value = '';
     let backendField = '';
@@ -168,9 +168,9 @@ export default function ListingEditorPage() {
     } else if (field === 'location') {
       title = '장소 수정';
       value = listing.location || '';
-      backendField = 'location';
+      backendField = 'address'; // 백엔드 엔티티 필드명은 address
     }
-    
+
     setModal({
       isOpen: true,
       field,
@@ -185,14 +185,14 @@ export default function ListingEditorPage() {
 
     const updates: { [key: string]: string } = {};
     updates[modal.backendField] = modal.value;
-    
+
     // 1. API 업데이트 요청
     await updateListing(updates);
 
     // 2. 모달 닫기
     setModal({ ...modal, isOpen: false });
   };
-  
+
   // ----------------------------------------------------
   // handleEdit 함수 수정 (프롬프트 대신 모달 호출)
   // ----------------------------------------------------
@@ -215,9 +215,9 @@ export default function ListingEditorPage() {
       alert(`${section} 편집 기능은 준비 중입니다.`);
     }
   };
-  
+
   // ... (handlePhotoUpload, handleAddAccessibility, handleSwitchToGuestMode 함수는 변경 없음)
-  
+
   // ... (로딩 상태 처리 및 allAmenities 정의는 변경 없음)
 
   const handlePhotoUpload = async () => { /* ... 기존 로직 유지 ... */ };
@@ -225,14 +225,14 @@ export default function ListingEditorPage() {
   const handleSwitchToGuestMode = () => { router.push("/"); };
 
   if (!listing) {
-     return (
-       <div className="min-h-screen bg-white flex items-center justify-center">
-         <p className="text-gray-600">리스팅 정보를 불러오는 중...</p>
-       </div>
-     );
-   }
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-gray-600">리스팅 정보를 불러오는 중...</p>
+      </div>
+    );
+  }
 
-   const allAmenities = [...(listing.popularAmenities || []), ...(listing.standoutAmenities || [])];
+  const allAmenities = [...(listing.popularAmenities || []), ...(listing.standoutAmenities || [])];
 
 
   return (
@@ -278,7 +278,7 @@ export default function ListingEditorPage() {
           </div>
         </div>
       )}
-      
+
       {/* Main Layout (기존 내용) */}
       <div className="bg-white">
         <div className="flex h-[calc(100vh-73px)]">
@@ -286,115 +286,115 @@ export default function ListingEditorPage() {
           <aside className="w-64 border-r border-gray-200 overflow-y-auto scrollbar-hide">
             {/* ... (기존 Sidebar 내용 유지) ... */}
             <div className="p-4 space-y-4">
-                {/* Listing Preview Card */}
-                <div className="border border-gray-300 rounded-lg overflow-hidden">
+              {/* Listing Preview Card */}
+              <div className="border border-gray-300 rounded-lg overflow-hidden">
                 <div className="aspect-video bg-gray-200 flex items-center justify-center relative">
-                    {listing.photos.length > 0 ? (
-                        <img
-                        src={listing.photos[0]}
-                        alt="Listing"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            console.error('Failed to load image:', listing.photos[0]?.substring(0, 100));
-                            e.currentTarget.style.display = "none";
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                                const fallback = document.createElement('div');
-                                fallback.className = 'flex flex-col items-center justify-center text-gray-400';
-                                fallback.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-xs mt-2">이미지 로드 실패</span>';
-                                parent.appendChild(fallback);
-                            }
-                        }}
-                        onLoad={() => console.log('Image loaded successfully')}
-                        />
-                    ) : (
-                        <div className="flex flex-col items-center justify-center text-gray-400">
-                            <Upload size={32} />
-                            <span className="text-xs mt-2">이미지 없음</span>
-                        </div>
-                    )}
+                  {listing.photos.length > 0 ? (
+                    <img
+                      src={listing.photos[0]}
+                      alt="Listing"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Failed to load image:', listing.photos[0]?.substring(0, 100));
+                        e.currentTarget.style.display = "none";
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                          const fallback = document.createElement('div');
+                          fallback.className = 'flex flex-col items-center justify-center text-gray-400';
+                          fallback.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-xs mt-2">이미지 로드 실패</span>';
+                          parent.appendChild(fallback);
+                        }
+                      }}
+                      onLoad={() => console.log('Image loaded successfully')}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-gray-400">
+                      <Upload size={32} />
+                      <span className="text-xs mt-2">이미지 없음</span>
+                    </div>
+                  )}
                 </div>
                 <div className="p-3">
-                    <h3 className="font-semibold text-sm mb-1">{listing.propertyName}</h3>
-                    <p className="text-xs text-gray-600 mb-1">{listing.propertyType || '주택'}</p>
-                    <p className="text-xs font-medium">
-                        ₩{listing.basePrice?.toLocaleString() || '64,115'} / 박
-                    </p>
+                  <h3 className="font-semibold text-sm mb-1">{listing.propertyName}</h3>
+                  <p className="text-xs text-gray-600 mb-1">{listing.propertyType || '주택'}</p>
+                  <p className="text-xs font-medium">
+                    ₩{listing.basePrice?.toLocaleString() || '64,115'} / 박
+                  </p>
                 </div>
-                </div>
+              </div>
 
-                {/* Complete Required Steps */}
-                <div className="bg-pink-50 border border-pink-200 rounded-lg p-3">
+              {/* Complete Required Steps */}
+              <div className="bg-pink-50 border border-pink-200 rounded-lg p-3">
                 <h3 className="font-semibold text-sm mb-1 flex items-center gap-2">
-                    <Package size={16} />
-                    필수 단계 완료하기
+                  <Package size={16} />
+                  필수 단계 완료하기
                 </h3>
                 <p className="text-xs text-gray-600 mb-2">
-                    숙소를 게시하기 전에 몇 가지 필수 사항을 완료하세요.
+                  숙소를 게시하기 전에 몇 가지 필수 사항을 완료하세요.
                 </p>
                 <button className="w-full px-3 py-1.5 text-sm bg-white border border-gray-900 rounded-lg font-medium hover:bg-gray-50">
-                    시작하기
+                  시작하기
                 </button>
-                </div>
+              </div>
 
-                {/* Listing Details Summary */}
-                <div className="space-y-3">
+              {/* Listing Details Summary */}
+              <div className="space-y-3">
                 <h3 className="font-semibold text-sm">숙소 정보</h3>
                 <div className="space-y-2 text-xs">
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">게스트</span>
-                        <span className="font-medium">{listing.guests}명</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">침실</span>
-                        <span className="font-medium">{listing.bedrooms}개</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">침대</span>
-                        <span className="font-medium">{listing.beds}개</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">욕실</span>
-                        <span className="font-medium">{listing.bathrooms}개</span>
-                    </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">게스트</span>
+                    <span className="font-medium">{listing.guests}명</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">침실</span>
+                    <span className="font-medium">{listing.bedrooms}개</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">침대</span>
+                    <span className="font-medium">{listing.beds}개</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">욕실</span>
+                    <span className="font-medium">{listing.bathrooms}개</span>
+                  </div>
                 </div>
-                </div>
+              </div>
 
-                {/* Amenities */}
-                <div className="space-y-3">
+              {/* Amenities */}
+              <div className="space-y-3">
                 <h3 className="font-semibold text-sm">편의시설</h3>
                 <div className="space-y-1.5">
-                    {(showAllAmenities ? allAmenities : allAmenities.slice(0, 5)).map((amenity, index) => (
-                        <div key={index} className="flex items-center gap-2 text-xs">
-                            {amenity === "와이파이" && <Wifi size={14} />}
-                            {amenity === "TV" && <Tv size={14} />}
-                            {amenity === "무료 주차" && <Car size={14} />}
-                            {amenity === "에어컨" && <Wind size={14} />}
-                            <span>{amenity}</span>
-                        </div>
-                    ))}
+                  {(showAllAmenities ? allAmenities : allAmenities.slice(0, 5)).map((amenity, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs">
+                      {amenity === "와이파이" && <Wifi size={14} />}
+                      {amenity === "TV" && <Tv size={14} />}
+                      {amenity === "무료 주차" && <Car size={14} />}
+                      {amenity === "에어컨" && <Wind size={14} />}
+                      <span>{amenity}</span>
+                    </div>
+                  ))}
                 </div>
                 <button
-                    onClick={() => setShowAllAmenities(!showAllAmenities)}
-                    className="text-xs font-medium underline hover:text-gray-900"
+                  onClick={() => setShowAllAmenities(!showAllAmenities)}
+                  className="text-xs font-medium underline hover:text-gray-900"
                 >
-                    {showAllAmenities ? '접기' : `편의시설 ${allAmenities.length}개 모두 보기`}
+                  {showAllAmenities ? '접기' : `편의시설 ${allAmenities.length}개 모두 보기`}
                 </button>
-                </div>
+              </div>
 
-                {/* Accessibility */}
-                <div className="space-y-3">
+              {/* Accessibility */}
+              <div className="space-y-3">
                 <h3 className="font-semibold text-sm">접근성</h3>
                 <p className="text-xs text-gray-600">
-                    접근성 기능을 추가하지 않았습니다.
+                  접근성 기능을 추가하지 않았습니다.
                 </p>
                 <button
-                    onClick={handleAddAccessibility}
-                    className="text-xs font-medium underline hover:text-gray-900"
+                  onClick={handleAddAccessibility}
+                  className="text-xs font-medium underline hover:text-gray-900"
                 >
-                    접근성 기능 추가하기
+                  접근성 기능 추가하기
                 </button>
-                </div>
+              </div>
             </div>
           </aside>
 
@@ -403,7 +403,7 @@ export default function ListingEditorPage() {
             <div className="max-w-4xl">
               {/* Photo Tour (사진 관련 섹션은 수정 없음) */}
               {/* ... */}
-              
+
               {/* 장소 섹션 - 수정된 부분 */}
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="flex items-center justify-between mb-4">
@@ -437,7 +437,7 @@ export default function ListingEditorPage() {
               </div>
 
               {/* ... (나머지 섹션은 수정 없음) ... */}
-              
+
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-2xl font-semibold">예약 설정</h2>
