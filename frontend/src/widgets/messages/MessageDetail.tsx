@@ -49,8 +49,8 @@ export default function MessageDetail({ messages, currentUserId }: Props) {
               )}
               <div
                 className={`rounded-3xl px-4 py-3 max-w-[400px] shadow-sm ${isMe
-                    ? "bg-rose-500 text-white rounded-tr-sm"
-                    : "bg-gray-100 text-gray-800 rounded-tl-sm"
+                  ? "bg-rose-500 text-white rounded-tr-sm"
+                  : "bg-gray-100 text-gray-800 rounded-tl-sm"
                   }`}
               >
                 {msg.text}
@@ -68,9 +68,12 @@ export default function MessageDetail({ messages, currentUserId }: Props) {
 
 function formatTime(dateString: string): string {
   const date = new Date(dateString);
-  const hours = date.getHours();
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const period = hours >= 12 ? "오후" : "오전";
-  const displayHours = hours > 12 ? hours - 12 : hours || 12;
-  return `${period} ${displayHours}:${minutes}`;
+
+  // 한국 시간대로 명시적 변환
+  return date.toLocaleTimeString('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
 }
