@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { InfoRow } from "@/shared/ui/InfoRow";
+import { useTranslations } from 'next-intl';
 
 // 열린 폼을 식별하기 위한 타입
 type OpenForm = 'language' | 'currency' | 'timezone' | null;
@@ -24,18 +25,18 @@ const LANGUAGE_OPTIONS = [
 // 통화 옵션
 const CURRENCY_OPTIONS = [
     { value: 'KRW', label: '한국 원 (₩)' },
-    { value: 'USD', label: '미국 달러 ($)' },
-    { value: 'EUR', label: '유로 (€)' },
-    { value: 'JPY', label: '일본 엔 (¥)' },
+    { value: 'USD', label: 'USD ($)' },
+    { value: 'EUR', label: 'EUR (€)' },
+    { value: 'JPY', label: 'JPY (¥)' },
 ];
 
 // 시간대 옵션
 const TIMEZONE_OPTIONS = [
-    { value: 'Asia/Seoul', label: 'UTC+9 (서울)' },
-    { value: 'Asia/Tokyo', label: 'UTC+9 (도쿄)' },
-    { value: 'America/New_York', label: 'UTC-5 (뉴욕)' },
-    { value: 'America/Los_Angeles', label: 'UTC-8 (로스앤젤레스)' },
-    { value: 'Europe/London', label: 'UTC+0 (런던)' },
+    { value: 'Asia/Seoul', label: 'UTC+9 (Seoul)' },
+    { value: 'Asia/Tokyo', label: 'UTC+9 (Tokyo)' },
+    { value: 'America/New_York', label: 'UTC-5 (New York)' },
+    { value: 'America/Los_Angeles', label: 'UTC-8 (Los Angeles)' },
+    { value: 'Europe/London', label: 'UTC+0 (London)' },
 ];
 
 // 값을 표시용 레이블로 변환
@@ -46,9 +47,12 @@ const getCurrencyLabel = (value: string) =>
     CURRENCY_OPTIONS.find(opt => opt.value === value)?.label || value || '한국 원 (₩)';
 
 const getTimezoneLabel = (value: string) =>
-    TIMEZONE_OPTIONS.find(opt => opt.value === value)?.label || value || '미제출';
+    TIMEZONE_OPTIONS.find(opt => opt.value === value)?.label || value || '';
 
 export const LanguageCurrencyList = () => {
+    const t = useTranslations('languageCurrency');
+    const tCommon = useTranslations('common');
+
     const [openForm, setOpenForm] = useState<OpenForm>(null);
     const [settings, setSettings] = useState<UserSettings>({});
     const [loading, setLoading] = useState(true);
@@ -79,7 +83,7 @@ export const LanguageCurrencyList = () => {
                 });
             }
         } catch (error) {
-            console.error('설정 가져오기 실패:', error);
+            console.error('Failed to fetch settings:', error);
         } finally {
             setLoading(false);
         }
@@ -100,6 +104,13 @@ export const LanguageCurrencyList = () => {
         await fetchSettings();
     };
 
+    // 언어 변경 후 페이지 새로고침 (번역 적용)
+    const handleLanguageSaveSuccess = async () => {
+        closeForm();
+        // 언어 변경 후 페이지 새로고침하여 번역 적용
+        window.location.reload();
+    };
+
     // 언어 수정 폼
     const LanguageEditForm = () => {
         const [value, setValue] = useState(settings.language || '한국어');
@@ -113,7 +124,7 @@ export const LanguageCurrencyList = () => {
             try {
                 const token = localStorage.getItem('accessToken');
                 if (!token) {
-                    setError('로그인이 필요합니다.');
+                    setError(tCommon('loginRequired'));
                     setIsLoading(false);
                     return;
                 }
@@ -128,13 +139,13 @@ export const LanguageCurrencyList = () => {
                 });
 
                 if (response.ok) {
-                    handleSaveSuccess();
+                    handleLanguageSaveSuccess();
                 } else {
-                    setError('저장에 실패했습니다.');
+                    setError(tCommon('error'));
                 }
             } catch (err) {
-                console.error('저장 실패:', err);
-                setError('저장 중 오류가 발생했습니다.');
+                console.error('Save failed:', err);
+                setError(tCommon('error'));
             } finally {
                 setIsLoading(false);
             }
@@ -143,7 +154,7 @@ export const LanguageCurrencyList = () => {
         return (
             <div className="mt-4">
                 <p className="text-gray-500 text-sm mt-2 mb-4">
-                    선호하는 언어에 따라 에어비앤비 페이지의 내용과 커뮤니케이션 방식이 업데이트됩니다.
+                    {t('languageDescription')}
                 </p>
 
                 <select
@@ -163,7 +174,7 @@ export const LanguageCurrencyList = () => {
                     disabled={isLoading}
                     className="bg-gray-900 text-white px-6 py-3 text-base rounded-lg mt-6 hover:bg-black transition disabled:opacity-50"
                 >
-                    {isLoading ? '저장 중...' : '저장'}
+                    {isLoading ? tCommon('saving') : tCommon('save')}
                 </button>
             </div>
         );
@@ -182,7 +193,7 @@ export const LanguageCurrencyList = () => {
             try {
                 const token = localStorage.getItem('accessToken');
                 if (!token) {
-                    setError('로그인이 필요합니다.');
+                    setError(tCommon('loginRequired'));
                     setIsLoading(false);
                     return;
                 }
@@ -199,11 +210,11 @@ export const LanguageCurrencyList = () => {
                 if (response.ok) {
                     handleSaveSuccess();
                 } else {
-                    setError('저장에 실패했습니다.');
+                    setError(tCommon('error'));
                 }
             } catch (err) {
-                console.error('저장 실패:', err);
-                setError('저장 중 오류가 발생했습니다.');
+                console.error('Save failed:', err);
+                setError(tCommon('error'));
             } finally {
                 setIsLoading(false);
             }
@@ -228,7 +239,7 @@ export const LanguageCurrencyList = () => {
                     disabled={isLoading}
                     className="bg-gray-900 text-white px-6 py-3 text-base rounded-lg mt-6 hover:bg-black transition disabled:opacity-50"
                 >
-                    {isLoading ? '저장 중...' : '저장'}
+                    {isLoading ? tCommon('saving') : tCommon('save')}
                 </button>
             </div>
         );
@@ -247,7 +258,7 @@ export const LanguageCurrencyList = () => {
             try {
                 const token = localStorage.getItem('accessToken');
                 if (!token) {
-                    setError('로그인이 필요합니다.');
+                    setError(tCommon('loginRequired'));
                     setIsLoading(false);
                     return;
                 }
@@ -264,11 +275,11 @@ export const LanguageCurrencyList = () => {
                 if (response.ok) {
                     handleSaveSuccess();
                 } else {
-                    setError('저장에 실패했습니다.');
+                    setError(tCommon('error'));
                 }
             } catch (err) {
-                console.error('저장 실패:', err);
-                setError('저장 중 오류가 발생했습니다.');
+                console.error('Save failed:', err);
+                setError(tCommon('error'));
             } finally {
                 setIsLoading(false);
             }
@@ -281,7 +292,7 @@ export const LanguageCurrencyList = () => {
                     onChange={(e) => setValue(e.target.value)}
                     className="w-full p-3 border border-gray-400 rounded-md appearance-none bg-white"
                 >
-                    <option value="">선택하세요...</option>
+                    <option value="">{t('selectTimezone')}</option>
                     {TIMEZONE_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
@@ -294,7 +305,7 @@ export const LanguageCurrencyList = () => {
                     disabled={isLoading}
                     className="bg-gray-900 text-white px-6 py-3 text-base rounded-lg mt-6 hover:bg-black transition disabled:opacity-50"
                 >
-                    {isLoading ? '저장 중...' : '저장'}
+                    {isLoading ? tCommon('saving') : tCommon('save')}
                 </button>
             </div>
         );
@@ -303,8 +314,8 @@ export const LanguageCurrencyList = () => {
     if (loading) {
         return (
             <div className="max-w-2xl">
-                <h1 className="text-3xl font-bold text-gray-900 mb-6">언어 및 통화</h1>
-                <div className="text-gray-500">로딩 중...</div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('title')}</h1>
+                <div className="text-gray-500">{tCommon('loading')}</div>
             </div>
         );
     }
@@ -312,39 +323,39 @@ export const LanguageCurrencyList = () => {
     return (
         <div className="max-w-2xl">
             <div className="mb-0 mt-0">
-                <h1 className="text-3xl font-bold text-gray-900 mb-0">언어 및 통화</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-0">{t('title')}</h1>
             </div>
 
             <section>
 
                 {/* 선호하는 언어 */}
                 <InfoRow
-                    label="선호하는 언어"
+                    label={t('preferredLanguage')}
                     value={getLanguageLabel(settings.language || '')}
                     onActionClick={() => handleToggle('language')}
                     isOpen={openForm === 'language'}
-                    buttonText={'수정'}
+                    buttonText={tCommon('edit')}
                 >
                     <LanguageEditForm />
                 </InfoRow>
 
                 {/* 선호하는 통화 */}
                 <InfoRow
-                    label="선호하는 통화"
+                    label={t('preferredCurrency')}
                     value={getCurrencyLabel(settings.currency || '')}
                     onActionClick={() => handleToggle('currency')}
                     isOpen={openForm === 'currency'}
-                    buttonText={'수정'}
+                    buttonText={tCommon('edit')}
                 >
                     <CurrencyEditForm />
                 </InfoRow>
 
                 {/* 시간대 */}
                 <InfoRow
-                    label="시간대"
-                    value={settings.timezone ? getTimezoneLabel(settings.timezone) : '미제출'}
+                    label={t('timezone')}
+                    value={settings.timezone ? getTimezoneLabel(settings.timezone) : t('selectTimezone')}
                     isBorderBottom={false}
-                    buttonText={'수정'}
+                    buttonText={tCommon('edit')}
                     onActionClick={() => handleToggle('timezone')}
                     isOpen={openForm === 'timezone'}
                 >
