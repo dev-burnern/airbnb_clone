@@ -7,21 +7,17 @@ import { json, urlencoded } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-    // ConfigService
-    const configService = app.get(ConfigService);
-    const port = configService.get<number>('PORT', 3001);
-    const apiPrefix = configService.get<string>('API_PREFIX', 'api/v1');
+  // Body size 제한 증가 (기본 100kb → 50mb)
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
-    // Global Prefix
-    app.setGlobalPrefix(apiPrefix);
-
-    // CORS
-    app.enableCors({
-        origin: configService.get<string>('FRONTEND_URL', 'http://localhost:3000'),
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-    });
+  // ⚡⚡⚡ CORS 설정 추가 (최우선!)
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://frontend:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   // Global prefix
   app.setGlobalPrefix('api/v1');
