@@ -191,7 +191,7 @@ export default function BookingsPage() {
 
                                     <div className="flex justify-between items-center">
                                         <div className="font-bold text-lg">
-                                            ₩{booking.totalPrice?.toLocaleString() || 0}
+                                            ₩{Math.round(Number(booking.totalPrice) || 0).toLocaleString('ko-KR')}
                                         </div>
                                         <button
                                             onClick={() => handleMessageHost(booking)}
