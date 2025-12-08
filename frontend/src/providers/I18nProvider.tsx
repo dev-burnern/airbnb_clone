@@ -3,6 +3,9 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode, useEffect, useState } from 'react';
 
+// 기본 메시지 (하드코딩하여 초기 렌더링 지원)
+import defaultMessages from '../../messages/ko.json';
+
 // 메시지 타입
 type Messages = Record<string, Record<string, string>>;
 
@@ -14,8 +17,7 @@ const DEFAULT_LOCALE = 'ko';
 
 export function I18nProvider({ children }: { children: ReactNode }) {
     const [locale, setLocale] = useState(DEFAULT_LOCALE);
-    const [messages, setMessages] = useState<Messages | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [messages, setMessages] = useState<Messages>(defaultMessages as Messages);
 
     useEffect(() => {
         const loadMessages = async () => {
@@ -55,26 +57,19 @@ export function I18nProvider({ children }: { children: ReactNode }) {
                     userLocale = DEFAULT_LOCALE;
                 }
 
-                // 메시지 로드
-                const messageModule = await import(`../../messages/${userLocale}.json`);
-                setMessages(messageModule.default);
-                setLocale(userLocale);
+                // 현재 언어와 다르면 새 메시지 로드
+                if (userLocale !== locale) {
+                    const messageModule = await import(`../../messages/${userLocale}.json`);
+                    setMessages(messageModule.default);
+                    setLocale(userLocale);
+                }
             } catch (error) {
                 console.error('Failed to load messages:', error);
-                // 기본 한국어 메시지 로드
-                const defaultMessages = await import('../../messages/ko.json');
-                setMessages(defaultMessages.default);
-            } finally {
-                setLoading(false);
             }
         };
 
         loadMessages();
-    }, []);
-
-    if (loading || !messages) {
-        return <>{children}</>;
-    }
+    }, [locale]);
 
     return (
         <NextIntlClientProvider locale={locale} messages={messages}>
