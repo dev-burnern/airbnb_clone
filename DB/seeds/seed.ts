@@ -508,21 +508,33 @@ async function seedReservations(dataSource: DataSource, roomIds: string[]) {
 async function seedConversations(dataSource: DataSource) {
     const users = await dataSource.query(`SELECT id FROM users`);
 
-    for (let i = 0; i < 50; i++) {
-        const user1 = users[i % users.length].id;
-        const user2 = users[(i + 1) % users.length].id;
+    // 고유한 사용자 쌍에만 대화 생성 (중복 방지)
+    const createdPairs = new Set<string>();
+    let conversationCount = 0;
 
-        await dataSource.query(`
-            INSERT INTO conversations (title, "participant1Id", "participant2Id", "lastMessageAt")
-            VALUES ($1, $2, $3, $4)
-        `, [
-            `예약 문의 #${i + 1}`,
-            user1,
-            user2,
-            new Date()
-        ]);
+    for (let i = 0; i < users.length; i++) {
+        for (let j = i + 1; j < users.length; j++) {
+            const user1 = users[i].id;
+            const user2 = users[j].id;
+
+            // 이미 생성된 쌍인지 확인
+            const pairKey = [user1, user2].sort().join('-');
+            if (createdPairs.has(pairKey)) continue;
+            createdPairs.add(pairKey);
+
+            await dataSource.query(`
+                INSERT INTO conversations (title, "participant1Id", "participant2Id", "lastMessageAt")
+                VALUES ($1, $2, $3, $4)
+            `, [
+                `예약 문의 #${conversationCount + 1}`,
+                user1,
+                user2,
+                new Date()
+            ]);
+            conversationCount++;
+        }
     }
-    console.log('💬 Conversations: 50개 생성');
+    console.log(`💬 Conversations: ${conversationCount}개 생성 (고유 사용자 쌍)`);
 }
 
 // ========== 메시지 (messages) ==========
