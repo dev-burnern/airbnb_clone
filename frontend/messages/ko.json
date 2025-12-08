@@ -1,0 +1,61 @@
+{
+    "common": {
+        "save": "저장",
+        "cancel": "취소",
+        "edit": "수정",
+        "add": "추가",
+        "loading": "로딩 중...",
+        "saving": "저장 중...",
+        "error": "오류가 발생했습니다.",
+        "loginRequired": "로그인이 필요합니다."
+    },
+    "header": {
+        "home": "홈",
+        "wishlist": "위시리스트",
+        "messages": "메시지",
+        "profile": "프로필",
+        "accountSettings": "계정 관리",
+        "languageAndCurrency": "언어 및 통화",
+        "logout": "로그아웃",
+        "login": "로그인",
+        "hosting": "호스팅하기",
+        "switchToHostMode": "호스트 모드로 전환"
+    },
+    "accountSidebar": {
+        "personalInfo": "개인 정보",
+        "languageCurrency": "언어 및 통화",
+        "loginSecurity": "로그인 및 보안",
+        "privacy": "개인 정보 보호",
+        "notifications": "알림",
+        "paymentsPayouts": "결제 및 대금 수령"
+    },
+    "personalInfo": {
+        "title": "개인 정보",
+        "legalName": "실명",
+        "preferredName": "선호하는 이름",
+        "email": "이메일 주소",
+        "phone": "전화번호",
+        "notProvided": "미제출",
+        "nameDescription": "다음 예약 전에 새로 실명 확인 절차를 거쳐야 합니다.",
+        "givenName": "신분증에 기재된 이름(예: 길동)",
+        "familyName": "신분증에 기재된 성(예: 홍)",
+        "preferredNameDescription": "호스트와 게스트에게 표시되는 이름입니다.",
+        "emailDescription": "언제든지 확인하실 수 있는 주소를 사용하세요",
+        "phoneDescription": "알림, 미리 알림 및 로그인에 도움이 됩니다.",
+        "country": "국가/지역"
+    },
+    "languageCurrency": {
+        "title": "언어 및 통화",
+        "preferredLanguage": "선호하는 언어",
+        "preferredCurrency": "선호하는 통화",
+        "timezone": "시간대",
+        "languageDescription": "선호하는 언어에 따라 에어비앤비 페이지의 내용과 커뮤니케이션 방식이 업데이트됩니다.",
+        "selectTimezone": "선택하세요..."
+    },
+    "footer": {
+        "copyright": "© 2025 Airbnb, Inc.",
+        "privacyPolicy": "개인정보 처리방침",
+        "cookiePolicy": "쿠키 정책",
+        "terms": "이용약관"
+    }
+}

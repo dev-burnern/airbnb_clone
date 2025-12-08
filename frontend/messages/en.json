@@ -1,0 +1,61 @@
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "add": "Add",
+        "loading": "Loading...",
+        "saving": "Saving...",
+        "error": "An error occurred.",
+        "loginRequired": "Login required."
+    },
+    "header": {
+        "home": "Home",
+        "wishlist": "Wishlist",
+        "messages": "Messages",
+        "profile": "Profile",
+        "accountSettings": "Account Settings",
+        "languageAndCurrency": "Language & Currency",
+        "logout": "Log out",
+        "login": "Log in",
+        "hosting": "Become a Host",
+        "switchToHostMode": "Switch to Host Mode"
+    },
+    "accountSidebar": {
+        "personalInfo": "Personal Info",
+        "languageCurrency": "Language & Currency",
+        "loginSecurity": "Login & Security",
+        "privacy": "Privacy",
+        "notifications": "Notifications",
+        "paymentsPayouts": "Payments & Payouts"
+    },
+    "personalInfo": {
+        "title": "Personal Info",
+        "legalName": "Legal Name",
+        "preferredName": "Preferred Name",
+        "email": "Email Address",
+        "phone": "Phone Number",
+        "notProvided": "Not provided",
+        "nameDescription": "You'll need to verify your identity before your next reservation.",
+        "givenName": "Given name on ID (e.g., John)",
+        "familyName": "Family name on ID (e.g., Doe)",
+        "preferredNameDescription": "This is the name displayed to hosts and guests.",
+        "emailDescription": "Use an address you can always access",
+        "phoneDescription": "For notifications, reminders, and login help.",
+        "country": "Country/Region"
+    },
+    "languageCurrency": {
+        "title": "Language & Currency",
+        "preferredLanguage": "Preferred Language",
+        "preferredCurrency": "Preferred Currency",
+        "timezone": "Timezone",
+        "languageDescription": "The language you select will update the content and communication style on Airbnb.",
+        "selectTimezone": "Select..."
+    },
+    "footer": {
+        "copyright": "© 2025 Airbnb, Inc.",
+        "privacyPolicy": "Privacy Policy",
+        "cookiePolicy": "Cookie Policy",
+        "terms": "Terms of Service"
+    }
+}
