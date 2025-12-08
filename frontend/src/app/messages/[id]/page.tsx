@@ -58,6 +58,11 @@ export default function MessagePage() {
   // WebSocket 메시지 수신 핸들러
   const handleNewMessage = useCallback(
     (chatMessage: ChatMessage) => {
+      // 본인이 보낸 메시지는 무시 (REST API에서 이미 추가됨)
+      if (chatMessage.sender.id === currentUser?.id) {
+        return;
+      }
+
       if (chatMessage.conversationId === id) {
         const message: Message = {
           id: Date.now().toString(),
@@ -71,7 +76,7 @@ export default function MessagePage() {
         addMessage(id, message);
       }
     },
-    [id, addMessage]
+    [id, addMessage, currentUser?.id]
   );
 
   const handleUserTyping = useCallback((data: { userName: string }) => {
