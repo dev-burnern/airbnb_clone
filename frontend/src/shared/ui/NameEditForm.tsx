@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface NameEditFormProps {
   currentName: string;
@@ -9,6 +10,9 @@ interface NameEditFormProps {
 }
 
 export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps) => {
+  const t = useTranslations('personalInfo');
+  const tCommon = useTranslations('common');
+
   // 한국식 이름 처리: 첫 글자가 성, 나머지가 이름
   const [familyName, setFamilyName] = useState(currentName.charAt(0) || '');
   const [givenName, setGivenName] = useState(currentName.slice(1) || '');
@@ -17,7 +21,7 @@ export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps
 
   const handleSave = async () => {
     if (!familyName || !givenName) {
-      setError('이름과 성을 모두 입력해주세요.');
+      setError(t('enterNameAndSurname'));
       return;
     }
 
@@ -27,7 +31,7 @@ export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        setError('로그인이 필요합니다.');
+        setError(tCommon('loginRequired'));
         setIsLoading(false);
         return;
       }
@@ -46,11 +50,11 @@ export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps
       if (response.ok) {
         onSave();
       } else {
-        setError('저장에 실패했습니다. 다시 시도해주세요.');
+        setError(tCommon('saveFailed'));
       }
     } catch (err) {
-      console.error('이름 저장 실패:', err);
-      setError('저장 중 오류가 발생했습니다.');
+      console.error('Name save failed:', err);
+      setError(tCommon('error'));
     } finally {
       setIsLoading(false);
     }
@@ -59,13 +63,13 @@ export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps
   return (
     <div className="space-y-4">
       <p className="mb-4 text-sm text-gray-500">
-        다음 예약 전에 새로 실명 확인 절차를 거쳐야 합니다.
+        {t('nameDescription')}
       </p>
       <div className="flex space-x-4">
         {/* 신분증에 기재된 이름 */}
         <div className="flex-1">
           <label htmlFor="givenName" className="text-xs text-gray-500">
-            신분증에 기재된 이름(예: 길동)
+            {t('givenName')}
           </label>
           <input
             type="text"
@@ -73,13 +77,12 @@ export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps
             value={givenName}
             onChange={(e) => setGivenName(e.target.value)}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 placeholder-gray-400"
-            placeholder="이름"
           />
         </div>
         {/* 신분증에 기재된 성 */}
         <div className="flex-1">
           <label htmlFor="familyName" className="text-xs text-gray-500">
-            신분증에 기재된 성(예: 홍)
+            {t('familyName')}
           </label>
           <input
             type="text"
@@ -87,7 +90,6 @@ export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps
             value={familyName}
             onChange={(e) => setFamilyName(e.target.value)}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 placeholder-gray-400"
-            placeholder="성"
           />
         </div>
       </div>
@@ -100,13 +102,13 @@ export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps
           disabled={isLoading}
           className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50"
         >
-          {isLoading ? '저장 중...' : '저장'}
+          {isLoading ? tCommon('saving') : tCommon('save')}
         </button>
         <button
           onClick={onClose}
           className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
         >
-          취소
+          {tCommon('cancel')}
         </button>
       </div>
     </div>

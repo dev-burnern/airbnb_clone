@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface PreferredNameEditFormProps {
   currentPreferredName: string;
@@ -9,6 +10,9 @@ interface PreferredNameEditFormProps {
 }
 
 export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }: PreferredNameEditFormProps) => {
+  const t = useTranslations('personalInfo');
+  const tCommon = useTranslations('common');
+
   const [preferredName, setPreferredName] = useState(currentPreferredName);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +24,7 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        setError('로그인이 필요합니다.');
+        setError(tCommon('loginRequired'));
         setIsLoading(false);
         return;
       }
@@ -37,11 +41,11 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
       if (response.ok) {
         onSave();
       } else {
-        setError('저장에 실패했습니다. 다시 시도해주세요.');
+        setError(tCommon('saveFailed'));
       }
     } catch (err) {
-      console.error('선호하는 이름 저장 실패:', err);
-      setError('저장 중 오류가 발생했습니다.');
+      console.error('Preferred name save failed:', err);
+      setError(tCommon('error'));
     } finally {
       setIsLoading(false);
     }
@@ -50,13 +54,13 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-500">
-        호스트와 게스트에게 표시되는 이름입니다.
+        {t('preferredNameDescription')}
       </p>
       <input
         type="text"
         value={preferredName}
         onChange={(e) => setPreferredName(e.target.value)}
-        placeholder="선호하는 이름(선택사항)"
+        placeholder={t('preferredName')}
         className="block w-full border border-gray-300 rounded-md shadow-sm p-3 placeholder-gray-400"
       />
 
@@ -68,13 +72,13 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
           disabled={isLoading}
           className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50"
         >
-          {isLoading ? '저장 중...' : '저장'}
+          {isLoading ? tCommon('saving') : tCommon('save')}
         </button>
         <button
           onClick={onClose}
           className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
         >
-          취소
+          {tCommon('cancel')}
         </button>
       </div>
     </div>

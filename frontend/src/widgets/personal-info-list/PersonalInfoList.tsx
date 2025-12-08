@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { InfoRow } from "@/shared/ui/InfoRow";
+import { useTranslations } from 'next-intl';
 
 import { NameEditForm } from '@/shared/ui/NameEditForm';
 import { PreferredNameEditForm } from '@/shared/ui/PreferredNameEditForm';
@@ -21,8 +22,8 @@ interface UserData {
 }
 
 // 이메일 마스킹 함수 (예: test@gmail.com -> t***@gmail.com)
-const maskEmail = (email: string): string => {
-    if (!email) return '미제출';
+const maskEmail = (email: string, notProvided: string): string => {
+    if (!email) return notProvided;
     const [localPart, domain] = email.split('@');
     if (!domain) return email;
     const maskedLocal = localPart.charAt(0) + '***';
@@ -30,14 +31,17 @@ const maskEmail = (email: string): string => {
 };
 
 // 전화번호 마스킹 함수 (예: 010-1234-5678 -> +82 **-****-5678)
-const maskPhone = (phone: string): string => {
-    if (!phone) return '미제출';
+const maskPhone = (phone: string, notProvided: string): string => {
+    if (!phone) return notProvided;
     // 마지막 4자리만 표시
     const lastFour = phone.slice(-4);
     return `+82 **-****-${lastFour}`;
 };
 
 export const PersonalInfoList = () => {
+    const t = useTranslations('personalInfo');
+    const tCommon = useTranslations('common');
+
     // 현재 열려 있는 폼의 상태를 관리
     const [openForm, setOpenForm] = useState<OpenForm>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
@@ -64,7 +68,7 @@ export const PersonalInfoList = () => {
                 setUserData(data);
             }
         } catch (error) {
-            console.error('사용자 정보 가져오기 실패:', error);
+            console.error('Failed to fetch user data:', error);
         } finally {
             setLoading(false);
         }
@@ -93,9 +97,9 @@ export const PersonalInfoList = () => {
         return (
             <div className="max-w-2xl">
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-gray-900">개인 정보</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
                 </div>
-                <div className="text-gray-500">로딩 중...</div>
+                <div className="text-gray-500">{tCommon('loading')}</div>
             </div>
         );
     }
@@ -103,16 +107,17 @@ export const PersonalInfoList = () => {
     return (
         <div className="max-w-2xl">
             <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">개인 정보</h1>
+                <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
             </div>
             <section>
 
                 {/* 실명 */}
                 <InfoRow
-                    label="실명"
-                    value={userData?.name || '미제출'}
+                    label={t('legalName')}
+                    value={userData?.name || tCommon('notProvided')}
                     onActionClick={() => handleToggle('name')}
                     isOpen={openForm === 'name'}
+                    buttonText={tCommon('edit')}
                 >
                     <NameEditForm
                         currentName={userData?.name || ''}
@@ -123,9 +128,9 @@ export const PersonalInfoList = () => {
 
                 {/* 선호하는 이름 */}
                 <InfoRow
-                    label="선호하는 이름"
-                    value={userData?.preferredName || '미제출'}
-                    buttonText={userData?.preferredName ? "수정" : "추가"}
+                    label={t('preferredName')}
+                    value={userData?.preferredName || tCommon('notProvided')}
+                    buttonText={userData?.preferredName ? tCommon('edit') : tCommon('add')}
                     onActionClick={() => handleToggle('preferredName')}
                     isOpen={openForm === 'preferredName'}
                 >
@@ -138,10 +143,11 @@ export const PersonalInfoList = () => {
 
                 {/* 이메일 주소 */}
                 <InfoRow
-                    label="이메일 주소"
-                    value={maskEmail(userData?.email || '')}
+                    label={t('email')}
+                    value={maskEmail(userData?.email || '', tCommon('notProvided'))}
                     onActionClick={() => handleToggle('email')}
                     isOpen={openForm === 'email'}
+                    buttonText={tCommon('edit')}
                 >
                     <EmailEditForm
                         currentEmail={userData?.email || ''}
@@ -152,10 +158,10 @@ export const PersonalInfoList = () => {
 
                 {/* 전화번호 */}
                 <InfoRow
-                    label="전화번호"
-                    value={userData?.phone ? maskPhone(userData.phone) : '미제출'}
+                    label={t('phone')}
+                    value={userData?.phone ? maskPhone(userData.phone, tCommon('notProvided')) : tCommon('notProvided')}
                     isBorderBottom={false}
-                    buttonText={userData?.phone ? "수정" : "추가"}
+                    buttonText={userData?.phone ? tCommon('edit') : tCommon('add')}
                     onActionClick={() => handleToggle('phone')}
                     isOpen={openForm === 'phone'}
                 >

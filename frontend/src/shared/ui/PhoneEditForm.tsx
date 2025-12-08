@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface PhoneEditFormProps {
   currentPhone: string;
@@ -9,6 +10,9 @@ interface PhoneEditFormProps {
 }
 
 export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormProps) => {
+  const t = useTranslations('personalInfo');
+  const tCommon = useTranslations('common');
+
   const [phone, setPhone] = useState(currentPhone);
   const [countryCode] = useState('+82');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,14 +39,14 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
 
   const handleSave = async () => {
     if (!phone) {
-      setError('전화번호를 입력해주세요.');
+      setError(t('enterPhone'));
       return;
     }
 
     // 숫자만 추출하여 10-11자리인지 확인
     const numbersOnly = phone.replace(/[^\d]/g, '');
     if (numbersOnly.length < 10 || numbersOnly.length > 11) {
-      setError('유효한 전화번호를 입력해주세요.');
+      setError(t('invalidPhone'));
       return;
     }
 
@@ -52,7 +56,7 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        setError('로그인이 필요합니다.');
+        setError(tCommon('loginRequired'));
         setIsLoading(false);
         return;
       }
@@ -72,11 +76,11 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
       if (response.ok) {
         onSave();
       } else {
-        setError('저장에 실패했습니다. 다시 시도해주세요.');
+        setError(tCommon('saveFailed'));
       }
     } catch (err) {
-      console.error('전화번호 저장 실패:', err);
-      setError('저장 중 오류가 발생했습니다.');
+      console.error('Phone save failed:', err);
+      setError(tCommon('error'));
     } finally {
       setIsLoading(false);
     }
@@ -85,13 +89,13 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-500">
-        알림, 미리 알림 및 로그인에 도움이 됩니다.
+        {t('phoneDescription')}
       </p>
 
       {/* 국가/지역 드롭다운 */}
       <div>
         <label htmlFor="country" className="block text-xs font-medium text-gray-700">
-          국가/지역
+          {t('country')}
         </label>
         <select
           id="country"
@@ -106,7 +110,7 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
       {/* 전화번호 입력 */}
       <div>
         <label htmlFor="phone" className="block text-xs font-medium text-gray-700">
-          전화번호
+          {t('phone')}
         </label>
         <input
           type="tel"
@@ -120,7 +124,7 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
       </div>
 
       <p className="text-xs text-gray-400">
-        전화번호는 예약 확인 및 중요한 알림을 위해 사용됩니다.
+        {t('phoneNote')}
       </p>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
@@ -131,13 +135,13 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
           disabled={isLoading}
           className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50"
         >
-          {isLoading ? '저장 중...' : '저장'}
+          {isLoading ? tCommon('saving') : tCommon('save')}
         </button>
         <button
           onClick={onClose}
           className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
         >
-          취소
+          {tCommon('cancel')}
         </button>
       </div>
     </div>
