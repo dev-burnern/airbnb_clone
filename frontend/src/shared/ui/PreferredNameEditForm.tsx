@@ -1,7 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+
+// 한국어 텍스트 상수
+const TEXT = {
+  preferredName: '선호하는 이름',
+  preferredNameDescription: '호스트와 게스트에게 표시될 이름입니다. 이름이나 별명을 사용할 수 있습니다.',
+};
+
+const COMMON_TEXT = {
+  save: '저장',
+  saving: '저장 중...',
+  cancel: '취소',
+  loginRequired: '로그인이 필요합니다.',
+  saveFailed: '저장에 실패했습니다.',
+  error: '오류가 발생했습니다.',
+};
 
 interface PreferredNameEditFormProps {
   currentPreferredName: string;
@@ -10,9 +24,6 @@ interface PreferredNameEditFormProps {
 }
 
 export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }: PreferredNameEditFormProps) => {
-  const t = useTranslations('personalInfo');
-  const tCommon = useTranslations('common');
-
   const [preferredName, setPreferredName] = useState(currentPreferredName);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +35,7 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        setError(tCommon('loginRequired'));
+        setError(COMMON_TEXT.loginRequired);
         setIsLoading(false);
         return;
       }
@@ -41,11 +52,11 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
       if (response.ok) {
         onSave();
       } else {
-        setError(tCommon('saveFailed'));
+        setError(COMMON_TEXT.saveFailed);
       }
     } catch (err) {
       console.error('Preferred name save failed:', err);
-      setError(tCommon('error'));
+      setError(COMMON_TEXT.error);
     } finally {
       setIsLoading(false);
     }
@@ -54,13 +65,13 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-500">
-        {t('preferredNameDescription')}
+        {TEXT.preferredNameDescription}
       </p>
       <input
         type="text"
         value={preferredName}
         onChange={(e) => setPreferredName(e.target.value)}
-        placeholder={t('preferredName')}
+        placeholder={TEXT.preferredName}
         className="block w-full border border-gray-300 rounded-md shadow-sm p-3 placeholder-gray-400"
       />
 
@@ -72,13 +83,13 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
           disabled={isLoading}
           className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50"
         >
-          {isLoading ? tCommon('saving') : tCommon('save')}
+          {isLoading ? COMMON_TEXT.saving : COMMON_TEXT.save}
         </button>
         <button
           onClick={onClose}
           className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
         >
-          {tCommon('cancel')}
+          {COMMON_TEXT.cancel}
         </button>
       </div>
     </div>

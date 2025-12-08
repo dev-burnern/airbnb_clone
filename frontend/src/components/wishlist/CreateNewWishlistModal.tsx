@@ -8,6 +8,7 @@ interface CreateNewWishlistModalProps {
   onClose: () => void;
   onBack: () => void;
   listingId: string;
+  onSuccess?: () => void;
 }
 
 const API_BASE_URL = "http://localhost:3001/api/v1";
@@ -26,6 +27,7 @@ export const CreateNewWishlistModal: React.FC<CreateNewWishlistModalProps> = ({
   onClose,
   onBack,
   listingId,
+  onSuccess,
 }) => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,9 +37,9 @@ export const CreateNewWishlistModal: React.FC<CreateNewWishlistModalProps> = ({
 
     try {
       setLoading(true);
-      
+
       console.log('위시리스트 생성 시작:', name.trim());
-      
+
       // 1. 새 위시리스트 생성
       const createResponse = await axios.post(
         `${API_BASE_URL}/wishlists`,
@@ -68,7 +70,13 @@ export const CreateNewWishlistModal: React.FC<CreateNewWishlistModalProps> = ({
 
       alert('위시리스트가 생성되고 숙소가 추가되었습니다!');
       setName('');
-      onClose();
+
+      // 성공 콜백 호출 (하트 색상 변경)
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        onClose();
+      }
     } catch (error: any) {
       console.error('위시리스트 생성 실패:', error);
       console.error('에러 상세:', error.response?.data);
@@ -120,11 +128,10 @@ export const CreateNewWishlistModal: React.FC<CreateNewWishlistModalProps> = ({
           <button
             onClick={handleCreate}
             disabled={!name.trim() || loading}
-            className={`px-6 py-2 rounded-lg font-semibold transition ${
-              name.trim() && !loading
+            className={`px-6 py-2 rounded-lg font-semibold transition ${name.trim() && !loading
                 ? 'bg-[#FF385C] text-white hover:bg-[#E31C5F]'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-            }`}
+              }`}
           >
             {loading ? '생성 중...' : '새로 만들기'}
           </button>

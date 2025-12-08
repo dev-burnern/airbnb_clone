@@ -34,9 +34,11 @@ const fetchWishlists = async (): Promise<WishlistGroup[]> => {
     
     return dataArray.map((item: any) => ({
       id: item.id,
-      title: item.title || item.name, 
-      subtitle: `${item.listings?.length || 0}개 저장된 항목`, 
-      images: item.listings?.slice(0, 4).map((listing: any) => listing.mainImageUrl || "/images/placeholder.jpg") || [],
+      title: item.title || item.name,
+      subtitle: `${item.listings?.length || 0}개 저장된 항목`,
+      images: item.listings?.slice(0, 4).map((listing: any) =>
+        listing.mainImageUrl || (Array.isArray(listing.images) ? listing.images[0] : undefined) || "/images/placeholder.jpg"
+      ) || [],
     })) as WishlistGroup[];
 
   } catch (error) {

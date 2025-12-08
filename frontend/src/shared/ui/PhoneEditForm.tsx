@@ -1,7 +1,25 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+
+// 한국어 텍스트 상수
+const TEXT = {
+  phone: '전화번호',
+  phoneDescription: '예약 관련 연락에 사용됩니다. 변경사항은 프로필에 반영됩니다.',
+  enterPhone: '전화번호를 입력해주세요.',
+  invalidPhone: '유효한 전화번호를 입력해주세요.',
+  phoneNote: '연락처는 예약 확정 후 호스트 또는 에어비앤비에서만 연락하는 데 사용됩니다.',
+  country: '국가/지역',
+};
+
+const COMMON_TEXT = {
+  save: '저장',
+  saving: '저장 중...',
+  cancel: '취소',
+  loginRequired: '로그인이 필요합니다.',
+  saveFailed: '저장에 실패했습니다.',
+  error: '오류가 발생했습니다.',
+};
 
 interface PhoneEditFormProps {
   currentPhone: string;
@@ -10,9 +28,6 @@ interface PhoneEditFormProps {
 }
 
 export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormProps) => {
-  const t = useTranslations('personalInfo');
-  const tCommon = useTranslations('common');
-
   const [phone, setPhone] = useState(currentPhone);
   const [countryCode] = useState('+82');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,14 +54,14 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
 
   const handleSave = async () => {
     if (!phone) {
-      setError(t('enterPhone'));
+      setError(TEXT.enterPhone);
       return;
     }
 
     // 숫자만 추출하여 10-11자리인지 확인
     const numbersOnly = phone.replace(/[^\d]/g, '');
     if (numbersOnly.length < 10 || numbersOnly.length > 11) {
-      setError(t('invalidPhone'));
+      setError(TEXT.invalidPhone);
       return;
     }
 
@@ -56,7 +71,7 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        setError(tCommon('loginRequired'));
+        setError(COMMON_TEXT.loginRequired);
         setIsLoading(false);
         return;
       }
@@ -76,11 +91,11 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
       if (response.ok) {
         onSave();
       } else {
-        setError(tCommon('saveFailed'));
+        setError(COMMON_TEXT.saveFailed);
       }
     } catch (err) {
       console.error('Phone save failed:', err);
-      setError(tCommon('error'));
+      setError(COMMON_TEXT.error);
     } finally {
       setIsLoading(false);
     }
@@ -89,13 +104,13 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-500">
-        {t('phoneDescription')}
+        {TEXT.phoneDescription}
       </p>
 
       {/* 국가/지역 드롭다운 */}
       <div>
         <label htmlFor="country" className="block text-xs font-medium text-gray-700">
-          {t('country')}
+          {TEXT.country}
         </label>
         <select
           id="country"
@@ -110,7 +125,7 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
       {/* 전화번호 입력 */}
       <div>
         <label htmlFor="phone" className="block text-xs font-medium text-gray-700">
-          {t('phone')}
+          {TEXT.phone}
         </label>
         <input
           type="tel"
@@ -124,7 +139,7 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
       </div>
 
       <p className="text-xs text-gray-400">
-        {t('phoneNote')}
+        {TEXT.phoneNote}
       </p>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
@@ -135,13 +150,13 @@ export const PhoneEditForm = ({ currentPhone, onSave, onClose }: PhoneEditFormPr
           disabled={isLoading}
           className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50"
         >
-          {isLoading ? tCommon('saving') : tCommon('save')}
+          {isLoading ? COMMON_TEXT.saving : COMMON_TEXT.save}
         </button>
         <button
           onClick={onClose}
           className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
         >
-          {tCommon('cancel')}
+          {COMMON_TEXT.cancel}
         </button>
       </div>
     </div>
