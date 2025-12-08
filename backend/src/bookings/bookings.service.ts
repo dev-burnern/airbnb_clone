@@ -98,18 +98,18 @@ export class BookingsService {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
+        // 날짜를 YYYY-MM-DD 형식으로 변환 (시간대 문제 해결)
+        const todayStr = today.toISOString().split('T')[0];
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
         return this.bookingsRepository
             .createQueryBuilder('booking')
             .innerJoinAndSelect('booking.listing', 'listing')
             .innerJoin('listing.host', 'host')
             .innerJoinAndSelect('booking.guest', 'guest')
             .where('host.id = :hostId', { hostId })
-            .andWhere('booking.status IN (:...statuses)', {
-                statuses: [BookingStatus.CONFIRMED, BookingStatus.PAID]
-            })
-            .andWhere('(booking.checkIn >= :today AND booking.checkIn < :tomorrow) OR (booking.checkOut >= :today AND booking.checkOut < :tomorrow)', {
-                today: today.toISOString(),
-                tomorrow: tomorrow.toISOString(),
+            .andWhere('(DATE(booking.checkIn) = :todayStr OR DATE(booking.checkOut) = :todayStr)', {
+                todayStr,
             })
             .orderBy('booking.checkIn', 'ASC')
             .getMany();
