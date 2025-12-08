@@ -84,8 +84,9 @@ export class BookingsService {
         return this.bookingsRepository
             .createQueryBuilder('booking')
             .innerJoinAndSelect('booking.listing', 'listing')
+            .innerJoin('listing.host', 'host')
             .innerJoinAndSelect('booking.guest', 'guest')
-            .where('listing.hostId = :hostId', { hostId })
+            .where('host.id = :hostId', { hostId })
             .orderBy('booking.checkIn', 'DESC')
             .getMany();
     }
@@ -100,8 +101,9 @@ export class BookingsService {
         return this.bookingsRepository
             .createQueryBuilder('booking')
             .innerJoinAndSelect('booking.listing', 'listing')
+            .innerJoin('listing.host', 'host')
             .innerJoinAndSelect('booking.guest', 'guest')
-            .where('listing.hostId = :hostId', { hostId })
+            .where('host.id = :hostId', { hostId })
             .andWhere('booking.status IN (:...statuses)', {
                 statuses: [BookingStatus.CONFIRMED, BookingStatus.PAID]
             })
@@ -121,8 +123,9 @@ export class BookingsService {
         return this.bookingsRepository
             .createQueryBuilder('booking')
             .innerJoinAndSelect('booking.listing', 'listing')
+            .innerJoin('listing.host', 'host')
             .innerJoinAndSelect('booking.guest', 'guest')
-            .where('listing.hostId = :hostId', { hostId })
+            .where('host.id = :hostId', { hostId })
             .andWhere('booking.status IN (:...statuses)', {
                 statuses: [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.PAID]
             })
