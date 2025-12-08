@@ -33,6 +33,12 @@ export class UserProfile {
     @Column({ type: 'varchar', length: 100, nullable: false })
     language: string;
 
+    @Column({ type: 'varchar', length: 50, nullable: true, default: 'KRW' })
+    currency: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true, default: 'Asia/Seoul' })
+    timezone: string;
+
     @Column({ type: 'text', nullable: true })
     job: string;
 
