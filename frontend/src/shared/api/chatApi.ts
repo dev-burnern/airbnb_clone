@@ -3,7 +3,7 @@
  * 백엔드 /chat 엔드포인트와 통신
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/backend/api/v1';
 
 // 타입 정의
 export interface User {

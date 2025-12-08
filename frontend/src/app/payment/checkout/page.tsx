@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!listingId) return;
     setListingLoading(true);
-    fetch(`http://localhost:3001/api/v1/listings/${listingId}`)
+    fetch(`/backend/api/v1/listings/${listingId}`)
       .then(res => res.json())
       .then(json => setListing(json.success && json.data ? json.data : json))
       .catch(e => setListingError('숙소 정보를 불러올 수 없습니다.'))
@@ -274,5 +274,21 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CheckoutLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600"></div>
+    </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<CheckoutLoading />}>
+      <CheckoutContent />
+    </Suspense>
   );
 }

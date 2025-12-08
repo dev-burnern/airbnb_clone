@@ -62,7 +62,7 @@ export default function ListingEditorPage() {
   const updateListing = useCallback(async (updates: any) => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`, {
+      const response = await fetch(`/backend/api/v1/listings/${listingId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function ListingEditorPage() {
     if (!listingId) return;
     
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`);
+      const response = await fetch(`/backend/api/v1/listings/${listingId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch listing: ${response.status}`);
       }

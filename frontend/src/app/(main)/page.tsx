@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AccommodationList } from '@/widgets/accommodation-list/AccommodationList';
 
@@ -24,7 +24,7 @@ interface Listing {
   longitude: number;
 }
 
-export default function MainPage() {
+function MainPageContent() {
   const searchParams = useSearchParams();
   const [listingsByRegion, setListingsByRegion] = useState<{ [key: string]: AccommodationData[] }>({});
   const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ export default function MainPage() {
 
   const fetchListings = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/v1/listings');
+      const response = await fetch('/backend/api/v1/listings');
       const result = await response.json();
 
       // 백엔드 응답 구조 처리 (배열 또는 { data: [] } 형태)
@@ -298,5 +298,21 @@ export default function MainPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function MainPageLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600"></div>
+    </div>
+  );
+}
+
+export default function MainPage() {
+  return (
+    <Suspense fallback={<MainPageLoading />}>
+      <MainPageContent />
+    </Suspense>
   );
 }

@@ -31,7 +31,7 @@ export default function HostListingsPage() {
       }
 
       // 백엔드 API에서 현재 사용자의 리스팅 가져오기
-      const response = await fetch('http://localhost:3001/api/v1/listings', {
+      const response = await fetch('/backend/api/v1/listings', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -73,7 +73,7 @@ export default function HostListingsPage() {
     if (confirm('정말 이 리스팅을 삭제하시겠습니까?')) {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`, {
+        const response = await fetch(`/backend/api/v1/listings/${listingId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,

@@ -12,7 +12,7 @@ type WishlistGroup = {
   images: string[];
 };
 
-const API_BASE_URL = "http://localhost:3001/api/v1"; 
+const API_BASE_URL = "/backend/api/v1"; 
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("accessToken"); 

@@ -211,7 +211,7 @@ export default function HostRegistrationModal({
       });
 
       // 백엔드 API 호출
-      const response = await fetch('http://localhost:3001/api/v1/listings', {
+      const response = await fetch('/backend/api/v1/listings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

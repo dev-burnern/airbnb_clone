@@ -28,7 +28,7 @@ export default function HeaderProfile({ isLoggedIn, setIsLoggedIn }: HeaderProfi
             return;
           }
 
-          const response = await fetch('http://localhost:3001/api/v1/users/me', {
+          const response = await fetch('/backend/api/v1/users/me', {
             headers: {
               'Authorization': `Bearer ${token}`,
             },

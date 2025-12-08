@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(true);
@@ -28,7 +28,7 @@ export default function PaymentSuccessPage() {
       }
 
       // 1. 백엔드에 예약 생성 요청
-      const bookingResponse = await fetch('http://localhost:3001/api/v1/bookings', {
+      const bookingResponse = await fetch('/backend/api/v1/bookings', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -57,12 +57,12 @@ export default function PaymentSuccessPage() {
 
       // 2. 호스트와 채팅 생성 (선택사항)
       try {
-        const listingResponse = await fetch(`http://localhost:3001/api/v1/listings/${listingId}`);
+        const listingResponse = await fetch(`/backend/api/v1/listings/${listingId}`);
         const listingResult = await listingResponse.json();
         const listingData = listingResult.data || listingResult;
 
         if (listingData && listingData.hostId) {
-          const chatResponse = await fetch('http://localhost:3001/api/v1/chat/conversations', {
+          const chatResponse = await fetch('/backend/api/v1/chat/conversations', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -79,7 +79,7 @@ export default function PaymentSuccessPage() {
             const chatData = chatResult.data || chatResult;
 
             // 예약 완료 메시지 전송
-            await fetch(`http://localhost:3001/api/v1/chat/conversations/${chatData.id}/messages`, {
+            await fetch(`/backend/api/v1/chat/conversations/${chatData.id}/messages`, {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -122,7 +122,7 @@ export default function PaymentSuccessPage() {
       const processPayment = async () => {
         try {
           // 1. 백엔드를 통해 결제 승인 (백엔드에서 토스 API 호출)
-          const confirmResponse = await fetch('http://localhost:3001/api/v1/payments/toss/verify', {
+          const confirmResponse = await fetch('/backend/api/v1/payments/toss/verify', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -235,5 +235,26 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading fallback for Suspense
+function PaymentSuccessLoading() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-rose-600 mx-auto mb-4"></div>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">결제 처리 중...</h2>
+        <p className="text-gray-600">잠시만 기다려주세요.</p>
+      </div>
+    </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<PaymentSuccessLoading />}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

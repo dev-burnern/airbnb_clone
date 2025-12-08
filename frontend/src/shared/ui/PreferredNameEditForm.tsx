@@ -40,7 +40,7 @@ export const PreferredNameEditForm = ({ currentPreferredName, onSave, onClose }:
         return;
       }
 
-      const response = await fetch('http://localhost:3001/api/v1/users/me', {
+      const response = await fetch('/backend/api/v1/users/me', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

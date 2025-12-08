@@ -55,6 +55,7 @@ services:
       - DB_HOST=airbnb_db
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=airbnb-bot
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
     depends_on:
       db:
         condition: service_healthy
@@ -78,7 +79,7 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://backend:3001
+      - NEXT_PUBLIC_API_URL=/backend/api/v1
     depends_on:
       backend:
         condition: service_started

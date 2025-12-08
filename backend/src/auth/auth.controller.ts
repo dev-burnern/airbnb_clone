@@ -45,6 +45,7 @@ export class AuthController {
     @ApiOperation({ summary: 'GitHub OAuth 콜백 처리' })
     async githubLoginCallback(@Req() req, @Res() res) {
         const jwt = await this.authService.login(req.user);
-        res.redirect(`http://localhost:3000/?token=${jwt.access_token}`);
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        res.redirect(`${frontendUrl}/?token=${jwt.access_token}`);
     }
 }

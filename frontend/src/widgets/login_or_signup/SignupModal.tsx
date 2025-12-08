@@ -47,14 +47,14 @@ export default function SignupModal({
 
         try {
             // 1. 회원가입
-            await axios.post('http://localhost:3001/api/v1/auth/register', {
+            await axios.post('/backend/api/v1/auth/register', {
                 email,
                 name,
                 password
             });
 
             // 2. 자동 로그인 시도
-            const loginResponse = await axios.post('http://localhost:3001/api/v1/auth/login', {
+            const loginResponse = await axios.post('/backend/api/v1/auth/login', {
                 email,
                 password
             });

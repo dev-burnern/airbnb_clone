@@ -51,7 +51,7 @@ export const NameEditForm = ({ currentName, onSave, onClose }: NameEditFormProps
 
       const fullName = familyName + givenName;
 
-      const response = await fetch('http://localhost:3001/api/v1/users/me', {
+      const response = await fetch('/backend/api/v1/users/me', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

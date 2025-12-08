@@ -46,7 +46,7 @@ export default function EmailLogion({ open, onClose, onSubmit, onSignup }: Props
 
     try {
       // Check if email exists
-      const response = await axios.post('http://localhost:3001/api/v1/users/check-email', { email });
+      const response = await axios.post('/backend/api/v1/users/check-email', { email });
       // TransformInterceptor 적용 여부에 따라 두 가지 응답 형식 처리
       // 1. TransformInterceptor 적용: { data: { exists: true } }
       // 2. TransformInterceptor 미적용: { exists: true }
@@ -65,7 +65,7 @@ export default function EmailLogion({ open, onClose, onSubmit, onSignup }: Props
 
   const handleGithub = () => {
     // redirect to GitHub OAuth endpoint (adjust to your backend route)
-    window.location.href = "http://localhost:3001/api/v1/auth/github";
+    window.location.href = "/backend/api/v1/auth/github";
   };
 
   return (

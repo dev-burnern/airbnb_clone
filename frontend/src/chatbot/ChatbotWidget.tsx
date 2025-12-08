@@ -48,7 +48,7 @@ export default function ChatWidget() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000);
 
-      const res = await fetch("http://localhost:3001/api/v1/chatbot", {
+      const res = await fetch("/backend/api/v1/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,

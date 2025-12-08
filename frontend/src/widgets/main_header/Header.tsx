@@ -55,7 +55,7 @@ export default function Header() {
     if (!token) return;
 
     try {
-      const listingsResponse = await fetch('http://localhost:3001/api/v1/listings/my', {
+      const listingsResponse = await fetch('/backend/api/v1/listings/my', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -88,7 +88,7 @@ export default function Header() {
 
       try {
         // 토큰 유효성 검증을 위한 API 호출
-        const response = await fetch('http://localhost:3001/api/v1/users/me', {
+        const response = await fetch('/backend/api/v1/users/me', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

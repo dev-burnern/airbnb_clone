@@ -10,11 +10,11 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         configService: ConfigService,
         private authService: AuthService,
     ) {
-        const apiPrefix = configService.get<string>('API_PREFIX', 'api/v1');
+        const callbackURL = configService.get<string>('GITHUB_CALLBACK_URL', 'http://localhost:3001/api/v1/auth/github/callback');
         super({
             clientID: configService.get<string>('GITHUB_CLIENT_ID', 'client_id'),
             clientSecret: configService.get<string>('GITHUB_CLIENT_SECRET', 'client_secret'),
-            callbackURL: `http://localhost:3001/${apiPrefix}/auth/github/callback`,
+            callbackURL: callbackURL,
             scope: ['user:email'],
         });
     }

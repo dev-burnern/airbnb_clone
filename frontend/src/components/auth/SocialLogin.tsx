@@ -5,7 +5,7 @@ import { FaGithub } from 'react-icons/fa';
 export default function SocialLogin() {
     const handleGithubLogin = () => {
         // Redirect to backend GitHub auth endpoint
-        window.location.href = 'http://localhost:3001/api/v1/auth/github';
+        window.location.href = '/backend/api/v1/auth/github';
     };
 
     return (

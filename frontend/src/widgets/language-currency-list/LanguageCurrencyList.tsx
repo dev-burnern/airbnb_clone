@@ -62,7 +62,7 @@ export const LanguageCurrencyList = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:3001/api/v1/users/me', {
+            const response = await fetch('/backend/api/v1/users/me', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -118,7 +118,7 @@ export const LanguageCurrencyList = () => {
                     return;
                 }
 
-                const response = await fetch('http://localhost:3001/api/v1/users/me', {
+                const response = await fetch('/backend/api/v1/users/me', {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -187,7 +187,7 @@ export const LanguageCurrencyList = () => {
                     return;
                 }
 
-                const response = await fetch('http://localhost:3001/api/v1/users/me', {
+                const response = await fetch('/backend/api/v1/users/me', {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -252,7 +252,7 @@ export const LanguageCurrencyList = () => {
                     return;
                 }
 
-                const response = await fetch('http://localhost:3001/api/v1/users/me', {
+                const response = await fetch('/backend/api/v1/users/me', {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${token}`,

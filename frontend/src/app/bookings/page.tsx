@@ -40,7 +40,7 @@ export default function BookingsPage() {
             }
 
             try {
-                const response = await fetch('http://localhost:3001/api/v1/bookings', {
+                const response = await fetch('/backend/api/v1/bookings', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -71,7 +71,7 @@ export default function BookingsPage() {
 
         try {
             // 대화방 생성 또는 기존 대화방 찾기
-            const response = await fetch('http://localhost:3001/api/v1/chat/conversations', {
+            const response = await fetch('/backend/api/v1/chat/conversations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

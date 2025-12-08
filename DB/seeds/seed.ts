@@ -4,13 +4,21 @@ import * as bcrypt from 'bcryptjs';
 
 // 시드 실행 함수
 async function runSeed() {
-    const dataSource = new DataSource(dataSourceOptions);
+    // 환경변수로 DB 연결 정보 오버라이드 (도커 환경용)
+    const baseOptions = dataSourceOptions as any;
+    const dbOptions = {
+        ...baseOptions,
+        host: process.env.DB_HOST || baseOptions.host || 'localhost',
+        port: parseInt(process.env.DB_PORT || String(baseOptions.port) || '5432', 10),
+        username: process.env.DB_USERNAME || baseOptions.username || 'airbnb',
+        password: process.env.DB_PASSWORD || baseOptions.password || 'airbnb',
+        database: process.env.DB_DATABASE || baseOptions.database || 'airbnb',
+        synchronize: false, // 기존 스키마 사용
+    };
+    
+    const dataSource = new DataSource(dbOptions);
     await dataSource.initialize();
-    console.log('📦 데이터베이스 연결 완료');
-
-    // DB 초기화 (Schema Drop & Sync)
-    await dataSource.synchronize(true);
-    console.log('⚠️ 데이터베이스 초기화 및 스키마 동기화 완료');
+    console.log('📦 데이터베이스 연결 완료:', dbOptions.host, dbOptions.port, dbOptions.database);
 
     try {
         // 순서대로 시드 실행 (의존성 순서)

@@ -40,8 +40,8 @@ export default function HostDashboardPage() {
       }
 
       const endpoint = activeTab === "today"
-        ? 'http://localhost:3001/api/v1/bookings/host/today'
-        : 'http://localhost:3001/api/v1/bookings/host/upcoming';
+        ? '/backend/api/v1/bookings/host/today'
+        : '/backend/api/v1/bookings/host/upcoming';
 
       const response = await fetch(endpoint, {
         headers: {
@@ -66,7 +66,7 @@ export default function HostDashboardPage() {
       const token = localStorage.getItem('accessToken');
       if (!token) return;
 
-      const response = await fetch('http://localhost:3001/api/v1/listings/my', {
+      const response = await fetch('/backend/api/v1/listings/my', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -116,7 +116,7 @@ export default function HostDashboardPage() {
       const token = localStorage.getItem('accessToken');
       if (!token) return;
 
-      const response = await fetch(`http://localhost:3001/api/v1/bookings/${bookingId}/status`, {
+      const response = await fetch(`/backend/api/v1/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
