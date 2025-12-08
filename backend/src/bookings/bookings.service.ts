@@ -93,14 +93,14 @@ export class BookingsService {
 
     // 호스트용: 오늘 체크인/체크아웃 예약
     async findTodayBookings(hostId: string): Promise<Booking[]> {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
+        // 로컬 시간 기준으로 오늘 날짜 계산 (YYYY-MM-DD)
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
 
-        // 날짜를 YYYY-MM-DD 형식으로 변환 (시간대 문제 해결)
-        const todayStr = today.toISOString().split('T')[0];
-        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        console.log('Today string for booking query:', todayStr); // 디버깅용
 
         return this.bookingsRepository
             .createQueryBuilder('booking')
@@ -108,7 +108,7 @@ export class BookingsService {
             .innerJoin('listing.host', 'host')
             .innerJoinAndSelect('booking.guest', 'guest')
             .where('host.id = :hostId', { hostId })
-            .andWhere('(DATE(booking.checkIn) = :todayStr OR DATE(booking.checkOut) = :todayStr)', {
+            .andWhere('(booking.checkIn = :todayStr OR booking.checkOut = :todayStr)', {
                 todayStr,
             })
             .orderBy('booking.checkIn', 'ASC')

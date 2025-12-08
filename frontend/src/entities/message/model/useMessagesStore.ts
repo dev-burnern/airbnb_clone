@@ -72,7 +72,8 @@ const transformApiConversation = (conv: ApiConversation, currentUserId?: string)
   const otherUser = currentUserId === conv.participant1?.id ? conv.participant2 : conv.participant1;
 
   const messages = conv.messages?.map(transformApiMessage) || [];
-  const lastMessage = messages[messages.length - 1];
+  // 백엔드에서 마지막 메시지가 첫 번째로 반환됨 (내림차순 정렬)
+  const lastMessage = messages[0];
 
   return {
     id: conv.id,

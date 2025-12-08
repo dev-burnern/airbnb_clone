@@ -48,14 +48,23 @@ export class ChatService {
     }
 
     async findUserConversations(user: User): Promise<Conversation[]> {
-        return this.conversationRepository
+        const conversations = await this.conversationRepository
             .createQueryBuilder('conv')
             .leftJoinAndSelect('conv.participant1', 'p1')
             .leftJoinAndSelect('conv.participant2', 'p2')
+            .leftJoinAndSelect('conv.messages', 'messages')
+            .leftJoinAndSelect('messages.sender', 'sender')
             .where('conv.participant1Id = :userId', { userId: user.id })
             .orWhere('conv.participant2Id = :userId', { userId: user.id })
             .orderBy('conv.lastMessageAt', 'DESC')
+            .addOrderBy('messages.createdAt', 'DESC')
             .getMany();
+
+        // 각 대화에서 마지막 메시지만 유지 (최적화)
+        return conversations.map(conv => ({
+            ...conv,
+            messages: conv.messages?.slice(0, 1) || [],
+        }));
     }
 
     async findConversationById(id: string, user: User): Promise<Conversation> {

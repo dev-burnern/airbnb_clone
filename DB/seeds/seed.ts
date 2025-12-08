@@ -29,15 +29,15 @@ async function runSeed() {
         await seedRoomImages(dataSource, roomIds);
         await seedListings(dataSource);
 
-        await seedBookings(dataSource);
+        // await seedBookings(dataSource); // 예약 시드 비활성화
         await seedReservations(dataSource, roomIds);
-        await seedConversations(dataSource);
-        await seedMessages(dataSource);
+        // await seedConversations(dataSource); // 대화 시드 비활성화
+        // await seedMessages(dataSource); // 메시지 시드 비활성화
         await seedChatbot(dataSource);
         await seedChatbotSessions(dataSource);
         await seedChatbotLogs(dataSource);
         await seedChatMessages(dataSource);
-        await seedReviews(dataSource);
+        // await seedReviews(dataSource); // 후기 시드 비활성화
         await seedWishlists(dataSource);
 
         console.log('✅ 전체 시드 데이터 생성 완료!');
