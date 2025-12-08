@@ -138,7 +138,7 @@ export default function MainPage() {
 
       // 숙소 데이터 변환 및 지역별 그룹화
       const allListings = filteredListings
-        .map((listing: Listing) => {
+        .map((listing: Listing & { isWished?: boolean }) => {
           // 유효한 첫 번째 이미지 찾기
           const validImage = listing.images?.find((img: string) =>
             img &&
@@ -155,7 +155,7 @@ export default function MainPage() {
             price: listing.basePrice,
             rating: Math.random() * 0.5 + 4.5,
             dates: '예약 가능',
-            isWished: false,
+            isWished: listing.isWished ?? false,
           };
         })
         // 이미지가 실제로 있는 것만 최종 필터링

@@ -120,24 +120,11 @@ export default function ChatWidget() {
 
       {/* 챗봇 창 */}
       {opened && (
-        <div className="fixed bottom-28 right-8 w-[450px] h-[650px] bg-white shadow-2xl rounded-2xl flex flex-col z-40 overflow-hidden border border-gray-200 animate-slideUp">
-          
-          {/* 헤더 */}
-          <div className={`${AIRBNB_RED} text-white px-6 py-4 flex items-center justify-between`}>
-            <div>
-              <h3 className="font-bold text-lg">에어비앤비 챗봇</h3>
-              <p className="text-xs text-white/80">숙소 추천 도우미</p>
-            </div>
-            <button 
-              onClick={() => setOpened(false)}
-              className="text-white/80 hover:text-white text-2xl leading-none"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* 메시지 영역 */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+        <div 
+          // 높이 h-[500px] 유지
+          className="fixed bottom-24 right-8 w-80 h-[500px] bg-white shadow-2xl border border-gray-100 rounded-xl flex flex-col z-40 overflow-hidden"
+        >
+          <div className="p-3 overflow-y-auto flex-1">
             {messages.map((m, i) => (
               <div
                 key={i}
@@ -167,37 +154,20 @@ export default function ChatWidget() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* 입력 영역 */}
-          <div className="border-t border-gray-200 p-4 bg-white">
-            <div className="flex gap-3 items-end">
-              <textarea
-                className={`flex-1 border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 ${AIRBNB_RING} ${AIRBNB_BORDER} transition-all text-sm resize-none focus:outline-none`}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey && !isLoading) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
-                placeholder={isLoading ? "답변 생성 중..." : "메시지를 입력하세요... (Shift+Enter로 줄바꿈)"}
-                disabled={isLoading}
-                rows={1}
-                style={{ minHeight: "44px", maxHeight: "120px" }}
-              />
-              <button
-                className={`${AIRBNB_RED} text-white px-6 py-3 rounded-xl ${
-                  isLoading ? 'opacity-50 cursor-not-allowed' : AIRBNB_HOVER
-                } transition-all text-sm font-semibold shadow-md hover:shadow-lg disabled:hover:shadow-md`}
-                onClick={sendMessage}
-                disabled={isLoading || !input.trim()}
-              >
-                {isLoading ? "..." : "전송"}
-              </button>
-            </div>
-            <p className="text-xs text-gray-400 mt-2 text-center">
-              AI가 생성한 답변은 부정확할 수 있습니다
-            </p>
+          <div className="border-t p-3 flex gap-2 bg-gray-50">
+            <input
+              className={`flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 ${AIRBNB_RING} ${AIRBNB_BORDER} transition-colors text-sm`}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              placeholder="메시지를 입력하세요..."
+            />
+            <button
+              className={`${AIRBNB_RED} text-white px-3 rounded-lg ${AIRBNB_HOVER} transition-colors text-sm font-medium`}
+              onClick={sendMessage}
+            >
+              전송
+            </button>
           </div>
         </div>
       )}

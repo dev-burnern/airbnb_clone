@@ -47,8 +47,11 @@ export default function EmailLogion({ open, onClose, onSubmit, onSignup }: Props
     try {
       // Check if email exists
       const response = await axios.post('http://localhost:3001/api/v1/users/check-email', { email });
-      // Backend wraps response in { data: ... } due to TransformInterceptor
-      if (response.data.data?.exists) {
+      // TransformInterceptor 적용 여부에 따라 두 가지 응답 형식 처리
+      // 1. TransformInterceptor 적용: { data: { exists: true } }
+      // 2. TransformInterceptor 미적용: { exists: true }
+      const exists = response.data.data?.exists ?? response.data.exists;
+      if (exists) {
         onSubmit?.(email);
       } else {
         // Switch to signup modal

@@ -230,9 +230,40 @@ export default function Calendar({ checkIn, checkOut, onDateSelect, minDate }: C
         (currentMonth.year === today.getFullYear() && currentMonth.month > today.getMonth());
 
     return (
-        <div className="bg-white rounded-xl p-6">
+        <div className="bg-white rounded-2xl p-6">
+            {/* 상단 헤더 */}
+            <div className="mb-6">
+                <h2 className="text-xl font-semibold mb-3">날짜 선택</h2>
+                <p className="text-sm text-gray-600 mb-4">여행 날짜를 입력하여 정확한 요금을 확인하세요.</p>
+                
+                {/* 날짜 입력 필드 */}
+                <div className="flex gap-3 items-center">
+                    <div className="flex-1 border-2 border-gray-900 rounded-xl p-3">
+                        <label className="block text-xs font-bold text-gray-900 mb-1">체크인</label>
+                        <div className={`text-sm ${checkIn ? 'text-gray-900' : 'text-gray-400'}`}>
+                            {checkIn ? checkIn.replace(/-/g, '. ') + '.' : 'YYYY.MM.DD.'}
+                        </div>
+                    </div>
+                    <button
+                        onClick={clearDates}
+                        className="p-2 hover:bg-gray-100 rounded-full transition"
+                        aria-label="날짜 지우기"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <div className="flex-1 border-2 border-gray-900 rounded-xl p-3">
+                        <label className="block text-xs font-bold text-gray-900 mb-1">체크아웃</label>
+                        <div className={`text-sm ${checkOut ? 'text-gray-900' : 'text-gray-400'}`}>
+                            {checkOut ? checkOut.replace(/-/g, '. ') + '.' : 'YYYY.MM.DD.'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* 네비게이션 */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-4">
                 <button
                     onClick={goToPrevMonth}
                     disabled={!canGoPrev}
@@ -264,25 +295,22 @@ export default function Calendar({ checkIn, checkOut, onDateSelect, minDate }: C
                 />
             </div>
 
-            {/* 선택된 날짜 표시 및 초기화 */}
-            <div className="mt-6 flex justify-between items-center text-sm">
-                <div className="text-gray-600">
-                    {checkIn && checkOut ? (
-                        <span>{checkIn} ~ {checkOut}</span>
-                    ) : checkIn ? (
-                        <span>{checkIn} - 체크아웃 날짜를 선택하세요</span>
-                    ) : (
-                        <span>체크인 날짜를 선택하세요</span>
-                    )}
-                </div>
-                {(checkIn || checkOut) && (
-                    <button
-                        onClick={clearDates}
-                        className="text-gray-900 underline hover:text-gray-700"
-                    >
-                        날짜 지우기
-                    </button>
-                )}
+            {/* 하단 버튼 */}
+            <div className="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center">
+                <button
+                    onClick={clearDates}
+                    className="flex items-center gap-2 text-sm font-medium underline hover:text-gray-600 transition"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    날짜 지우기
+                </button>
+                <button
+                    className="px-6 py-2 bg-gray-900 text-white rounded-lg font-semibold hover:bg-gray-800 transition"
+                >
+                    닫기
+                </button>
             </div>
         </div>
     );

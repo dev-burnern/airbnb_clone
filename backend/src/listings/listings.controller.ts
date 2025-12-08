@@ -8,6 +8,14 @@ import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger'
 export class ListingsController {
     constructor(private listingsService: ListingsService) { }
 
+    @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
+    @Get('my')
+    @ApiOperation({ summary: '내 숙소 목록 조회' })
+    async findMyListings(@Request() req) {
+        return this.listingsService.findByHost(req.user.id);
+    }
+
     @Get()
     @ApiOperation({ summary: '필터를 적용하여 모든 숙소 목록 조회' })
     @ApiQuery({ name: 'minLat', required: false })

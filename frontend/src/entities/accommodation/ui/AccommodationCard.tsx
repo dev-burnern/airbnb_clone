@@ -28,6 +28,10 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({
   isWished = false,
 }) => {
   const [wished, setWished] = useState(isWished);
+  // isWished prop이 변경될 때마다 wished 상태를 동기화
+  React.useEffect(() => {
+    setWished(isWished);
+  }, [isWished]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -58,6 +62,12 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({
   const handleCloseAll = () => {
     setShowAddModal(false);
     setShowCreateModal(false);
+  };
+
+  // 위시리스트 추가 성공 시 호출되는 콜백
+  const handleWishlistSuccess = () => {
+    setWished(true);
+    handleCloseAll();
   };
 
   const formatPrice = (p: number) => `₩${p.toLocaleString('ko-KR')}`;
@@ -92,8 +102,8 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({
             >
               <Heart
                 className={`h-6 w-6 transition-colors ${wished
-                    ? 'fill-red-500 stroke-red-500'
-                    : 'fill-black/50 stroke-white hover:fill-red-500 hover:stroke-red-500'
+                  ? 'fill-red-500 stroke-red-500'
+                  : 'fill-black/50 stroke-white hover:fill-red-500 hover:stroke-red-500'
                   }`}
               />
             </div>
@@ -141,6 +151,7 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({
         onClose={handleCloseAll}
         listingId={id}
         onCreateNew={handleCreateNewClick}
+        onSuccess={handleWishlistSuccess}
       />
 
       <CreateNewWishlistModal
@@ -148,6 +159,7 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({
         onClose={handleCloseAll}
         onBack={handleBackToAdd}
         listingId={id}
+        onSuccess={handleWishlistSuccess}
       />
     </>
   );

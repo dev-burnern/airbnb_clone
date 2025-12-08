@@ -2,17 +2,26 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json, urlencoded } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ⚡⚡⚡ CORS 설정 추가 (최우선!)
-  app.enableCors({
-    origin: ['http://localhost:3000', 'http://frontend:3000'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  });
+    // ConfigService
+    const configService = app.get(ConfigService);
+    const port = configService.get<number>('PORT', 3001);
+    const apiPrefix = configService.get<string>('API_PREFIX', 'api/v1');
+
+    // Global Prefix
+    app.setGlobalPrefix(apiPrefix);
+
+    // CORS
+    app.enableCors({
+        origin: configService.get<string>('FRONTEND_URL', 'http://localhost:3000'),
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    });
 
   // Global prefix
   app.setGlobalPrefix('api/v1');
